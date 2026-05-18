@@ -95,7 +95,7 @@ export function renderQuoteHtml(args: {
     </div>
     <div style="height:5px;background:#EDBA1A;"></div>
 
-    <div style="padding:36px 48px 30px;">
+    <div style="padding:32px 48px 24px;">
 
       <!-- CLIENTE + FECHA -->
       <table style="width:100%;border-collapse:collapse;">
@@ -191,7 +191,7 @@ export function renderQuoteHtml(args: {
       </table>
 
       <!-- Especificaciones -->
-      <div style="margin-top:28px;">
+      <div style="margin-top:24px;">
         <div style="font-size:9.5px;letter-spacing:0.16em;font-weight:800;color:#1C1E22;margin-bottom:8px;text-transform:uppercase;">Especificaciones del Producto</div>
         <div style="height:1px;background:#E8E8E8;"></div>
         <table style="width:100%;font-size:10.5px;border-collapse:collapse;margin-top:8px;">
