@@ -8,7 +8,6 @@ import {
 } from "@/lib/vialux/constants";
 import type { QuoteState } from "@/hooks/useQuoteState";
 import type { QuoteCalc } from "./generateQuotePdf";
-import logoUrl from "@/assets/vialux-logo.png";
 
 function esc(s: string) {
   return (s || "").replace(/[&<>"]/g, (c) =>
@@ -39,8 +38,9 @@ export function renderQuoteHtml(args: {
   state: QuoteState;
   calc: QuoteCalc;
   deliveryMsg: string;
+  logoDataUrl: string;
 }) {
-  const { folio, state, calc } = args;
+  const { folio, state, calc, logoDataUrl } = args;
   const prod = PRODUCTOS[state.producto];
   const hoy = new Date();
   const vence = new Date(hoy.getTime() + VIGENCIA_DIAS * 24 * 60 * 60 * 1000);
@@ -85,7 +85,7 @@ export function renderQuoteHtml(args: {
 
     <!-- HEADER -->
     <div style="background:#343331;padding:32px 56px 36px;">
-      <img src="${logoUrl}" alt="VIALUX" style="height:78px;display:block;" />
+      <img src="${logoDataUrl}" alt="VIALUX" style="height:78px;display:block;" />
     </div>
     <div style="height:6px;background:#EDBA1A;"></div>
 
