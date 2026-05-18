@@ -51,14 +51,14 @@ export function renderQuoteHtml(args: {
 
   const fleteRow = state.incluyeFlete
     ? `<tr>
-        <td style="padding:10px 0;border-top:1px solid #E8E8E8;vertical-align:top;padding-right:20px;">
-          <div style="font-weight:700;font-size:11px;">ENVÍO VÍA ${esc(
+        <td style="padding:13px 20px 13px 0;border-top:1px solid #E8E8E8;vertical-align:top;">
+          <div style="font-weight:700;font-size:11.5px;">ENVÍO VÍA ${esc(
             (state.fletePaqueteria || "PAQUETERÍA").toUpperCase(),
           )} — ${esc(state.fleteModalidad)}${fleteDestino}</div>
         </td>
-        <td style="padding:10px 0;border-top:1px solid #E8E8E8;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;">1</td>
-        <td style="padding:10px 0;border-top:1px solid #E8E8E8;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px;">—</td>
-        <td style="padding:10px 0;border-top:1px solid #E8E8E8;text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace;font-size:11px;">${formatMoney(
+        <td style="padding:13px 0;border-top:1px solid #E8E8E8;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11.5px;">1</td>
+        <td style="padding:13px 0;border-top:1px solid #E8E8E8;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11.5px;">—</td>
+        <td style="padding:13px 0;border-top:1px solid #E8E8E8;text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace;font-size:11.5px;">${formatMoney(
           calc.subtotalFlete,
         )}</td>
       </tr>`
@@ -67,8 +67,8 @@ export function renderQuoteHtml(args: {
   const ivaRow = state.requiereFactura
     ? `<tr>
         <td colspan="2"></td>
-        <td style="padding:4px 0;text-align:right;color:#6B7280;letter-spacing:0.06em;font-size:10px;">IVA (16%)</td>
-        <td style="padding:4px 0;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px;">${formatMoney(
+        <td style="padding:5px 0;text-align:right;color:#6B7280;letter-spacing:0.06em;font-size:10.5px;">IVA (16%)</td>
+        <td style="padding:5px 0;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11.5px;">${formatMoney(
           calc.iva,
         )}</td>
       </tr>`
@@ -90,139 +90,139 @@ export function renderQuoteHtml(args: {
   <div style="font-family:'Manrope',Arial,sans-serif;color:#1C1E22;background:#ffffff;width:794px;">
 
     <!-- HEADER -->
-    <div style="background:#343331;padding:18px 48px 20px;display:table;width:100%;">
-      <img src="${logoDataUrl}" alt="VIALUX" style="height:52px;display:block;" />
+    <div style="background:#343331;padding:24px 48px 26px;">
+      <img src="${logoDataUrl}" alt="VIALUX" style="height:auto;max-height:64px;width:auto;max-width:220px;display:block;" />
     </div>
-    <div style="height:4px;background:#EDBA1A;"></div>
+    <div style="height:5px;background:#EDBA1A;"></div>
 
-    <div style="padding:22px 48px 16px;">
+    <div style="padding:28px 48px 24px;">
 
       <!-- CLIENTE + FECHA -->
       <table style="width:100%;border-collapse:collapse;">
         <tr>
           <td style="vertical-align:top;">
-            <div style="font-size:9px;letter-spacing:0.2em;color:#8A8F99;text-transform:uppercase;">Cotización para:</div>
-            <div style="font-size:22px;font-weight:800;margin-top:4px;line-height:1.1;letter-spacing:-0.01em;">${esc(state.cliente.toUpperCase())}</div>
-            <div style="margin-top:4px;color:#6B7280;font-size:10px;letter-spacing:0.08em;">ATENDIDO POR: ${EJECUTIVO}</div>
+            <div style="font-size:9.5px;letter-spacing:0.2em;color:#8A8F99;text-transform:uppercase;">Cotización para:</div>
+            <div style="font-size:25px;font-weight:800;margin-top:5px;line-height:1.1;letter-spacing:-0.01em;">${esc(state.cliente.toUpperCase())}</div>
+            <div style="margin-top:5px;color:#6B7280;font-size:10.5px;letter-spacing:0.08em;">ATENDIDO POR: ${EJECUTIVO}</div>
           </td>
           <td style="vertical-align:top;text-align:right;width:38%;">
-            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#1C1E22;font-weight:700;">${fechaLarga(hoy)}</div>
-            <div style="font-size:9px;color:#8A8F99;font-style:italic;margin-top:4px;">VÁLIDA HASTA ${fechaLarga(vence)}</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#1C1E22;font-weight:700;">${fechaLarga(hoy)}</div>
+            <div style="font-size:9.5px;color:#8A8F99;font-style:italic;margin-top:5px;">VÁLIDA HASTA ${fechaLarga(vence)}</div>
           </td>
         </tr>
       </table>
 
       <!-- BADGE + FOLIO -->
-      <table style="width:auto;border-collapse:collapse;margin-top:10px;">
+      <table style="width:auto;border-collapse:collapse;margin-top:14px;">
         <tr>
           <td style="padding:0;">
-            <span style="background:#EDBA1A;color:#1C1E22;padding:5px 12px;border-radius:4px;font-weight:800;font-size:10px;letter-spacing:0.14em;display:inline-block;">SEÑALIZACIÓN VIAL</span>
+            <span style="background:#EDBA1A;color:#1C1E22;padding:6px 14px;border-radius:5px;font-weight:800;font-size:10.5px;letter-spacing:0.14em;display:inline-block;">SEÑALIZACIÓN VIAL</span>
           </td>
-          <td style="padding:0 0 0 12px;">
-            <span style="font-family:'JetBrains Mono',monospace;color:#8A8F99;font-size:11px;">FOLIO: ${esc(folio)}</span>
+          <td style="padding:0 0 0 14px;">
+            <span style="font-family:'JetBrains Mono',monospace;color:#8A8F99;font-size:11.5px;">FOLIO: ${esc(folio)}</span>
           </td>
         </tr>
       </table>
 
-      <div style="height:1px;background:#1C1E22;margin-top:14px;"></div>
+      <div style="height:1px;background:#1C1E22;margin-top:18px;"></div>
 
       <!-- TABLA PRINCIPAL -->
-      <table style="width:100%;border-collapse:collapse;margin-top:10px;font-size:11px;">
+      <table style="width:100%;border-collapse:collapse;margin-top:12px;font-size:11.5px;">
         <thead>
-          <tr style="color:#1C1E22;text-transform:uppercase;letter-spacing:0.1em;font-size:9.5px;">
-            <th style="padding:10px 0;text-align:left;font-weight:800;">Descripción</th>
-            <th style="padding:10px 0;text-align:center;font-weight:800;width:18%;">Cantidad (Pzas)</th>
-            <th style="padding:10px 0;text-align:right;font-weight:800;width:16%;">Precio/Pza</th>
-            <th style="padding:10px 0;text-align:right;font-weight:800;width:18%;">Subtotal</th>
+          <tr style="color:#1C1E22;text-transform:uppercase;letter-spacing:0.1em;font-size:10px;">
+            <th style="padding:12px 0;text-align:left;font-weight:800;">Descripción</th>
+            <th style="padding:12px 0;text-align:center;font-weight:800;width:18%;">Cantidad (Pzas)</th>
+            <th style="padding:12px 0;text-align:right;font-weight:800;width:16%;">Precio/Pza</th>
+            <th style="padding:12px 0;text-align:right;font-weight:800;width:18%;">Subtotal</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td style="padding:10px 0;border-top:1px solid #E8E8E8;vertical-align:top;padding-right:20px;">
-              <div style="font-weight:700;line-height:1.3;font-size:11px;">${esc(prod.descripcion)}</div>
-              <div style="color:#9CA3AF;font-size:9px;margin-top:4px;letter-spacing:0.04em;font-family:'JetBrains Mono',monospace;">${esc(shortSpec(state.producto))}</div>
+            <td style="padding:14px 20px 14px 0;border-top:1px solid #E8E8E8;vertical-align:top;">
+              <div style="font-weight:700;line-height:1.35;font-size:11.5px;">${esc(prod.descripcion)}</div>
+              <div style="color:#9CA3AF;font-size:9.5px;margin-top:5px;letter-spacing:0.04em;font-family:'JetBrains Mono',monospace;">${esc(shortSpec(state.producto))}</div>
             </td>
-            <td style="padding:10px 0;border-top:1px solid #E8E8E8;text-align:center;font-family:'JetBrains Mono',monospace;">${formatInt(state.cantidad)}</td>
-            <td style="padding:10px 0;border-top:1px solid #E8E8E8;text-align:right;font-family:'JetBrains Mono',monospace;">${formatMoney(calc.precioUnitario)}</td>
-            <td style="padding:10px 0;border-top:1px solid #E8E8E8;text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace;">${formatMoney(calc.subtotalProducto)}</td>
+            <td style="padding:14px 0;border-top:1px solid #E8E8E8;text-align:center;font-family:'JetBrains Mono',monospace;">${formatInt(state.cantidad)}</td>
+            <td style="padding:14px 0;border-top:1px solid #E8E8E8;text-align:right;font-family:'JetBrains Mono',monospace;">${formatMoney(calc.precioUnitario)}</td>
+            <td style="padding:14px 0;border-top:1px solid #E8E8E8;text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace;">${formatMoney(calc.subtotalProducto)}</td>
           </tr>
           ${fleteRow}
           <!-- Totales -->
           <tr>
             <td colspan="2"></td>
-            <td style="padding:10px 0 4px;text-align:right;color:#6B7280;letter-spacing:0.08em;font-size:10px;">SUBTOTAL</td>
-            <td style="padding:10px 0 4px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px;">${formatMoney(calc.subtotalGeneral)}</td>
+            <td style="padding:13px 0 5px;text-align:right;color:#6B7280;letter-spacing:0.08em;font-size:10.5px;">SUBTOTAL</td>
+            <td style="padding:13px 0 5px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11.5px;">${formatMoney(calc.subtotalGeneral)}</td>
           </tr>
           ${ivaRow}
           <tr>
             <td colspan="2"></td>
-            <td colspan="2" style="padding:4px 0 0;"><div style="height:2px;background:#EDBA1A;"></div></td>
+            <td colspan="2" style="padding:5px 0 0;"><div style="height:2px;background:#EDBA1A;"></div></td>
           </tr>
           <tr>
             <td colspan="2"></td>
-            <td style="padding:7px 0;text-align:right;font-weight:800;font-size:15px;">TOTAL</td>
-            <td style="padding:7px 0;text-align:right;font-weight:800;font-size:17px;color:#C99B0E;font-family:'JetBrains Mono',monospace;">${formatMoney(calc.total)}</td>
+            <td style="padding:9px 0;text-align:right;font-weight:800;font-size:16px;">TOTAL</td>
+            <td style="padding:9px 0;text-align:right;font-weight:800;font-size:18px;color:#C99B0E;font-family:'JetBrains Mono',monospace;">${formatMoney(calc.total)}</td>
           </tr>
         </tbody>
       </table>
 
       <!-- Entrega + Pago -->
-      <table style="width:100%;border-collapse:separate;border-spacing:12px 0;margin-top:12px;">
+      <table style="width:100%;border-collapse:separate;border-spacing:14px 0;margin-top:18px;">
         <tr>
           <td style="width:50%;vertical-align:top;padding:0;">
-            <div style="font-size:9px;letter-spacing:0.16em;font-weight:800;color:#1C1E22;margin-bottom:6px;text-transform:uppercase;">Tiempo de Entrega</div>
-            <div style="border:1px solid #E5E7EB;border-radius:8px;padding:12px 14px;">
-              <div style="font-weight:700;letter-spacing:0.04em;font-size:11px;">${esc(args.deliveryMsg)}</div>
+            <div style="font-size:9.5px;letter-spacing:0.16em;font-weight:800;color:#1C1E22;margin-bottom:7px;text-transform:uppercase;">Tiempo de Entrega</div>
+            <div style="border:1px solid #E5E7EB;border-radius:8px;padding:14px 16px;">
+              <div style="font-weight:700;letter-spacing:0.04em;font-size:11.5px;">${esc(args.deliveryMsg)}</div>
               ${state.incluyeFlete
-                ? `<div style="color:#6B7280;font-size:10px;margin-top:4px;">ENTREGA VÍA ${esc((state.fletePaqueteria || "PAQUETERÍA").toUpperCase())}${state.cp ? ` · CP ${esc(state.cp)}` : ""}</div>`
-                : `<div style="color:#6B7280;font-size:10px;margin-top:4px;">RECOLECCIÓN EN PLANTA</div>`
+                ? `<div style="color:#6B7280;font-size:10.5px;margin-top:5px;">ENTREGA VÍA ${esc((state.fletePaqueteria || "PAQUETERÍA").toUpperCase())}${state.cp ? ` · CP ${esc(state.cp)}` : ""}</div>`
+                : `<div style="color:#6B7280;font-size:10.5px;margin-top:5px;">RECOLECCIÓN EN PLANTA</div>`
               }
             </div>
           </td>
           <td style="width:50%;vertical-align:top;padding:0;">
-            <div style="font-size:9px;letter-spacing:0.16em;font-weight:800;color:#1C1E22;margin-bottom:6px;text-transform:uppercase;">Forma de Pago</div>
-            <div style="border:1px solid #E5E7EB;border-radius:8px;padding:12px 14px;">
-              <div style="font-weight:700;letter-spacing:0.04em;font-size:11px;">TRANSFERENCIA BANCARIA</div>
-              <div style="color:#6B7280;font-size:10px;margin-top:4px;">PAGO ANTICIPADO REQUERIDO</div>
-              <div style="color:#6B7280;font-size:10px;">DATOS BANCARIOS AL CONFIRMAR ORDEN</div>
+            <div style="font-size:9.5px;letter-spacing:0.16em;font-weight:800;color:#1C1E22;margin-bottom:7px;text-transform:uppercase;">Forma de Pago</div>
+            <div style="border:1px solid #E5E7EB;border-radius:8px;padding:14px 16px;">
+              <div style="font-weight:700;letter-spacing:0.04em;font-size:11.5px;">TRANSFERENCIA BANCARIA</div>
+              <div style="color:#6B7280;font-size:10.5px;margin-top:5px;">PAGO ANTICIPADO REQUERIDO</div>
+              <div style="color:#6B7280;font-size:10.5px;margin-top:3px;">DATOS BANCARIOS AL CONFIRMAR ORDEN</div>
             </div>
           </td>
         </tr>
       </table>
 
       <!-- Especificaciones -->
-      <div style="margin-top:16px;">
-        <div style="font-size:9px;letter-spacing:0.16em;font-weight:800;color:#1C1E22;margin-bottom:6px;text-transform:uppercase;">Especificaciones del Producto</div>
+      <div style="margin-top:22px;">
+        <div style="font-size:9.5px;letter-spacing:0.16em;font-weight:800;color:#1C1E22;margin-bottom:8px;text-transform:uppercase;">Especificaciones del Producto</div>
         <div style="height:1px;background:#E8E8E8;"></div>
-        <table style="width:100%;font-size:10px;border-collapse:collapse;margin-top:6px;">
+        <table style="width:100%;font-size:10.5px;border-collapse:collapse;margin-top:8px;">
           ${pairs.map(([a, b]) => `
             <tr>
-              <td style="padding:3px 0;color:#C99B0E;font-weight:800;letter-spacing:0.06em;width:15%;font-size:9px;">${esc(a.label)}</td>
-              <td style="padding:3px 0;width:35%;font-size:10px;">${esc(a.value)}</td>
-              <td style="padding:3px 0;color:#C99B0E;font-weight:800;letter-spacing:0.06em;width:15%;font-size:9px;">${b ? esc(b.label) : ""}</td>
-              <td style="padding:3px 0;width:35%;font-size:10px;">${b ? esc(b.value) : ""}</td>
+              <td style="padding:5px 0;color:#C99B0E;font-weight:800;letter-spacing:0.06em;width:15%;font-size:9.5px;">${esc(a.label)}</td>
+              <td style="padding:5px 0;width:35%;font-size:10.5px;">${esc(a.value)}</td>
+              <td style="padding:5px 0;color:#C99B0E;font-weight:800;letter-spacing:0.06em;width:15%;font-size:9.5px;">${b ? esc(b.label) : ""}</td>
+              <td style="padding:5px 0;width:35%;font-size:10.5px;">${b ? esc(b.value) : ""}</td>
             </tr>`).join("")}
         </table>
       </div>
 
       <!-- Términos -->
-      <div style="margin-top:14px;">
+      <div style="margin-top:18px;">
         <div style="height:1px;background:#E8E8E8;"></div>
-        <div style="font-size:9px;letter-spacing:0.16em;font-weight:800;color:#1C1E22;margin-top:10px;text-transform:uppercase;">Términos y Condiciones</div>
-        <div style="margin-top:6px;font-size:9.5px;color:#6B7280;line-height:1.45;">
-          <span style="color:#4A6274;font-weight:800;letter-spacing:0.08em;font-size:9px;">POLÍTICA DE CAMBIOS Y DEVOLUCIONES — </span>UNA VEZ ENTREGADO EL PRODUCTO, NO SE ACEPTAN CAMBIOS NI DEVOLUCIONES, SALVO DEFECTO DE FABRICACIÓN NOTIFICADO AL MOMENTO DE LA ENTREGA.
+        <div style="font-size:9.5px;letter-spacing:0.16em;font-weight:800;color:#1C1E22;margin-top:12px;text-transform:uppercase;">Términos y Condiciones</div>
+        <div style="margin-top:8px;font-size:10px;color:#6B7280;line-height:1.5;">
+          <span style="color:#4A6274;font-weight:800;letter-spacing:0.08em;font-size:9.5px;">POLÍTICA DE CAMBIOS Y DEVOLUCIONES — </span>UNA VEZ ENTREGADO EL PRODUCTO, NO SE ACEPTAN CAMBIOS NI DEVOLUCIONES, SALVO DEFECTO DE FABRICACIÓN NOTIFICADO AL MOMENTO DE LA ENTREGA.
         </div>
-        <div style="margin-top:5px;font-size:9.5px;color:#6B7280;line-height:1.45;">
-          <span style="color:#4A6274;font-weight:800;letter-spacing:0.08em;font-size:9px;">ACEPTACIÓN DE LOS TÉRMINOS — </span>LA ACEPTACIÓN DE ESTA COTIZACIÓN IMPLICA CONFORMIDAD TOTAL CON LOS TÉRMINOS ESTABLECIDOS. LA ORDEN DEBE RECIBIRSE POR ESCRITO.
+        <div style="margin-top:7px;font-size:10px;color:#6B7280;line-height:1.5;">
+          <span style="color:#4A6274;font-weight:800;letter-spacing:0.08em;font-size:9.5px;">ACEPTACIÓN DE LOS TÉRMINOS — </span>LA ACEPTACIÓN DE ESTA COTIZACIÓN IMPLICA CONFORMIDAD TOTAL CON LOS TÉRMINOS ESTABLECIDOS. LA ORDEN DEBE RECIBIRSE POR ESCRITO.
         </div>
       </div>
 
     </div>
 
     <!-- FOOTER -->
-    <div style="background:#343331;color:#fff;padding:14px 48px;text-align:center;font-size:9.5px;letter-spacing:0.18em;text-transform:uppercase;">
+    <div style="background:#343331;color:#fff;padding:16px 48px;text-align:center;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;">
       <div style="font-weight:700;">SEÑALIZACIÓN VIAL DE PRECISIÓN · DISPONIBILIDAD INMEDIATA · ENVÍO NACIONAL</div>
-      <div style="color:#9aa3ad;margin-top:5px;font-size:9px;letter-spacing:0.22em;">MONTERREY, NUEVO LEÓN, MÉXICO</div>
+      <div style="color:#9aa3ad;margin-top:6px;font-size:9.5px;letter-spacing:0.22em;">MONTERREY, NUEVO LEÓN, MÉXICO</div>
     </div>
 
   </div>
