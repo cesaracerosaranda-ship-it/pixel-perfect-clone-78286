@@ -48,16 +48,7 @@ export async function generateQuotePdf(args: {
         margin: 0,
         filename,
         image: { type: "jpeg", quality: 0.98 },
-        html2canvas: {
-          scale: 2,
-          useCORS: true,
-          backgroundColor: "#ffffff",
-          onclone: (clonedDoc: Document) => {
-            // html2canvas no soporta oklch (Tailwind v4) — removemos todos los
-            // stylesheets del clon; el template usa 100% inline styles con hex.
-            clonedDoc.querySelectorAll('link[rel="stylesheet"], style').forEach((el) => el.remove());
-          },
-        },
+        html2canvas: { scale: 2, useCORS: true, backgroundColor: "#ffffff" },
         jsPDF: { unit: "pt", format: "a4", orientation: "portrait" },
       })
       .save();
