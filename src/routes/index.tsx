@@ -29,6 +29,7 @@ function CotizadorPage() {
   const { state, setState, update, reset, calc } = useQuoteState();
   const [savedFolio, setSavedFolio] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
   // Prefill if duplicating
   useEffect(() => {
@@ -40,6 +41,7 @@ function CotizadorPage() {
         .eq("id", duplicate)
         .maybeSingle();
       if (!data) return;
+      const parentFolio = data.folio_padre ?? data.folio;
       const next: QuoteState = {
         ...initialQuote,
         cliente: data.cliente_nombre,
@@ -52,7 +54,8 @@ function CotizadorPage() {
         precioEspecialOn: data.precio_especial,
         precioEspecial: data.precio_especial ? Number(data.precio_unitario) : 0,
         notas: data.notas_internas ?? "",
-        revision: 0,
+        revision: (data.revision ?? 0) + 1,
+        folioPadre: parentFolio,
         incluyeFlete: data.incluye_flete,
         fletePaqueteria: data.flete_paqueteria ?? "",
         fleteModalidad:
@@ -71,20 +74,22 @@ function CotizadorPage() {
 
   const ensureFolio = async (): Promise<string> => {
     if (savedFolio) return savedFolio;
-    const folio = await generateFolio(state.revision, null);
+    const folio = await generateFolio(state.revision, state.folioPadre);
     setSavedFolio(folio);
     return folio;
   };
 
-  const validate = () => {
-    if (!state.cliente.trim()) return "Falta el nombre del cliente";
-    if (!state.cantidad || state.cantidad <= 0) return "Falta la cantidad";
-    return null;
+  const validate = (): Record<string, string> | null => {
+    const errs: Record<string, string> = {};
+    if (!state.cliente.trim()) errs.cliente = "Requerido";
+    if (!state.cantidad || state.cantidad <= 0) errs.cantidad = "Requerido";
+    return Object.keys(errs).length ? errs : null;
   };
 
   const handleSave = async () => {
-    const err = validate();
-    if (err) return toast.error(err);
+    const errs = validate();
+    if (errs) { setFormErrors(errs); return; }
+    setFormErrors({});
     try {
       setSaving(true);
       const folio = await ensureFolio();
@@ -114,7 +119,7 @@ function CotizadorPage() {
         margen_porcentaje: Number(calc.margen.toFixed(2)),
         estado: "cotizado",
         revision: state.revision,
-        folio_padre: null,
+        folio_padre: state.folioPadre,
         notas_internas: state.notas,
       };
       const { error } = await supabase.from("cotizaciones").insert(row);
@@ -128,8 +133,9 @@ function CotizadorPage() {
   };
 
   const handlePdf = async () => {
-    const err = validate();
-    if (err) return toast.error(err);
+    const errs = validate();
+    if (errs) { setFormErrors(errs); return; }
+    setFormErrors({});
     try {
       const folio = await ensureFolio();
       await generateQuotePdf({ folio, state, calc, deliveryMsg });
@@ -152,6 +158,7 @@ function CotizadorPage() {
   const handleReset = () => {
     reset();
     setSavedFolio(null);
+    setFormErrors({});
     toast.info("Formulario limpiado");
   };
 
@@ -172,7 +179,7 @@ function CotizadorPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
-        <QuoteForm state={state} update={update} />
+        <QuoteForm state={state} update={update} errors={formErrors} />
         <div className="space-y-4">
           <PriceSummary
             calc={calc}

@@ -18,6 +18,7 @@ export type QuoteState = {
   precioEspecial: number;
   notas: string;
   revision: number;
+  folioPadre: string | null;
   incluyeFlete: boolean;
   fletePaqueteria: string;
   fleteModalidad: "ENTREGA A DOMICILIO" | "OCURRE";
@@ -36,6 +37,7 @@ export const initialQuote: QuoteState = {
   precioEspecial: 0,
   notas: "",
   revision: 0,
+  folioPadre: null,
   incluyeFlete: false,
   fletePaqueteria: "",
   fleteModalidad: "ENTREGA A DOMICILIO",
@@ -60,8 +62,7 @@ export function useQuoteState(initial: QuoteState = initialQuote) {
     const subtotalProducto = precioUnitario * (state.cantidad || 0);
     const subtotalFlete = state.incluyeFlete ? state.fleteCosto || 0 : 0;
     const subtotalGeneral = subtotalProducto + subtotalFlete;
-    // IVA aplica sólo al producto (flete sin IVA, como en el formato VIALUX)
-    const iva = state.requiereFactura ? subtotalProducto * IVA_RATE : 0;
+    const iva = state.requiereFactura ? subtotalGeneral * IVA_RATE : 0;
     const total = subtotalGeneral + iva;
     const margen =
       precioUnitario > 0 ? ((precioUnitario - COSTO_BASE) / precioUnitario) * 100 : 0;

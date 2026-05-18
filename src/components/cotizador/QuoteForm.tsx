@@ -18,20 +18,30 @@ import type { QuoteState } from "@/hooks/useQuoteState";
 type Props = {
   state: QuoteState;
   update: <K extends keyof QuoteState>(k: K, v: QuoteState[K]) => void;
+  errors?: Record<string, string>;
 };
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
+function Field({
+  label,
+  error,
+  children,
+}: {
+  label: string;
+  error?: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="space-y-1.5">
       <Label className="text-[10px] uppercase tracking-[0.16em] text-[#6B8899]">
         {label}
       </Label>
       {children}
+      {error && <p className="text-xs text-red-400">{error}</p>}
     </div>
   );
 }
 
-export function QuoteForm({ state, update }: Props) {
+export function QuoteForm({ state, update, errors = {} }: Props) {
   return (
     <div className="space-y-6">
       <section className="rounded-lg border border-border bg-card p-5">
@@ -39,11 +49,12 @@ export function QuoteForm({ state, update }: Props) {
           Cliente
         </h3>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <Field label="Nombre del cliente *">
+          <Field label="Nombre del cliente *" error={errors.cliente}>
             <Input
               value={state.cliente}
               onChange={(e) => update("cliente", e.target.value)}
               placeholder="EJ. JUAN PÉREZ"
+              className={errors.cliente ? "border-red-400" : ""}
             />
           </Field>
           <Field label="Empresa">
@@ -116,7 +127,7 @@ export function QuoteForm({ state, update }: Props) {
         </RadioGroup>
 
         <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-3">
-          <Field label="Cantidad *">
+          <Field label="Cantidad *" error={errors.cantidad}>
             <div className="flex items-center gap-2">
               <Button
                 type="button"
@@ -131,7 +142,7 @@ export function QuoteForm({ state, update }: Props) {
                 min={0}
                 value={state.cantidad || ""}
                 onChange={(e) => update("cantidad", Number(e.target.value) || 0)}
-                className="font-mono text-center"
+                className={`font-mono text-center${errors.cantidad ? " border-red-400" : ""}`}
               />
               <Button
                 type="button"

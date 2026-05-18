@@ -73,7 +73,7 @@ export function renderQuoteHtml(args: {
   const ivaRow = state.requiereFactura
     ? `<tr>
         <td colspan="2"></td>
-        <td style="padding:6px 0;text-align:right;color:#6B7280;letter-spacing:0.08em;font-size:11px;">IVA (16%) PRODUCTO</td>
+        <td style="padding:6px 0;text-align:right;color:#6B7280;letter-spacing:0.08em;font-size:11px;">IVA (16%)</td>
         <td style="padding:6px 0;text-align:right;font-family:'JetBrains Mono',monospace;">${formatMoney(
           calc.iva,
         )}</td>
