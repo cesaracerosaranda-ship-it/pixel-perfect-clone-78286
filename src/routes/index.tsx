@@ -20,11 +20,33 @@ export const Route = createFileRoute("/")({
   component: CotizadorPage,
   validateSearch: (s: Record<string, unknown>) => ({
     duplicate: typeof s.duplicate === "string" ? s.duplicate : undefined,
+    clienteId: typeof s.clienteId === "string" ? s.clienteId : undefined,
   }),
 });
 
+async function upsertCliente(state: QuoteState): Promise<string | null> {
+  if (!state.cliente.trim()) return null;
+  const nombre = state.cliente.trim().toUpperCase();
+  const { data: existing } = await supabase
+    .from("clientes")
+    .select("id")
+    .eq("nombre", nombre)
+    .maybeSingle();
+  if (existing) return existing.id;
+  const { data: created } = await supabase
+    .from("clientes")
+    .insert({
+      nombre,
+      empresa: (state.empresa || "").trim().toUpperCase(),
+      telefono: state.telefono.trim(),
+    })
+    .select("id")
+    .single();
+  return created?.id ?? null;
+}
+
 function CotizadorPage() {
-  const { duplicate } = Route.useSearch();
+  const { duplicate, clienteId } = Route.useSearch();
   const navigate = useNavigate();
   const { state, setState, update, reset, calc } = useQuoteState();
   const [savedFolio, setSavedFolio] = useState<string | null>(null);
@@ -70,6 +92,28 @@ function CotizadorPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [duplicate]);
 
+  // Prefill from client directory
+  useEffect(() => {
+    if (!clienteId) return;
+    (async () => {
+      const { data } = await supabase
+        .from("clientes")
+        .select("*")
+        .eq("id", clienteId)
+        .maybeSingle();
+      if (!data) return;
+      setState((s) => ({
+        ...s,
+        cliente: data.nombre,
+        empresa: data.empresa ?? "",
+        telefono: data.telefono ?? "",
+      }));
+      void navigate({ to: "/", search: {} as never, replace: true });
+      toast.success(`Cliente ${data.nombre} cargado`);
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clienteId]);
+
   const deliveryMsg = deliveryMessage(state.cp, state.cantidad);
 
   const ensureFolio = async (): Promise<string> => {
@@ -92,10 +136,14 @@ function CotizadorPage() {
     setFormErrors({});
     try {
       setSaving(true);
-      const folio = await ensureFolio();
+      const [folio, clienteIdLinked] = await Promise.all([
+        ensureFolio(),
+        upsertCliente(state),
+      ]);
       const prod = PRODUCTOS[state.producto];
       const row: Omit<QuoteRow, "id" | "fecha"> = {
         folio,
+        cliente_id: clienteIdLinked,
         cliente_nombre: state.cliente.toUpperCase(),
         cliente_empresa: (state.empresa || "-").toUpperCase(),
         cliente_telefono: state.telefono,

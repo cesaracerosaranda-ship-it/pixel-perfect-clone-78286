@@ -11,7 +11,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Minus, Plus } from "lucide-react";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Minus, Plus, Users } from "lucide-react";
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { PRODUCTOS, formatMoney } from "@/lib/vialux/constants";
 import type { QuoteState } from "@/hooks/useQuoteState";
 
@@ -41,13 +56,79 @@ function Field({
   );
 }
 
+type ClienteOption = { id: string; nombre: string; empresa: string; telefono: string };
+
+function ClientSearch({
+  onSelect,
+}: {
+  onSelect: (c: ClienteOption) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [clientes, setClientes] = useState<ClienteOption[]>([]);
+
+  useEffect(() => {
+    if (!open) return;
+    supabase
+      .from("clientes")
+      .select("id, nombre, empresa, telefono")
+      .order("nombre")
+      .then(({ data }) => setClientes(data ?? []));
+  }, [open]);
+
+  return (
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <Button variant="outline" size="sm" className="gap-2 text-[10px] uppercase tracking-[0.14em]">
+          <Users className="h-3.5 w-3.5" /> Buscar cliente existente
+        </Button>
+      </PopoverTrigger>
+      <PopoverContent className="w-80 p-0" align="start">
+        <Command>
+          <CommandInput placeholder="Nombre o empresa..." />
+          <CommandList>
+            <CommandEmpty>Sin resultados.</CommandEmpty>
+            <CommandGroup>
+              {clientes.map((c) => (
+                <CommandItem
+                  key={c.id}
+                  value={`${c.nombre} ${c.empresa}`}
+                  onSelect={() => {
+                    onSelect(c);
+                    setOpen(false);
+                  }}
+                >
+                  <div>
+                    <div className="font-semibold uppercase">{c.nombre}</div>
+                    {c.empresa && (
+                      <div className="text-xs text-muted-foreground">{c.empresa}</div>
+                    )}
+                  </div>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </Command>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 export function QuoteForm({ state, update, errors = {} }: Props) {
   return (
     <div className="space-y-6">
       <section className="rounded-lg border border-border bg-card p-5">
-        <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-[#EDBA1A]">
-          Cliente
-        </h3>
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-[#EDBA1A]">
+            Cliente
+          </h3>
+          <ClientSearch
+            onSelect={(c) => {
+              update("cliente", c.nombre);
+              update("empresa", c.empresa);
+              update("telefono", c.telefono);
+            }}
+          />
+        </div>
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           <Field label="Nombre del cliente *" error={errors.cliente}>
             <Input

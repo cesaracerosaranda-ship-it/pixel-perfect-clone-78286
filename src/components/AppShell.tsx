@@ -1,10 +1,11 @@
 import { Link } from "@tanstack/react-router";
-import { Calculator, ClipboardList } from "lucide-react";
+import { Calculator, ClipboardList, Users } from "lucide-react";
 import type { ReactNode } from "react";
 
 const tabs = [
   { to: "/", label: "Cotizador", icon: Calculator },
   { to: "/historial", label: "Historial", icon: ClipboardList },
+  { to: "/clientes", label: "Clientes", icon: Users },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {

@@ -16,6 +16,7 @@ export type QuoteRow = {
   id?: string;
   folio: string;
   fecha?: string;
+  cliente_id?: string | null;
   cliente_nombre: string;
   cliente_empresa: string;
   cliente_telefono: string;
