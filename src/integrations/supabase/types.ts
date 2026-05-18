@@ -14,13 +14,144 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      cotizaciones: {
+        Row: {
+          cantidad: number
+          cliente_empresa: string
+          cliente_nombre: string
+          cliente_telefono: string | null
+          cp_destino: string | null
+          created_at: string
+          descripcion_producto: string
+          estado: string
+          estado_destino: string | null
+          fecha: string
+          flete_costo: number | null
+          flete_modalidad: string | null
+          flete_paqueteria: string | null
+          folio: string
+          folio_padre: string | null
+          id: string
+          incluye_flete: boolean
+          iva: number | null
+          margen_porcentaje: number | null
+          municipio: string | null
+          notas_internas: string | null
+          precio_especial: boolean
+          precio_unitario: number
+          producto: string
+          requiere_factura: boolean
+          revision: number
+          subtotal_general: number
+          subtotal_producto: number
+          total: number
+          updated_at: string
+        }
+        Insert: {
+          cantidad?: number
+          cliente_empresa?: string
+          cliente_nombre?: string
+          cliente_telefono?: string | null
+          cp_destino?: string | null
+          created_at?: string
+          descripcion_producto?: string
+          estado?: string
+          estado_destino?: string | null
+          fecha?: string
+          flete_costo?: number | null
+          flete_modalidad?: string | null
+          flete_paqueteria?: string | null
+          folio: string
+          folio_padre?: string | null
+          id?: string
+          incluye_flete?: boolean
+          iva?: number | null
+          margen_porcentaje?: number | null
+          municipio?: string | null
+          notas_internas?: string | null
+          precio_especial?: boolean
+          precio_unitario?: number
+          producto?: string
+          requiere_factura?: boolean
+          revision?: number
+          subtotal_general?: number
+          subtotal_producto?: number
+          total?: number
+          updated_at?: string
+        }
+        Update: {
+          cantidad?: number
+          cliente_empresa?: string
+          cliente_nombre?: string
+          cliente_telefono?: string | null
+          cp_destino?: string | null
+          created_at?: string
+          descripcion_producto?: string
+          estado?: string
+          estado_destino?: string | null
+          fecha?: string
+          flete_costo?: number | null
+          flete_modalidad?: string | null
+          flete_paqueteria?: string | null
+          folio?: string
+          folio_padre?: string | null
+          id?: string
+          incluye_flete?: boolean
+          iva?: number | null
+          margen_porcentaje?: number | null
+          municipio?: string | null
+          notas_internas?: string | null
+          precio_especial?: boolean
+          precio_unitario?: number
+          producto?: string
+          requiere_factura?: boolean
+          revision?: number
+          subtotal_general?: number
+          subtotal_producto?: number
+          total?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      folio_counter: {
+        Row: {
+          id: number
+          last_number: number
+        }
+        Insert: {
+          id?: number
+          last_number?: number
+        }
+        Update: {
+          id?: number
+          last_number?: number
+        }
+        Relationships: []
+      }
+      inventario: {
+        Row: {
+          boyas_disponibles: number
+          id: number
+          updated_at: string
+        }
+        Insert: {
+          boyas_disponibles?: number
+          id?: number
+          updated_at?: string
+        }
+        Update: {
+          boyas_disponibles?: number
+          id?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      next_folio: { Args: { p_year: number }; Returns: string }
     }
     Enums: {
       [_ in never]: never
