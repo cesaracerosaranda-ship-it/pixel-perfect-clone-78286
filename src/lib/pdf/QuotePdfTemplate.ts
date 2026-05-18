@@ -51,14 +51,14 @@ export function renderQuoteHtml(args: {
 
   const fleteRow = state.incluyeFlete
     ? `<tr>
-        <td style="padding:13px 20px 13px 0;border-top:1px solid #E8E8E8;vertical-align:top;">
+        <td style="padding:16px 20px 16px 0;border-top:1px solid #E8E8E8;vertical-align:top;">
           <div style="font-weight:700;font-size:11.5px;">ENVÍO VÍA ${esc(
             (state.fletePaqueteria || "PAQUETERÍA").toUpperCase(),
           )} — ${esc(state.fleteModalidad)}${fleteDestino}</div>
         </td>
-        <td style="padding:13px 0;border-top:1px solid #E8E8E8;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11.5px;">1</td>
-        <td style="padding:13px 0;border-top:1px solid #E8E8E8;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11.5px;">—</td>
-        <td style="padding:13px 0;border-top:1px solid #E8E8E8;text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace;font-size:11.5px;">${formatMoney(
+        <td style="padding:16px 0;border-top:1px solid #E8E8E8;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11.5px;">1</td>
+        <td style="padding:16px 0;border-top:1px solid #E8E8E8;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11.5px;">—</td>
+        <td style="padding:16px 0;border-top:1px solid #E8E8E8;text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace;font-size:11.5px;">${formatMoney(
           calc.subtotalFlete,
         )}</td>
       </tr>`
@@ -67,8 +67,8 @@ export function renderQuoteHtml(args: {
   const ivaRow = state.requiereFactura
     ? `<tr>
         <td colspan="2"></td>
-        <td style="padding:5px 0;text-align:right;color:#6B7280;letter-spacing:0.06em;font-size:10.5px;">IVA (16%)</td>
-        <td style="padding:5px 0;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11.5px;">${formatMoney(
+        <td style="padding:6px 0;text-align:right;color:#6B7280;letter-spacing:0.06em;font-size:10.5px;">IVA (16%)</td>
+        <td style="padding:6px 0;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11.5px;">${formatMoney(
           calc.iva,
         )}</td>
       </tr>`
@@ -90,12 +90,12 @@ export function renderQuoteHtml(args: {
   <div style="font-family:'Manrope',Arial,sans-serif;color:#1C1E22;background:#ffffff;width:794px;">
 
     <!-- HEADER -->
-    <div style="background:#343331;padding:24px 48px 26px;">
-      <img src="${logoDataUrl}" alt="VIALUX" style="height:auto;max-height:64px;width:auto;max-width:220px;display:block;" />
+    <div style="background:#343331;padding:28px 48px 30px;">
+      <img src="${logoDataUrl}" alt="VIALUX" style="height:auto;max-height:80px;width:auto;max-width:240px;display:block;" />
     </div>
     <div style="height:5px;background:#EDBA1A;"></div>
 
-    <div style="padding:28px 48px 24px;">
+    <div style="padding:36px 48px 30px;">
 
       <!-- CLIENTE + FECHA -->
       <table style="width:100%;border-collapse:collapse;">
@@ -113,7 +113,7 @@ export function renderQuoteHtml(args: {
       </table>
 
       <!-- BADGE + FOLIO -->
-      <table style="width:auto;border-collapse:collapse;margin-top:14px;">
+      <table style="width:auto;border-collapse:collapse;margin-top:18px;">
         <tr>
           <td style="padding:0;">
             <span style="background:#EDBA1A;color:#1C1E22;padding:6px 14px;border-radius:5px;font-weight:800;font-size:10.5px;letter-spacing:0.14em;display:inline-block;">SEÑALIZACIÓN VIAL</span>
@@ -124,10 +124,10 @@ export function renderQuoteHtml(args: {
         </tr>
       </table>
 
-      <div style="height:1px;background:#1C1E22;margin-top:18px;"></div>
+      <div style="height:1px;background:#1C1E22;margin-top:22px;"></div>
 
       <!-- TABLA PRINCIPAL -->
-      <table style="width:100%;border-collapse:collapse;margin-top:12px;font-size:11.5px;">
+      <table style="width:100%;border-collapse:collapse;margin-top:14px;font-size:11.5px;">
         <thead>
           <tr style="color:#1C1E22;text-transform:uppercase;letter-spacing:0.1em;font-size:10px;">
             <th style="padding:12px 0;text-align:left;font-weight:800;">Descripción</th>
@@ -138,20 +138,20 @@ export function renderQuoteHtml(args: {
         </thead>
         <tbody>
           <tr>
-            <td style="padding:14px 20px 14px 0;border-top:1px solid #E8E8E8;vertical-align:top;">
+            <td style="padding:18px 20px 18px 0;border-top:1px solid #E8E8E8;vertical-align:top;">
               <div style="font-weight:700;line-height:1.35;font-size:11.5px;">${esc(prod.descripcion)}</div>
               <div style="color:#9CA3AF;font-size:9.5px;margin-top:5px;letter-spacing:0.04em;font-family:'JetBrains Mono',monospace;">${esc(shortSpec(state.producto))}</div>
             </td>
-            <td style="padding:14px 0;border-top:1px solid #E8E8E8;text-align:center;font-family:'JetBrains Mono',monospace;">${formatInt(state.cantidad)}</td>
-            <td style="padding:14px 0;border-top:1px solid #E8E8E8;text-align:right;font-family:'JetBrains Mono',monospace;">${formatMoney(calc.precioUnitario)}</td>
-            <td style="padding:14px 0;border-top:1px solid #E8E8E8;text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace;">${formatMoney(calc.subtotalProducto)}</td>
+            <td style="padding:18px 0;border-top:1px solid #E8E8E8;text-align:center;font-family:'JetBrains Mono',monospace;">${formatInt(state.cantidad)}</td>
+            <td style="padding:18px 0;border-top:1px solid #E8E8E8;text-align:right;font-family:'JetBrains Mono',monospace;">${formatMoney(calc.precioUnitario)}</td>
+            <td style="padding:18px 0;border-top:1px solid #E8E8E8;text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace;">${formatMoney(calc.subtotalProducto)}</td>
           </tr>
           ${fleteRow}
           <!-- Totales -->
           <tr>
             <td colspan="2"></td>
-            <td style="padding:13px 0 5px;text-align:right;color:#6B7280;letter-spacing:0.08em;font-size:10.5px;">SUBTOTAL</td>
-            <td style="padding:13px 0 5px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11.5px;">${formatMoney(calc.subtotalGeneral)}</td>
+            <td style="padding:16px 0 6px;text-align:right;color:#6B7280;letter-spacing:0.08em;font-size:10.5px;">SUBTOTAL</td>
+            <td style="padding:16px 0 6px;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11.5px;">${formatMoney(calc.subtotalGeneral)}</td>
           </tr>
           ${ivaRow}
           <tr>
@@ -160,18 +160,18 @@ export function renderQuoteHtml(args: {
           </tr>
           <tr>
             <td colspan="2"></td>
-            <td style="padding:9px 0;text-align:right;font-weight:800;font-size:16px;">TOTAL</td>
-            <td style="padding:9px 0;text-align:right;font-weight:800;font-size:18px;color:#C99B0E;font-family:'JetBrains Mono',monospace;">${formatMoney(calc.total)}</td>
+            <td style="padding:11px 0;text-align:right;font-weight:800;font-size:16px;">TOTAL</td>
+            <td style="padding:11px 0;text-align:right;font-weight:800;font-size:18px;color:#C99B0E;font-family:'JetBrains Mono',monospace;">${formatMoney(calc.total)}</td>
           </tr>
         </tbody>
       </table>
 
       <!-- Entrega + Pago -->
-      <table style="width:100%;border-collapse:separate;border-spacing:14px 0;margin-top:18px;">
+      <table style="width:100%;border-collapse:separate;border-spacing:14px 0;margin-top:24px;">
         <tr>
           <td style="width:50%;vertical-align:top;padding:0;">
             <div style="font-size:9.5px;letter-spacing:0.16em;font-weight:800;color:#1C1E22;margin-bottom:7px;text-transform:uppercase;">Tiempo de Entrega</div>
-            <div style="border:1px solid #E5E7EB;border-radius:8px;padding:14px 16px;">
+            <div style="border:1px solid #E5E7EB;border-radius:8px;padding:18px 18px;">
               <div style="font-weight:700;letter-spacing:0.04em;font-size:11.5px;">${esc(args.deliveryMsg)}</div>
               ${state.incluyeFlete
                 ? `<div style="color:#6B7280;font-size:10.5px;margin-top:5px;">ENTREGA VÍA ${esc((state.fletePaqueteria || "PAQUETERÍA").toUpperCase())}${state.cp ? ` · CP ${esc(state.cp)}` : ""}</div>`
@@ -181,7 +181,7 @@ export function renderQuoteHtml(args: {
           </td>
           <td style="width:50%;vertical-align:top;padding:0;">
             <div style="font-size:9.5px;letter-spacing:0.16em;font-weight:800;color:#1C1E22;margin-bottom:7px;text-transform:uppercase;">Forma de Pago</div>
-            <div style="border:1px solid #E5E7EB;border-radius:8px;padding:14px 16px;">
+            <div style="border:1px solid #E5E7EB;border-radius:8px;padding:18px 18px;">
               <div style="font-weight:700;letter-spacing:0.04em;font-size:11.5px;">TRANSFERENCIA BANCARIA</div>
               <div style="color:#6B7280;font-size:10.5px;margin-top:5px;">PAGO ANTICIPADO REQUERIDO</div>
               <div style="color:#6B7280;font-size:10.5px;margin-top:3px;">DATOS BANCARIOS AL CONFIRMAR ORDEN</div>
@@ -191,28 +191,28 @@ export function renderQuoteHtml(args: {
       </table>
 
       <!-- Especificaciones -->
-      <div style="margin-top:22px;">
+      <div style="margin-top:28px;">
         <div style="font-size:9.5px;letter-spacing:0.16em;font-weight:800;color:#1C1E22;margin-bottom:8px;text-transform:uppercase;">Especificaciones del Producto</div>
         <div style="height:1px;background:#E8E8E8;"></div>
         <table style="width:100%;font-size:10.5px;border-collapse:collapse;margin-top:8px;">
           ${pairs.map(([a, b]) => `
             <tr>
-              <td style="padding:5px 0;color:#C99B0E;font-weight:800;letter-spacing:0.06em;width:15%;font-size:9.5px;">${esc(a.label)}</td>
-              <td style="padding:5px 0;width:35%;font-size:10.5px;">${esc(a.value)}</td>
-              <td style="padding:5px 0;color:#C99B0E;font-weight:800;letter-spacing:0.06em;width:15%;font-size:9.5px;">${b ? esc(b.label) : ""}</td>
-              <td style="padding:5px 0;width:35%;font-size:10.5px;">${b ? esc(b.value) : ""}</td>
+              <td style="padding:6px 0;color:#C99B0E;font-weight:800;letter-spacing:0.06em;width:15%;font-size:9.5px;">${esc(a.label)}</td>
+              <td style="padding:6px 0;width:35%;font-size:10.5px;">${esc(a.value)}</td>
+              <td style="padding:6px 0;color:#C99B0E;font-weight:800;letter-spacing:0.06em;width:15%;font-size:9.5px;">${b ? esc(b.label) : ""}</td>
+              <td style="padding:6px 0;width:35%;font-size:10.5px;">${b ? esc(b.value) : ""}</td>
             </tr>`).join("")}
         </table>
       </div>
 
       <!-- Términos -->
-      <div style="margin-top:18px;">
+      <div style="margin-top:24px;">
         <div style="height:1px;background:#E8E8E8;"></div>
         <div style="font-size:9.5px;letter-spacing:0.16em;font-weight:800;color:#1C1E22;margin-top:12px;text-transform:uppercase;">Términos y Condiciones</div>
-        <div style="margin-top:8px;font-size:10px;color:#6B7280;line-height:1.5;">
+        <div style="margin-top:12px;font-size:10px;color:#6B7280;line-height:1.5;">
           <span style="color:#4A6274;font-weight:800;letter-spacing:0.08em;font-size:9.5px;">POLÍTICA DE CAMBIOS Y DEVOLUCIONES — </span>UNA VEZ ENTREGADO EL PRODUCTO, NO SE ACEPTAN CAMBIOS NI DEVOLUCIONES, SALVO DEFECTO DE FABRICACIÓN NOTIFICADO AL MOMENTO DE LA ENTREGA.
         </div>
-        <div style="margin-top:7px;font-size:10px;color:#6B7280;line-height:1.5;">
+        <div style="margin-top:10px;font-size:10px;color:#6B7280;line-height:1.5;">
           <span style="color:#4A6274;font-weight:800;letter-spacing:0.08em;font-size:9.5px;">ACEPTACIÓN DE LOS TÉRMINOS — </span>LA ACEPTACIÓN DE ESTA COTIZACIÓN IMPLICA CONFORMIDAD TOTAL CON LOS TÉRMINOS ESTABLECIDOS. LA ORDEN DEBE RECIBIRSE POR ESCRITO.
         </div>
       </div>
