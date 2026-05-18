@@ -42,6 +42,8 @@ type Cliente = {
   telefono: string;
   email: string;
   notas: string;
+  contacto_nombre: string;
+  contacto_telefono: string;
   created_at: string;
 };
 
@@ -95,6 +97,8 @@ function ClientDetail({
     telefono: cliente.telefono,
     email: cliente.email,
     notas: cliente.notas,
+    contacto_nombre: cliente.contacto_nombre,
+    contacto_telefono: cliente.contacto_telefono,
   });
 
   const save = async () => {
@@ -173,43 +177,94 @@ function ClientDetail({
 
       {/* Info */}
       {editing ? (
-        <div className="space-y-3 rounded-lg border border-border bg-card p-4">
-          <div className="space-y-1.5">
-            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">Empresa</Label>
-            <Input value={form.empresa} onChange={(e) => setForm((f) => ({ ...f, empresa: e.target.value }))} />
+        <div className="space-y-4 rounded-lg border border-border bg-card p-4">
+          <div>
+            <div className="mb-2 text-[9px] font-bold uppercase tracking-[0.18em] text-[#EDBA1A]">Dirigida a (aparece en PDF)</div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">Empresa</Label>
+                <Input value={form.empresa} onChange={(e) => setForm((f) => ({ ...f, empresa: e.target.value }))} />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">Teléfono</Label>
+                <Input value={form.telefono} onChange={(e) => setForm((f) => ({ ...f, telefono: e.target.value }))} className="font-mono" />
+              </div>
+            </div>
+            <div className="mt-3 space-y-1.5">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">Email</Label>
+              <Input value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
+            </div>
           </div>
-          <div className="space-y-1.5">
-            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">Teléfono</Label>
-            <Input value={form.telefono} onChange={(e) => setForm((f) => ({ ...f, telefono: e.target.value }))} className="font-mono" />
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">Email</Label>
-            <Input value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
+          <div className="h-px bg-border" />
+          <div>
+            <div className="mb-2 text-[9px] font-bold uppercase tracking-[0.18em] text-[#6B8899]">Contacto (quién solicita)</div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">Nombre</Label>
+                <Input value={form.contacto_nombre} onChange={(e) => setForm((f) => ({ ...f, contacto_nombre: e.target.value }))} placeholder="EJ. ANA MEDINA" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">Teléfono</Label>
+                <Input value={form.contacto_telefono} onChange={(e) => setForm((f) => ({ ...f, contacto_telefono: e.target.value }))} className="font-mono" placeholder="8112345678" />
+              </div>
+            </div>
           </div>
           <div className="space-y-1.5">
             <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">Notas internas</Label>
-            <Textarea value={form.notas} onChange={(e) => setForm((f) => ({ ...f, notas: e.target.value }))} rows={3} />
+            <Textarea value={form.notas} onChange={(e) => setForm((f) => ({ ...f, notas: e.target.value }))} rows={2} />
           </div>
         </div>
       ) : (
-        <div className="space-y-2 rounded-lg border border-border bg-card p-4 text-sm">
-          {cliente.telefono && (
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Teléfono</span>
-              <span className="font-mono">{cliente.telefono}</span>
+        <div className="space-y-3 rounded-lg border border-border bg-card p-4 text-sm">
+          {(cliente.telefono || cliente.empresa || cliente.email) && (
+            <div>
+              <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#EDBA1A]">Dirigida a</div>
+              <div className="space-y-1">
+                {cliente.empresa && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Empresa</span>
+                    <span>{cliente.empresa}</span>
+                  </div>
+                )}
+                {cliente.telefono && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Teléfono</span>
+                    <span className="font-mono">{cliente.telefono}</span>
+                  </div>
+                )}
+                {cliente.email && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Email</span>
+                    <span>{cliente.email}</span>
+                  </div>
+                )}
+              </div>
             </div>
           )}
-          {cliente.email && (
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Email</span>
-              <span>{cliente.email}</span>
+          {(cliente.contacto_nombre || cliente.contacto_telefono) && (
+            <div>
+              <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#6B8899]">Contacto (quien solicita)</div>
+              <div className="space-y-1">
+                {cliente.contacto_nombre && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Nombre</span>
+                    <span className="font-semibold uppercase">{cliente.contacto_nombre}</span>
+                  </div>
+                )}
+                {cliente.contacto_telefono && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Teléfono</span>
+                    <span className="font-mono">{cliente.contacto_telefono}</span>
+                  </div>
+                )}
+              </div>
             </div>
+          )}
+          {!cliente.telefono && !cliente.email && !cliente.contacto_nombre && !cliente.empresa && (
+            <p className="text-xs text-muted-foreground">Sin información adicional. Haz clic en editar para agregar.</p>
           )}
           {cliente.notas && (
-            <div className="mt-2 text-xs text-muted-foreground">{cliente.notas}</div>
-          )}
-          {!cliente.telefono && !cliente.email && !cliente.notas && (
-            <p className="text-xs text-muted-foreground">Sin información adicional. Haz clic en editar para agregar.</p>
+            <p className="text-xs text-muted-foreground border-t border-border pt-2">{cliente.notas}</p>
           )}
         </div>
       )}
@@ -253,6 +308,11 @@ function ClientDetail({
 
 // ─── New Cliente Dialog ────────────────────────────────────────────────────────
 
+const emptyForm = {
+  nombre: "", empresa: "", telefono: "", email: "",
+  contacto_nombre: "", contacto_telefono: "",
+};
+
 function NuevoClienteDialog({
   open,
   onOpenChange,
@@ -262,8 +322,11 @@ function NuevoClienteDialog({
   onOpenChange: (v: boolean) => void;
   onCreated: () => void;
 }) {
-  const [form, setForm] = useState({ nombre: "", empresa: "", telefono: "", email: "" });
+  const [form, setForm] = useState(emptyForm);
   const [saving, setSaving] = useState(false);
+
+  const f = (k: keyof typeof emptyForm) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm((prev) => ({ ...prev, [k]: e.target.value }));
 
   const submit = async () => {
     if (!form.nombre.trim()) { toast.error("El nombre es requerido"); return; }
@@ -273,59 +336,81 @@ function NuevoClienteDialog({
       empresa: form.empresa.trim().toUpperCase(),
       telefono: form.telefono.trim(),
       email: form.email.trim(),
+      contacto_nombre: form.contacto_nombre.trim().toUpperCase(),
+      contacto_telefono: form.contacto_telefono.trim(),
     });
     setSaving(false);
     if (error) { toast.error(error.message); return; }
     toast.success("Cliente agregado");
-    setForm({ nombre: "", empresa: "", telefono: "", email: "" });
+    setForm(emptyForm);
     onOpenChange(false);
     onCreated();
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle className="uppercase tracking-wider">Nuevo Cliente</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4 py-2">
-          <div className="space-y-1.5">
-            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">Nombre *</Label>
-            <Input
-              value={form.nombre}
-              onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))}
-              placeholder="EJ. JUAN PÉREZ"
-              onKeyDown={(e) => e.key === "Enter" && submit()}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">Empresa</Label>
-            <Input
-              value={form.empresa}
-              onChange={(e) => setForm((f) => ({ ...f, empresa: e.target.value }))}
-              placeholder="—"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">Teléfono</Label>
-              <Input
-                value={form.telefono}
-                onChange={(e) => setForm((f) => ({ ...f, telefono: e.target.value }))}
-                placeholder="8112345678"
-                className="font-mono"
-              />
+
+        <div className="space-y-5 py-2">
+          {/* Sección: Dirigida a */}
+          <div>
+            <div className="mb-3 text-[9px] font-bold uppercase tracking-[0.18em] text-[#EDBA1A]">
+              Dirigida a — aparece en el PDF
             </div>
-            <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">Email</Label>
-              <Input
-                value={form.email}
-                onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
-                placeholder="correo@ejemplo.com"
-              />
+            <div className="space-y-3">
+              <div className="space-y-1.5">
+                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">Nombre *</Label>
+                <Input
+                  value={form.nombre}
+                  onChange={f("nombre")}
+                  placeholder="EJ. ITZARE DAYAN MONTIEL"
+                  autoFocus
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">Empresa</Label>
+                  <Input value={form.empresa} onChange={f("empresa")} placeholder="—" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">Teléfono</Label>
+                  <Input value={form.telefono} onChange={f("telefono")} placeholder="8112345678" className="font-mono" />
+                </div>
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">Email</Label>
+                <Input value={form.email} onChange={f("email")} placeholder="correo@ejemplo.com" />
+              </div>
+            </div>
+          </div>
+
+          <div className="relative flex items-center gap-3">
+            <div className="h-px flex-1 bg-border" />
+            <span className="text-[9px] uppercase tracking-[0.16em] text-muted-foreground">Contacto (opcional)</span>
+            <div className="h-px flex-1 bg-border" />
+          </div>
+
+          {/* Sección: Contacto */}
+          <div>
+            <div className="mb-3 text-[9px] font-bold uppercase tracking-[0.18em] text-[#6B8899]">
+              Quién solicita la cotización
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">Nombre del contacto</Label>
+                <Input value={form.contacto_nombre} onChange={f("contacto_nombre")} placeholder="EJ. ANA MEDINA" />
+              </div>
+              <div className="space-y-1.5">
+                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">Teléfono del contacto</Label>
+                <Input value={form.contacto_telefono} onChange={f("contacto_telefono")} placeholder="8112345678" className="font-mono" />
+              </div>
             </div>
           </div>
         </div>
+
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
           <Button

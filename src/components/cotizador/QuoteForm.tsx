@@ -56,13 +56,12 @@ function Field({
   );
 }
 
-type ClienteOption = { id: string; nombre: string; empresa: string; telefono: string };
+type ClienteOption = {
+  id: string; nombre: string; empresa: string; telefono: string;
+  contacto_nombre: string; contacto_telefono: string;
+};
 
-function ClientSearch({
-  onSelect,
-}: {
-  onSelect: (c: ClienteOption) => void;
-}) {
+function ClientSearch({ onSelect }: { onSelect: (c: ClienteOption) => void }) {
   const [open, setOpen] = useState(false);
   const [clientes, setClientes] = useState<ClienteOption[]>([]);
 
@@ -70,9 +69,9 @@ function ClientSearch({
     if (!open) return;
     supabase
       .from("clientes")
-      .select("id, nombre, empresa, telefono")
+      .select("id, nombre, empresa, telefono, contacto_nombre, contacto_telefono")
       .order("nombre")
-      .then(({ data }) => setClientes(data ?? []));
+      .then(({ data }) => setClientes((data as ClienteOption[]) ?? []));
   }, [open]);
 
   return (
@@ -82,25 +81,26 @@ function ClientSearch({
           <Users className="h-3.5 w-3.5" /> Buscar cliente existente
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-0" align="start">
+      <PopoverContent className="w-96 p-0" align="start">
         <Command>
-          <CommandInput placeholder="Nombre o empresa..." />
+          <CommandInput placeholder="Nombre, empresa o contacto..." />
           <CommandList>
             <CommandEmpty>Sin resultados.</CommandEmpty>
             <CommandGroup>
               {clientes.map((c) => (
                 <CommandItem
                   key={c.id}
-                  value={`${c.nombre} ${c.empresa}`}
-                  onSelect={() => {
-                    onSelect(c);
-                    setOpen(false);
-                  }}
+                  value={`${c.nombre} ${c.empresa} ${c.contacto_nombre}`}
+                  onSelect={() => { onSelect(c); setOpen(false); }}
                 >
-                  <div>
+                  <div className="w-full">
                     <div className="font-semibold uppercase">{c.nombre}</div>
-                    {c.empresa && (
-                      <div className="text-xs text-muted-foreground">{c.empresa}</div>
+                    {c.empresa && <div className="text-xs text-muted-foreground">{c.empresa}</div>}
+                    {c.contacto_nombre && (
+                      <div className="mt-0.5 text-[10px] text-[#6B8899]">
+                        Solicita: {c.contacto_nombre}
+                        {c.contacto_telefono && ` · ${c.contacto_telefono}`}
+                      </div>
                     )}
                   </div>
                 </CommandItem>

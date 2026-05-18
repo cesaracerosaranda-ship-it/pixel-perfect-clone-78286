@@ -22,6 +22,8 @@ export type Database = {
           telefono: string
           email: string
           notas: string
+          contacto_nombre: string
+          contacto_telefono: string
           created_at: string
           updated_at: string
         }
@@ -32,6 +34,8 @@ export type Database = {
           telefono?: string
           email?: string
           notas?: string
+          contacto_nombre?: string
+          contacto_telefono?: string
           created_at?: string
           updated_at?: string
         }
@@ -42,6 +46,8 @@ export type Database = {
           telefono?: string
           email?: string
           notas?: string
+          contacto_nombre?: string
+          contacto_telefono?: string
           created_at?: string
           updated_at?: string
         }

@@ -1,0 +1,60 @@
+-- Crea la tabla clientes de forma idempotente
+CREATE TABLE IF NOT EXISTS public.clientes (
+  id UUID NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
+  nombre TEXT NOT NULL,                        -- Destinatario de la cotización (aparece en el PDF)
+  empresa TEXT NOT NULL DEFAULT '',
+  telefono TEXT NOT NULL DEFAULT '',
+  email TEXT NOT NULL DEFAULT '',
+  notas TEXT NOT NULL DEFAULT '',
+  contacto_nombre TEXT NOT NULL DEFAULT '',    -- Persona con quien se tiene la comunicación
+  contacto_telefono TEXT NOT NULL DEFAULT '',  -- Teléfono del contacto
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+-- RLS
+ALTER TABLE public.clientes ENABLE ROW LEVEL SECURITY;
+
+DO $$ BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'clientes' AND policyname = 'Public all clientes'
+  ) THEN
+    CREATE POLICY "Public all clientes" ON public.clientes FOR ALL USING (true) WITH CHECK (true);
+  END IF;
+END $$;
+
+-- Trigger updated_at
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_trigger WHERE tgname = 'clientes_updated_at') THEN
+    CREATE TRIGGER clientes_updated_at
+      BEFORE UPDATE ON public.clientes
+      FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
+  END IF;
+END $$;
+
+-- Agregar columnas de contacto si la tabla ya existía sin ellas
+ALTER TABLE public.clientes
+  ADD COLUMN IF NOT EXISTS contacto_nombre TEXT NOT NULL DEFAULT '',
+  ADD COLUMN IF NOT EXISTS contacto_telefono TEXT NOT NULL DEFAULT '';
+
+-- FK en cotizaciones (idempotente)
+ALTER TABLE public.cotizaciones
+  ADD COLUMN IF NOT EXISTS cliente_id UUID REFERENCES public.clientes(id) ON DELETE SET NULL;
+
+-- Poblar clientes desde cotizaciones existentes
+INSERT INTO public.clientes (nombre, empresa, telefono)
+SELECT DISTINCT ON (cliente_nombre)
+  cliente_nombre,
+  COALESCE(NULLIF(TRIM(cliente_empresa), ''), ''),
+  COALESCE(cliente_telefono, '')
+FROM public.cotizaciones
+WHERE TRIM(cliente_nombre) != ''
+ON CONFLICT DO NOTHING
+ORDER BY cliente_nombre, fecha DESC;
+
+-- Vincular cotizaciones con sus clientes
+UPDATE public.cotizaciones c
+SET cliente_id = cl.id
+FROM public.clientes cl
+WHERE c.cliente_nombre = cl.nombre
+  AND c.cliente_id IS NULL;
