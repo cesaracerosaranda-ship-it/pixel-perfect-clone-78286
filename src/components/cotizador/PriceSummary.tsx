@@ -41,7 +41,7 @@ export function PriceSummary({
   );
 
   return (
-    <div className="sticky top-6 space-y-4 rounded-lg border border-border bg-card p-5">
+    <div className="space-y-4 rounded-lg border border-border bg-card p-5">
       <div>
         <div className="text-[10px] uppercase tracking-[0.2em] text-[#6B8899]">
           Resumen

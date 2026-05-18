@@ -180,7 +180,7 @@ function CotizadorPage() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
         <QuoteForm state={state} update={update} errors={formErrors} />
-        <div className="space-y-4">
+        <div className="space-y-4 lg:sticky lg:top-6 lg:self-start">
           <PriceSummary
             calc={calc}
             requiereFactura={state.requiereFactura}
