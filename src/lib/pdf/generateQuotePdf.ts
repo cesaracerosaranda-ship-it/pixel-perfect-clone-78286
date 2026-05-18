@@ -37,6 +37,19 @@ export async function generateQuotePdf(args: {
 }) {
   const { folio, state, calc } = args;
 
+  // Precarga Manrope y JetBrains Mono en el documento principal para que
+  // estén en caché cuando html2canvas renderice el contenido del PDF.
+  const fontsLoaded = document.head.querySelector("#vialux-pdf-fonts");
+  if (!fontsLoaded) {
+    const link = document.createElement("link");
+    link.id = "vialux-pdf-fonts";
+    link.rel = "stylesheet";
+    link.href =
+      "https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap";
+    document.head.appendChild(link);
+  }
+  await document.fonts.ready;
+
   const logoDataUrl = await toDataUrl(logoUrl);
   const html = renderQuoteHtml({ ...args, logoDataUrl });
 
