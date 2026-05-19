@@ -14,10 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      clientes: {
+        Row: {
+          contacto_nombre: string
+          contacto_telefono: string
+          created_at: string
+          email: string
+          empresa: string
+          id: string
+          nombre: string
+          notas: string
+          telefono: string
+          updated_at: string
+        }
+        Insert: {
+          contacto_nombre?: string
+          contacto_telefono?: string
+          created_at?: string
+          email?: string
+          empresa?: string
+          id?: string
+          nombre: string
+          notas?: string
+          telefono?: string
+          updated_at?: string
+        }
+        Update: {
+          contacto_nombre?: string
+          contacto_telefono?: string
+          created_at?: string
+          email?: string
+          empresa?: string
+          id?: string
+          nombre?: string
+          notas?: string
+          telefono?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       cotizaciones: {
         Row: {
           cantidad: number
           cliente_empresa: string
+          cliente_id: string | null
           cliente_nombre: string
           cliente_telefono: string | null
           cp_destino: string | null
@@ -50,6 +90,7 @@ export type Database = {
         Insert: {
           cantidad?: number
           cliente_empresa?: string
+          cliente_id?: string | null
           cliente_nombre?: string
           cliente_telefono?: string | null
           cp_destino?: string | null
@@ -82,6 +123,7 @@ export type Database = {
         Update: {
           cantidad?: number
           cliente_empresa?: string
+          cliente_id?: string | null
           cliente_nombre?: string
           cliente_telefono?: string | null
           cp_destino?: string | null
@@ -111,7 +153,15 @@ export type Database = {
           total?: number
           updated_at?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "cotizaciones_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       folio_counter: {
         Row: {
