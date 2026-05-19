@@ -14,50 +14,10 @@ export type Database = {
   }
   public: {
     Tables: {
-      clientes: {
-        Row: {
-          id: string
-          nombre: string
-          empresa: string
-          telefono: string
-          email: string
-          notas: string
-          contacto_nombre: string
-          contacto_telefono: string
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          nombre: string
-          empresa?: string
-          telefono?: string
-          email?: string
-          notas?: string
-          contacto_nombre?: string
-          contacto_telefono?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          nombre?: string
-          empresa?: string
-          telefono?: string
-          email?: string
-          notas?: string
-          contacto_nombre?: string
-          contacto_telefono?: string
-          created_at?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       cotizaciones: {
         Row: {
           cantidad: number
           cliente_empresa: string
-          cliente_id: string | null
           cliente_nombre: string
           cliente_telefono: string | null
           cp_destino: string | null
@@ -90,7 +50,6 @@ export type Database = {
         Insert: {
           cantidad?: number
           cliente_empresa?: string
-          cliente_id?: string | null
           cliente_nombre?: string
           cliente_telefono?: string | null
           cp_destino?: string | null
@@ -123,7 +82,6 @@ export type Database = {
         Update: {
           cantidad?: number
           cliente_empresa?: string
-          cliente_id?: string | null
           cliente_nombre?: string
           cliente_telefono?: string | null
           cp_destino?: string | null
