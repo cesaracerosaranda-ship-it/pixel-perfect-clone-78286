@@ -29,6 +29,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PRODUCTOS, formatMoney } from "@/lib/vialux/constants";
 import type { QuoteState } from "@/hooks/useQuoteState";
+import { CarriersPanel } from "./CarriersPanel";
 
 type Props = {
   state: QuoteState;
@@ -166,6 +167,8 @@ export function QuoteForm({ state, update, errors = {} }: Props) {
           </Field>
         </div>
       </section>
+
+      <CarriersPanel cp={state.cp} />
 
       <section className="rounded-lg border border-border bg-card p-5">
         <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-[#EDBA1A]">

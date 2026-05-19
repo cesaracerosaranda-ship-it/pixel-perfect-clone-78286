@@ -118,12 +118,32 @@ function HistorialPage() {
   }, [cotizacionesQuery.data, search, filter]);
 
   const changeStatus = async (id: string, estado: Estado) => {
+    if (estado === "cerrado") {
+      const row = cotizacionesQuery.data?.find((r) => r.id === id);
+      const inv = inventarioQuery.data?.boyas_disponibles ?? 0;
+      if (row && row.estado !== "cerrado" && inv < row.cantidad) {
+        toast.error(
+          `Sin stock suficiente — ${inv} boyas disponibles, se requieren ${row.cantidad}`,
+        );
+        return;
+      }
+    }
+
     const { error } = await supabase
       .from("cotizaciones")
       .update({ estado })
       .eq("id", id);
-    if (error) toast.error(error.message);
-    else toast.success(`Estado: ${ESTADO_LABEL[estado]}`);
+
+    if (error) {
+      if (error.message.includes("Stock insuficiente")) {
+        const inv = inventarioQuery.data?.boyas_disponibles ?? "?";
+        toast.error(`Sin stock — solo ${inv} boyas disponibles`);
+      } else {
+        toast.error(error.message);
+      }
+    } else {
+      toast.success(`Estado: ${ESTADO_LABEL[estado]}`);
+    }
   };
 
   const removeRow = async (id: string) => {

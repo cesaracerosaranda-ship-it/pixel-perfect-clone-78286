@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Calculator, ClipboardList, Users } from "lucide-react";
 import type { ReactNode } from "react";
+import { InventarioBadge } from "./InventarioBadge";
 
 const tabs = [
   { to: "/", label: "Cotizador", icon: Calculator },
@@ -24,6 +25,8 @@ export function AppShell({ children }: { children: ReactNode }) {
               </div>
             </div>
           </Link>
+          <div className="flex items-center gap-3">
+          <InventarioBadge />
           <nav className="flex items-center gap-1">
             {tabs.map((t) => {
               const Icon = t.icon;
@@ -44,6 +47,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               );
             })}
           </nav>
+          </div>
         </div>
       </header>
 
