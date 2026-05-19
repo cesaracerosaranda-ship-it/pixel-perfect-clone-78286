@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      carrier_coverage: {
+        Row: {
+          ciudad_destino: string
+          cp: string
+          created_at: string
+          direccion: string
+          estado: string
+          fuente_url: string
+          id: string
+          lat: number | null
+          lng: number | null
+          paqueteria: string
+        }
+        Insert: {
+          ciudad_destino: string
+          cp?: string
+          created_at?: string
+          direccion?: string
+          estado: string
+          fuente_url?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          paqueteria: string
+        }
+        Update: {
+          ciudad_destino?: string
+          cp?: string
+          created_at?: string
+          direccion?: string
+          estado?: string
+          fuente_url?: string
+          id?: string
+          lat?: number | null
+          lng?: number | null
+          paqueteria?: string
+        }
+        Relationships: []
+      }
       clientes: {
         Row: {
           contacto_nombre: string
