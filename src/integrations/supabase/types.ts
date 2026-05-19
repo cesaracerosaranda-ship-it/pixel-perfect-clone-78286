@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      codigos_postales: {
+        Row: {
+          cp: string
+          municipio: string
+          estado: string
+          estado_clave: string
+          lat: number | null
+          lng: number | null
+        }
+        Insert: {
+          cp: string
+          municipio: string
+          estado: string
+          estado_clave: string
+          lat?: number | null
+          lng?: number | null
+        }
+        Update: {
+          cp?: string
+          municipio?: string
+          estado?: string
+          estado_clave?: string
+          lat?: number | null
+          lng?: number | null
+        }
+        Relationships: []
+      }
       carrier_coverage: {
         Row: {
           ciudad_destino: string

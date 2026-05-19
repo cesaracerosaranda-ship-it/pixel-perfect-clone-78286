@@ -47,7 +47,10 @@ export function renderQuoteHtml(args: {
   const pairs: Array<[typeof SPECS[number], typeof SPECS[number] | undefined]> = [];
   for (let i = 0; i < SPECS.length; i += 2) pairs.push([SPECS[i], SPECS[i + 1]]);
 
-  const fleteDestino = state.cp ? `, A CP ${esc(state.cp)}` : "";
+  const lugarDestino = state.municipio && state.estadoNombre
+    ? ` — ${esc(state.municipio.toUpperCase())}, ${esc(state.estadoNombre.toUpperCase())}`
+    : "";
+  const fleteDestino = state.cp ? `, A CP ${esc(state.cp)}${lugarDestino}` : "";
 
   // Sección TIEMPO DE ENTREGA: comportamiento diferenciado por escenario
   const isLocalCp = /^6[4-7]/.test(state.cp || "");
@@ -58,11 +61,13 @@ export function renderQuoteHtml(args: {
     : esc(args.deliveryMsg);
   const deliverySub = state.incluyeFlete
     ? state.cp
-      ? `DESTINO: CP ${esc(state.cp)}`
+      ? `DESTINO: CP ${esc(state.cp)}${lugarDestino}`
       : ""
     : isLocalCp
       ? "RECOLECCIÓN EN PLANTA"
-      : "FLETE SE COTIZA POR SEPARADO";
+      : state.cp && state.municipio
+        ? `CP ${esc(state.cp)}${lugarDestino}`
+        : "FLETE SE COTIZA POR SEPARADO";
 
   const fleteRow = state.incluyeFlete
     ? `<tr>

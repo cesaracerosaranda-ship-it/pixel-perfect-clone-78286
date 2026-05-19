@@ -6,7 +6,7 @@ import type { Tables } from "@/integrations/supabase/types";
 
 type CoverageRow = Tables<"carrier_coverage">;
 
-type Props = { cp: string };
+type Props = { cp: string; clientLat?: number | null; clientLng?: number | null };
 
 function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): number {
   const R = 6371;
@@ -20,23 +20,12 @@ function haversineKm(lat1: number, lng1: number, lat2: number, lng2: number): nu
   return Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
 }
 
-function clientCoords(cp: string, rows: CoverageRow[], estado: string): [number, number] {
-  const cpNum = parseInt(cp, 10);
-  if (!isNaN(cpNum)) {
-    const withCoords = rows.filter(
-      (r) => r.cp !== null && r.lat !== null && r.lng !== null,
-    );
-    if (withCoords.length > 0) {
-      const nearest = withCoords.reduce((best, r) => {
-        const diff = Math.abs(parseInt(r.cp!, 10) - cpNum);
-        const bestDiff = Math.abs(parseInt(best.cp!, 10) - cpNum);
-        return diff < bestDiff ? r : best;
-      });
-      if (nearest.lat !== null && nearest.lng !== null) {
-        return [nearest.lat, nearest.lng];
-      }
-    }
-  }
+function resolveClientCoords(
+  clientLat: number | null | undefined,
+  clientLng: number | null | undefined,
+  estado: string,
+): [number, number] {
+  if (clientLat != null && clientLng != null) return [clientLat, clientLng];
   return STATE_COORDS[estado] ?? [23.6345, -102.5528];
 }
 
@@ -60,7 +49,7 @@ type CarrierEntry = {
   webUrl: string | null;
 };
 
-export function CarriersPanel({ cp }: Props) {
+export function CarriersPanel({ cp, clientLat, clientLng }: Props) {
   const estado = cpToEstado(cp);
 
   const { data, isLoading, isError } = useQuery({
@@ -139,7 +128,7 @@ export function CarriersPanel({ cp }: Props) {
   }
 
   // Compute client reference coordinates
-  const [cLat, cLng] = clientCoords(cp, data, estado);
+  const [cLat, cLng] = resolveClientCoords(clientLat, clientLng, estado);
 
   // Group by carrier, keep nearest branch
   const byCarrier = new Map<string, CarrierEntry>();

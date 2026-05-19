@@ -11,6 +11,8 @@ export type QuoteState = {
   empresa: string;
   telefono: string;
   cp: string;
+  municipio: string;
+  estadoNombre: string;
   producto: ProductoKey;
   cantidad: number;
   requiereFactura: boolean;
@@ -30,6 +32,8 @@ export const initialQuote: QuoteState = {
   empresa: "",
   telefono: "",
   cp: "",
+  municipio: "",
+  estadoNombre: "",
   producto: "boya_clavos",
   cantidad: 0,
   requiereFactura: true,

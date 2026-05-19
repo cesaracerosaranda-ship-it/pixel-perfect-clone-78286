@@ -29,6 +29,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PRODUCTOS, formatMoney } from "@/lib/vialux/constants";
 import type { QuoteState } from "@/hooks/useQuoteState";
+import { useCpLookup } from "@/hooks/useCpLookup";
 import { CarriersPanel } from "./CarriersPanel";
 
 type Props = {
@@ -115,6 +116,19 @@ function ClientSearch({ onSelect }: { onSelect: (c: ClienteOption) => void }) {
 }
 
 export function QuoteForm({ state, update, errors = {} }: Props) {
+  const { data: cpData } = useCpLookup(state.cp);
+
+  useEffect(() => {
+    if (state.cp.length === 5 && cpData) {
+      update("municipio", cpData.municipio);
+      update("estadoNombre", cpData.estado);
+    } else if (state.cp.length < 5) {
+      update("municipio", "");
+      update("estadoNombre", "");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.cp, cpData]);
+
   return (
     <div className="space-y-6">
       <section className="rounded-lg border border-border bg-card p-5">
@@ -164,11 +178,16 @@ export function QuoteForm({ state, update, errors = {} }: Props) {
               className="font-mono"
               maxLength={5}
             />
+            {state.cp.length === 5 && cpData && (
+              <p className="mt-1 font-mono text-[11px] uppercase tracking-wide text-[#6B8899]">
+                {cpData.municipio}, {cpData.estado}
+              </p>
+            )}
           </Field>
         </div>
       </section>
 
-      <CarriersPanel cp={state.cp} />
+      <CarriersPanel cp={state.cp} clientLat={cpData?.lat ?? null} clientLng={cpData?.lng ?? null} />
 
       <section className="rounded-lg border border-border bg-card p-5">
         <h3 className="mb-4 text-xs font-bold uppercase tracking-[0.18em] text-[#EDBA1A]">
