@@ -58,12 +58,12 @@ export type Database = {
           cantidad: number
           cliente_empresa: string
           cliente_id: string | null
-          es_historica: boolean
           cliente_nombre: string
           cliente_telefono: string | null
           cp_destino: string | null
           created_at: string
           descripcion_producto: string
+          es_historica: boolean
           estado: string
           estado_destino: string | null
           fecha: string
