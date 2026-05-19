@@ -152,6 +152,43 @@ export function cpToEstado(cp: string): string | null {
   return match?.[2] ?? null;
 }
 
+// Approximate coords for each state capital (lat, lng) — used as fallback when
+// carrier_coverage has no rows with a parseable CP close to the client's CP.
+export const STATE_COORDS: Record<string, [number, number]> = {
+  AGS: [21.8853, -102.2916],
+  BCN: [32.6245, -115.4523],
+  BCS: [24.1426, -110.3128],
+  CAMP: [19.8301, -90.5349],
+  CDMX: [19.4326, -99.1332],
+  COAH: [25.4232, -101.0053],
+  COL: [19.2452, -103.7241],
+  CHIS: [16.7569, -93.1292],
+  CHIH: [28.6353, -106.0889],
+  DGO: [24.0277, -104.6532],
+  GTO: [21.019, -101.2574],
+  GRO: [17.5506, -99.5017],
+  HGO: [20.0911, -98.7624],
+  JAL: [20.6597, -103.3496],
+  MEX: [19.2826, -99.6558],
+  MICH: [19.7008, -101.1844],
+  MOR: [18.9242, -99.2216],
+  NAY: [21.7514, -104.8455],
+  NL: [25.6866, -100.3161],
+  OAX: [17.0732, -96.7266],
+  PUE: [19.0414, -98.2063],
+  QRO: [20.5888, -100.3899],
+  QROO: [21.1743, -86.8466],
+  SLP: [22.1565, -100.9855],
+  SIN: [24.8091, -107.394],
+  SON: [29.0729, -110.9559],
+  TAB: [17.9869, -92.9303],
+  TAMPS: [23.7369, -99.1411],
+  TLAX: [19.3182, -98.2375],
+  VER: [19.1738, -96.1342],
+  YUC: [20.9674, -89.5926],
+  ZAC: [22.7709, -102.5832],
+};
+
 export function carriersForCp(cp: string): Carrier[] {
   const estado = cpToEstado(cp);
   if (!estado || estado === "NL") return [];
