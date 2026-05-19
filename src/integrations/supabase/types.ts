@@ -63,6 +63,7 @@ export type Database = {
           cp_destino: string | null
           created_at: string
           descripcion_producto: string
+          es_historica: boolean
           estado: string
           estado_destino: string | null
           fecha: string
@@ -96,6 +97,7 @@ export type Database = {
           cp_destino?: string | null
           created_at?: string
           descripcion_producto?: string
+          es_historica?: boolean
           estado?: string
           estado_destino?: string | null
           fecha?: string
@@ -129,6 +131,7 @@ export type Database = {
           cp_destino?: string | null
           created_at?: string
           descripcion_producto?: string
+          es_historica?: boolean
           estado?: string
           estado_destino?: string | null
           fecha?: string
