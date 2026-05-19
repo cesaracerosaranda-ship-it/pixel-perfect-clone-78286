@@ -3,6 +3,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -27,16 +30,27 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Copy, Trash2, Search, Package } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Copy, Trash2, Search, Package, Truck, History } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { formatMoney } from "@/lib/vialux/constants";
+import { formatMoney, IVA_RATE, PRODUCTOS } from "@/lib/vialux/constants";
+import type { ProductoKey } from "@/lib/vialux/constants";
+import { generateFolio } from "@/lib/vialux/quote-actions";
+import type { Tables } from "@/integrations/supabase/types";
 
 export const Route = createFileRoute("/historial")({
   component: HistorialPage,
 });
 
 type Estado = "cotizado" | "cerrado" | "enviado" | "perdido";
+type CotizacionRow = Tables<"cotizaciones">;
 
 const ESTADO_LABEL: Record<Estado, string> = {
   cotizado: "COTIZADO",
@@ -51,11 +65,441 @@ const ESTADO_CLASS: Record<Estado, string> = {
   perdido: "bg-red-500 text-white",
 };
 
+// ─── Agregar Flete Modal (Escenario C) ───────────────────────────────────────
+
+const FLETE_INIT = {
+  paqueteria: "",
+  modalidad: "ENTREGA A DOMICILIO" as "ENTREGA A DOMICILIO" | "OCURRE",
+  costo: 0,
+};
+
+function AgregarFleteModal({
+  row,
+  open,
+  onOpenChange,
+  onDone,
+}: {
+  row: CotizacionRow;
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  onDone: () => void;
+}) {
+  const [form, setForm] = useState(FLETE_INIT);
+  const [saving, setSaving] = useState(false);
+
+  const f = <K extends keyof typeof FLETE_INIT>(k: K, v: (typeof FLETE_INIT)[K]) =>
+    setForm((prev) => ({ ...prev, [k]: v }));
+
+  const subtotalProducto = Number(row.subtotal_producto);
+  const subtotalFlete = form.costo;
+  const subtotalGeneral = subtotalProducto + subtotalFlete;
+  const iva = row.requiere_factura ? subtotalGeneral * IVA_RATE : 0;
+  const totalNuevo = subtotalGeneral + iva;
+
+  const save = async () => {
+    if (!form.paqueteria.trim()) { toast.error("Ingresa la paquetería"); return; }
+    if (!form.costo || form.costo <= 0) { toast.error("Ingresa el costo del flete"); return; }
+    setSaving(true);
+    try {
+      const folioPadre = row.folio_padre || row.folio;
+      const nextRevision = (row.revision || 0) + 1;
+      const newFolio = await generateFolio(nextRevision, folioPadre);
+
+      const { error: insErr } = await supabase.from("cotizaciones").insert({
+        folio: newFolio,
+        folio_padre: folioPadre,
+        revision: nextRevision,
+        cliente_id: row.cliente_id,
+        cliente_nombre: row.cliente_nombre,
+        cliente_empresa: row.cliente_empresa,
+        cliente_telefono: row.cliente_telefono,
+        cp_destino: row.cp_destino,
+        municipio: row.municipio,
+        estado_destino: row.estado_destino,
+        producto: row.producto,
+        descripcion_producto: row.descripcion_producto,
+        cantidad: row.cantidad,
+        precio_unitario: Number(row.precio_unitario),
+        requiere_factura: row.requiere_factura,
+        precio_especial: row.precio_especial,
+        subtotal_producto: subtotalProducto,
+        incluye_flete: true,
+        flete_paqueteria: form.paqueteria.trim().toUpperCase(),
+        flete_modalidad: form.modalidad,
+        flete_costo: subtotalFlete,
+        subtotal_general: subtotalGeneral,
+        iva,
+        total: totalNuevo,
+        margen_porcentaje: Number(row.margen_porcentaje ?? 0),
+        estado: "cotizado",
+        notas_internas: row.notas_internas || "",
+      });
+      if (insErr) throw insErr;
+
+      const notaActual = (row.notas_internas || "").trim();
+      await supabase
+        .from("cotizaciones")
+        .update({
+          notas_internas: notaActual
+            ? `${notaActual}\nREEMPLAZADA POR ${newFolio}`
+            : `REEMPLAZADA POR ${newFolio}`,
+        })
+        .eq("id", row.id);
+
+      toast.success(`Revisión ${newFolio} creada`);
+      setForm(FLETE_INIT);
+      onOpenChange(false);
+      onDone();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if (!v) setForm(FLETE_INIT); onOpenChange(v); }}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="uppercase tracking-wider">
+            Agregar flete — {row.folio}
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-4 py-2">
+          <div className="space-y-1.5">
+            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+              Paquetería
+            </Label>
+            <Input
+              value={form.paqueteria}
+              onChange={(e) => f("paqueteria", e.target.value)}
+              placeholder="EJ. TRES GUERRAS"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+                Modalidad
+              </Label>
+              <Select value={form.modalidad} onValueChange={(v) => f("modalidad", v as typeof form.modalidad)}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ENTREGA A DOMICILIO">ENTREGA A DOMICILIO</SelectItem>
+                  <SelectItem value="OCURRE">OCURRE</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+                Costo del flete (MXN)
+              </Label>
+              <Input
+                type="number"
+                value={form.costo || ""}
+                onChange={(e) => f("costo", Number(e.target.value) || 0)}
+                className="font-mono"
+                placeholder="0.00"
+              />
+            </div>
+          </div>
+
+          {form.costo > 0 && (
+            <div className="rounded-md border border-border bg-background/40 p-3 space-y-1.5">
+              <div className="flex justify-between text-xs">
+                <span className="text-muted-foreground">Subtotal producto</span>
+                <span className="font-mono">{formatMoney(subtotalProducto)}</span>
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="text-muted-foreground">Flete</span>
+                <span className="font-mono">{formatMoney(subtotalFlete)}</span>
+              </div>
+              {row.requiere_factura && (
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">IVA (16%)</span>
+                  <span className="font-mono">{formatMoney(iva)}</span>
+                </div>
+              )}
+              <div className="flex justify-between border-t border-border pt-1.5">
+                <span className="text-xs font-bold uppercase tracking-wide">Nuevo total</span>
+                <span className="font-mono font-bold text-[#EDBA1A]">{formatMoney(totalNuevo)}</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <Button
+            onClick={save}
+            disabled={saving}
+            className="bg-[#EDBA1A] text-[#1C1E22] hover:bg-[#EDBA1A]/90"
+          >
+            {saving ? "Guardando..." : "Crear revisión"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ─── Registrar Venta Histórica Modal ─────────────────────────────────────────
+
+function todayISO() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+const HISTORICA_INIT = {
+  fecha: todayISO(),
+  cliente_nombre: "",
+  cliente_empresa: "",
+  producto: "boya_clavos" as ProductoKey,
+  cantidad: 0,
+  precio_unitario: 0,
+  requiere_factura: true,
+  cp_destino: "",
+  notas_internas: "",
+};
+
+function RegistrarHistoricaModal({
+  open,
+  onOpenChange,
+  onDone,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  onDone: () => void;
+}) {
+  const [form, setForm] = useState(HISTORICA_INIT);
+  const [saving, setSaving] = useState(false);
+
+  const f = <K extends keyof typeof HISTORICA_INIT>(k: K, v: (typeof HISTORICA_INIT)[K]) =>
+    setForm((prev) => ({ ...prev, [k]: v }));
+
+  const subtotalProducto = form.precio_unitario * form.cantidad;
+  const iva = form.requiere_factura ? subtotalProducto * IVA_RATE : 0;
+  const total = subtotalProducto + iva;
+
+  const save = async () => {
+    if (!form.cliente_nombre.trim()) { toast.error("El nombre del cliente es requerido"); return; }
+    if (!form.cantidad || form.cantidad <= 0) { toast.error("La cantidad es requerida"); return; }
+    if (!form.precio_unitario || form.precio_unitario <= 0) { toast.error("El precio unitario es requerido"); return; }
+    if (!form.fecha) { toast.error("La fecha es requerida"); return; }
+
+    setSaving(true);
+    try {
+      const folio = await generateFolio(0, null);
+      const [year, month, day] = form.fecha.split("-").map(Number);
+      const fechaISO = new Date(year, month - 1, day, 12, 0, 0).toISOString();
+
+      const { error } = await supabase.from("cotizaciones").insert({
+        folio,
+        fecha: fechaISO,
+        cliente_nombre: form.cliente_nombre.trim().toUpperCase(),
+        cliente_empresa: (form.cliente_empresa || "").trim().toUpperCase(),
+        cp_destino: form.cp_destino.trim() || null,
+        producto: form.producto,
+        descripcion_producto: PRODUCTOS[form.producto].descripcion,
+        cantidad: form.cantidad,
+        precio_unitario: form.precio_unitario,
+        requiere_factura: form.requiere_factura,
+        precio_especial: false,
+        subtotal_producto: subtotalProducto,
+        incluye_flete: false,
+        flete_costo: 0,
+        subtotal_general: subtotalProducto,
+        iva,
+        total,
+        margen_porcentaje: 0,
+        estado: "cerrado",
+        es_historica: true,
+        revision: 0,
+        notas_internas: form.notas_internas.trim(),
+      });
+      if (error) throw error;
+
+      toast.success(`Venta histórica ${folio} registrada`);
+      setForm({ ...HISTORICA_INIT, fecha: todayISO() });
+      onOpenChange(false);
+      onDone();
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(v) => { if (!v) setForm({ ...HISTORICA_INIT, fecha: todayISO() }); onOpenChange(v); }}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="uppercase tracking-wider">
+            Registrar venta histórica
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-4 py-2">
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+                Fecha de la venta *
+              </Label>
+              <Input
+                type="date"
+                value={form.fecha}
+                onChange={(e) => f("fecha", e.target.value)}
+                className="font-mono"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+                ¿Incluye factura?
+              </Label>
+              <div className="flex h-10 items-center gap-3 rounded-md border border-input bg-background px-3">
+                <Switch
+                  checked={form.requiere_factura}
+                  onCheckedChange={(v) => f("requiere_factura", v)}
+                />
+                <span className="text-sm font-medium">
+                  {form.requiere_factura ? "SÍ — IVA 16%" : "NO — sin IVA"}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+                Cliente *
+              </Label>
+              <Input
+                value={form.cliente_nombre}
+                onChange={(e) => f("cliente_nombre", e.target.value)}
+                placeholder="NOMBRE DEL CLIENTE"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+                Empresa
+              </Label>
+              <Input
+                value={form.cliente_empresa}
+                onChange={(e) => f("cliente_empresa", e.target.value)}
+                placeholder="—"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+              Producto *
+            </Label>
+            <Select value={form.producto} onValueChange={(v) => f("producto", v as ProductoKey)}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                {(Object.keys(PRODUCTOS) as ProductoKey[]).map((k) => (
+                  <SelectItem key={k} value={k}>{PRODUCTOS[k].label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            <div className="space-y-1.5">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+                Cantidad *
+              </Label>
+              <Input
+                type="number"
+                value={form.cantidad || ""}
+                onChange={(e) => f("cantidad", Number(e.target.value) || 0)}
+                className="font-mono"
+                placeholder="0"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+                Precio unitario *
+              </Label>
+              <Input
+                type="number"
+                value={form.precio_unitario || ""}
+                onChange={(e) => f("precio_unitario", Number(e.target.value) || 0)}
+                className="font-mono"
+                placeholder="0.00"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+                CP destino
+              </Label>
+              <Input
+                value={form.cp_destino}
+                onChange={(e) => f("cp_destino", e.target.value.replace(/\D/g, "").slice(0, 5))}
+                className="font-mono"
+                placeholder="64000"
+                maxLength={5}
+              />
+            </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+              Notas internas
+            </Label>
+            <Textarea
+              value={form.notas_internas}
+              onChange={(e) => f("notas_internas", e.target.value)}
+              rows={2}
+              placeholder="Referencia, observaciones..."
+            />
+          </div>
+
+          {form.cantidad > 0 && form.precio_unitario > 0 && (
+            <div className="rounded-md border border-border bg-background/40 p-3 space-y-1.5">
+              <div className="flex justify-between text-xs">
+                <span className="text-muted-foreground">Subtotal</span>
+                <span className="font-mono">{formatMoney(subtotalProducto)}</span>
+              </div>
+              {form.requiere_factura && (
+                <div className="flex justify-between text-xs">
+                  <span className="text-muted-foreground">IVA (16%)</span>
+                  <span className="font-mono">{formatMoney(iva)}</span>
+                </div>
+              )}
+              <div className="flex justify-between border-t border-border pt-1.5">
+                <span className="text-xs font-bold uppercase tracking-wide">Total</span>
+                <span className="font-mono font-bold text-[#EDBA1A]">{formatMoney(total)}</span>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <Button
+            onClick={save}
+            disabled={saving}
+            className="bg-[#EDBA1A] text-[#1C1E22] hover:bg-[#EDBA1A]/90"
+          >
+            {saving ? "Guardando..." : "Registrar venta"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// ─── Page ─────────────────────────────────────────────────────────────────────
+
 function HistorialPage() {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | Estado>("all");
+  const [fleteRow, setFleteRow] = useState<CotizacionRow | null>(null);
+  const [showHistorica, setShowHistorica] = useState(false);
 
   const cotizacionesQuery = useQuery({
     queryKey: ["cotizaciones"],
@@ -121,7 +565,7 @@ function HistorialPage() {
     if (estado === "cerrado") {
       const row = cotizacionesQuery.data?.find((r) => r.id === id);
       const inv = inventarioQuery.data?.boyas_disponibles ?? 0;
-      if (row && row.estado !== "cerrado" && inv < row.cantidad) {
+      if (row && row.estado !== "cerrado" && !row.es_historica && inv < row.cantidad) {
         toast.error(
           `Sin stock suficiente — ${inv} boyas disponibles, se requieren ${row.cantidad}`,
         );
@@ -155,6 +599,8 @@ function HistorialPage() {
   const duplicate = (id: string) => {
     navigate({ to: "/", search: { duplicate: id } });
   };
+
+  const invalidate = () => qc.invalidateQueries({ queryKey: ["cotizaciones"] });
 
   return (
     <div className="mx-auto w-full max-w-7xl px-6 py-8">
@@ -199,6 +645,14 @@ function HistorialPage() {
             <SelectItem value="perdido">Perdido</SelectItem>
           </SelectContent>
         </Select>
+        <Button
+          onClick={() => setShowHistorica(true)}
+          variant="outline"
+          className="gap-2"
+        >
+          <History className="h-4 w-4" />
+          Registrar venta histórica
+        </Button>
       </div>
 
       <div className="overflow-hidden rounded-lg border border-border bg-card">
@@ -231,10 +685,23 @@ function HistorialPage() {
             ) : (
               rows.map((r) => {
                 const estado = r.estado as Estado;
+                const canAddFlete =
+                  !r.incluye_flete &&
+                  (r.estado === "cotizado" || r.estado === "enviado");
                 return (
                   <tr key={r.id} className="border-t border-border hover:bg-muted/20">
-                    <td className="px-4 py-3 font-mono text-xs font-bold text-[#EDBA1A]">
-                      {r.folio}
+                    {/* Folio + badges */}
+                    <td className="px-4 py-3">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="font-mono text-xs font-bold text-[#EDBA1A]">
+                          {r.folio}
+                        </span>
+                        {r.es_historica && (
+                          <span className="rounded-full bg-gray-500/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-gray-400">
+                            HISTÓRICA
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
                       {new Date(r.fecha).toLocaleDateString("es-MX")}
@@ -272,11 +739,21 @@ function HistorialPage() {
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex justify-end gap-1">
+                        {canAddFlete && (
+                          <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => setFleteRow(r)}
+                            title="Agregar flete (crear revisión)"
+                          >
+                            <Truck className="h-4 w-4 text-[#6B8899]" />
+                          </Button>
+                        )}
                         <Button
                           size="icon"
                           variant="ghost"
                           onClick={() => duplicate(r.id)}
-                          title="Duplicar"
+                          title="Duplicar en cotizador"
                         >
                           <Copy className="h-4 w-4" />
                         </Button>
@@ -313,6 +790,21 @@ function HistorialPage() {
           </tbody>
         </table>
       </div>
+
+      {fleteRow && (
+        <AgregarFleteModal
+          row={fleteRow}
+          open={!!fleteRow}
+          onOpenChange={(v) => { if (!v) setFleteRow(null); }}
+          onDone={invalidate}
+        />
+      )}
+
+      <RegistrarHistoricaModal
+        open={showHistorica}
+        onOpenChange={setShowHistorica}
+        onDone={invalidate}
+      />
     </div>
   );
 }

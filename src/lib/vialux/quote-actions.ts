@@ -42,6 +42,7 @@ export type QuoteRow = {
   revision: number;
   folio_padre: string | null;
   notas_internas: string;
+  es_historica?: boolean;
 };
 
 export function buildWhatsAppUrl(state: QuoteState, folio: string, total: number) {

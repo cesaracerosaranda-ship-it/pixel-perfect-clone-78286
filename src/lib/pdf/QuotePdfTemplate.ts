@@ -47,7 +47,22 @@ export function renderQuoteHtml(args: {
   const pairs: Array<[typeof SPECS[number], typeof SPECS[number] | undefined]> = [];
   for (let i = 0; i < SPECS.length; i += 2) pairs.push([SPECS[i], SPECS[i + 1]]);
 
-  const fleteDestino = state.cp ? ` — CP ${esc(state.cp)}` : "";
+  const fleteDestino = state.cp ? `, A CP ${esc(state.cp)}` : "";
+
+  // Sección TIEMPO DE ENTREGA: comportamiento diferenciado por escenario
+  const isLocalCp = /^6[4-7]/.test(state.cp || "");
+  const deliveryMain = state.incluyeFlete
+    ? `${(state.fleteModalidad || "ENTREGA A DOMICILIO").toUpperCase()} VÍA ${esc(
+        (state.fletePaqueteria || "PAQUETERÍA").toUpperCase(),
+      )}`
+    : esc(args.deliveryMsg);
+  const deliverySub = state.incluyeFlete
+    ? state.cp
+      ? `DESTINO: CP ${esc(state.cp)}`
+      : ""
+    : isLocalCp
+      ? "RECOLECCIÓN EN PLANTA"
+      : "FLETE SE COTIZA POR SEPARADO";
 
   const fleteRow = state.incluyeFlete
     ? `<tr>
@@ -172,10 +187,10 @@ export function renderQuoteHtml(args: {
           <td style="width:50%;vertical-align:top;padding:0;">
             <div style="font-size:9.5px;letter-spacing:0.16em;font-weight:800;color:#1C1E22;margin-bottom:7px;text-transform:uppercase;">Tiempo de Entrega</div>
             <div style="border:1px solid #E5E7EB;border-radius:8px;padding:18px 18px;">
-              <div style="font-weight:700;letter-spacing:0.04em;font-size:11.5px;">${esc(args.deliveryMsg)}</div>
-              ${state.incluyeFlete
-                ? `<div style="color:#6B7280;font-size:10.5px;margin-top:5px;">ENTREGA VÍA ${esc((state.fletePaqueteria || "PAQUETERÍA").toUpperCase())}${state.cp ? ` · CP ${esc(state.cp)}` : ""}</div>`
-                : `<div style="color:#6B7280;font-size:10.5px;margin-top:5px;">RECOLECCIÓN EN PLANTA</div>`
+              <div style="font-weight:700;letter-spacing:0.04em;font-size:11.5px;">${deliveryMain}</div>
+              ${deliverySub
+                ? `<div style="color:#6B7280;font-size:10.5px;margin-top:5px;">${deliverySub}</div>`
+                : ""
               }
             </div>
           </td>
