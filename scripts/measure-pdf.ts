@@ -1,5 +1,5 @@
 // Renderiza el HTML del PDF con escenarios worst-case y lo guarda para
-// medir su altura con Chrome headless. Presupuesto A4: 1122px a 794px de ancho.
+// medir su altura con Chrome headless. Presupuesto carta: 1056px a 816px de ancho.
 import { readFileSync, writeFileSync, mkdirSync } from "node:fs";
 import { renderQuoteHtml } from "../src/lib/pdf/QuotePdfTemplate";
 import type { QuoteState } from "../src/hooks/useQuoteState";

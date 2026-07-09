@@ -256,12 +256,12 @@ function CotizadorPage() {
       <div className="mb-6 flex items-end justify-between">
         <div>
           <h1 className="text-2xl font-bold uppercase tracking-wider">Cotizador</h1>
-          <p className="text-xs uppercase tracking-[0.16em] text-[#6B8899]">
+          <p className="text-xs uppercase tracking-[0.16em] text-[#A49E91]">
             Captura los datos del cliente y genera la cotización
           </p>
         </div>
         {savedFolio && (
-          <div className="flex items-center gap-2 rounded-full bg-[#EDBA1A] px-4 py-1.5 font-mono text-xs font-bold text-[#1C1E22]">
+          <div className="flex items-center gap-2 rounded-full bg-[#EDBA1A] px-4 py-1.5 font-mono text-xs font-bold text-[#1B1A17]">
             {isSaved && <CheckCircle2 className="h-3.5 w-3.5" />}
             {savedFolio}
           </div>
@@ -281,7 +281,7 @@ function CotizadorPage() {
             <Button
               onClick={handlePdf}
               disabled={saving}
-              className="bg-[#EDBA1A] text-[#1C1E22] hover:bg-[#EDBA1A]/90"
+              className="bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#EDBA1A]/90"
             >
               <Download className="mr-2 h-4 w-4" /> PDF
             </Button>

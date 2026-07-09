@@ -35,7 +35,7 @@ export function PriceSummary({
   const Row = ({ k, v, dim }: { k: string; v: string; dim?: boolean }) => (
     <div className="flex items-center justify-between">
       <span
-        className={`text-xs uppercase tracking-[0.13em] ${dim ? "text-[#6B8899]" : "text-[#9aa3ad]"}`}
+        className={`text-xs uppercase tracking-[0.13em] ${dim ? "text-[#A49E91]" : "text-[#A5A099]"}`}
       >
         {k}
       </span>
@@ -47,13 +47,13 @@ export function PriceSummary({
     <div
       className="overflow-hidden rounded-xl border border-border"
       style={{
-        background: "linear-gradient(145deg, #3D4148 0%, #363A41 100%)",
+        background: "linear-gradient(145deg, #3A3936 0%, #34332F 100%)",
       }}
     >
       {/* Header strip */}
       <div className="flex items-center gap-2.5 border-b border-border/50 px-5 py-3">
         <div className="h-3.5 w-[3px] rounded-full bg-[#EDBA1A]" />
-        <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#6B8899]">
+        <span className="text-[10px] font-bold uppercase tracking-[0.22em] text-[#A49E91]">
           Resumen
         </span>
       </div>
@@ -72,7 +72,7 @@ export function PriceSummary({
         </div>
 
         {/* Total panel */}
-        <div className="rounded-lg bg-[#1C1E22] px-4 py-4">
+        <div className="rounded-lg bg-[#1B1A17] px-4 py-4">
           <div className="mb-1 text-[9px] uppercase tracking-[0.24em] text-[#424856]">
             Total cotización
           </div>
@@ -84,7 +84,7 @@ export function PriceSummary({
         {/* Margen */}
         <div className="rounded-lg border border-border bg-background/30 p-3">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-[10px] uppercase tracking-[0.18em] text-[#6B8899]">
+            <span className="text-[10px] uppercase tracking-[0.18em] text-[#A49E91]">
               Margen por pieza
             </span>
             <span className={`font-mono text-sm font-bold tabular-nums ${margenColor}`}>

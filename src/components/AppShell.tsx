@@ -25,7 +25,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-6 px-6 py-3.5">
           {/* Brand */}
           <Link to="/" className="group flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#EDBA1A] font-mono text-sm font-black text-[#1C1E22] ring-2 ring-[#EDBA1A]/20 transition-all group-hover:ring-[#EDBA1A]/50">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#EDBA1A] font-mono text-sm font-black text-[#1B1A17] ring-2 ring-[#EDBA1A]/20 transition-all group-hover:ring-[#EDBA1A]/50">
               VX
             </div>
             <div className="leading-tight">
@@ -42,7 +42,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-4">
             <InventarioBadge />
 
-            <div className="h-5 w-px bg-[#474B52]" />
+            <div className="h-5 w-px bg-[#4A4842]" />
 
             <nav className="flex items-center gap-0.5">
               {tabs.map((t) => {
@@ -54,7 +54,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                     className="flex items-center gap-1.5 rounded-md px-3.5 py-2 text-[11px] font-bold uppercase tracking-[0.12em] text-[#8A8F9A] transition-colors hover:bg-white/[0.06] hover:text-white"
                     activeProps={{
                       className:
-                        "flex items-center gap-1.5 rounded-md px-3.5 py-2 text-[11px] font-bold uppercase tracking-[0.12em] bg-[#EDBA1A] text-[#1C1E22] hover:bg-[#EDBA1A]",
+                        "flex items-center gap-1.5 rounded-md px-3.5 py-2 text-[11px] font-bold uppercase tracking-[0.12em] bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#EDBA1A]",
                     }}
                     activeOptions={{ exact: t.to === "/" }}
                   >
@@ -72,7 +72,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <footer className="border-t border-[#3a3a38] bg-[#343331] py-3">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6">
-          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#474B52]">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#4A4842]">
             © 2026 VIALUX
           </span>
           <span className="text-[10px] uppercase tracking-[0.16em] text-[#525866]">

@@ -64,14 +64,14 @@
 :root {
   /* VIALUX dark theme — applied by default (industrial infrastructure aesthetic). */
   --radius: 0.5rem;
-  /* Brand */
+  /* Brand — paleta cálida alineada a la ficha técnica (sin tonos azules) */
   --vialux-yellow: #EDBA1A;
   --vialux-yellow-dark: #C99B0E;
-  --vialux-graphite: #2D3036;
-  --vialux-graphite-2: #3D4148;
+  --vialux-graphite: #2B2A28;
+  --vialux-graphite-2: #3A3936;
   --vialux-graphite-3: #343331;
-  --vialux-steel: #4A6274;
-  --vialux-steel-light: #6B8899;
+  --vialux-stone: #7C766A;
+  --vialux-stone-light: #A49E91;
   --vialux-light: #F0EFEB;
 
   --background: var(--vialux-graphite);
@@ -82,19 +82,19 @@
   --popover-foreground: #F0EFEB;
   --primary: var(--vialux-yellow);
   --primary-foreground: #1C1E22;
-  --secondary: #474B52;
+  --secondary: #4A4842;
   --secondary-foreground: #F0EFEB;
-  --muted: #3D4148;
-  --muted-foreground: #7A8090;
+  --muted: #3A3936;
+  --muted-foreground: #8C867A;
   --accent: var(--vialux-yellow-dark);
   --accent-foreground: #1C1E22;
   --destructive: #DC2626;
   --destructive-foreground: #FAFAF9;
-  --border: #474B52;
-  --input: #474B52;
+  --border: #4A4842;
+  --input: #4A4842;
   --ring: var(--vialux-yellow);
   --chart-1: var(--vialux-yellow);
-  --chart-2: var(--vialux-steel-light);
+  --chart-2: var(--vialux-stone-light);
   --chart-3: #5CB85C;
   --chart-4: #F97316;
   --chart-5: var(--vialux-yellow-dark);
@@ -104,7 +104,7 @@
   --sidebar-primary-foreground: #1C1E22;
   --sidebar-accent: var(--vialux-graphite-2);
   --sidebar-accent-foreground: #F0EFEB;
-  --sidebar-border: #474B52;
+  --sidebar-border: #4A4842;
   --sidebar-ring: var(--vialux-yellow);
 
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
@@ -156,7 +156,7 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    background-image: radial-gradient(rgba(71, 75, 82, 0.28) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(74, 72, 66, 0.3) 1px, transparent 1px);
     background-size: 28px 28px;
   }
 
@@ -170,10 +170,10 @@
     height: 5px;
   }
   ::-webkit-scrollbar-track {
-    background: #2D3036;
+    background: #2B2A28;
   }
   ::-webkit-scrollbar-thumb {
-    background: #474B52;
+    background: #4A4842;
     border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {

@@ -47,31 +47,42 @@ Costo base: $32/pieza. Margen objetivo: 27-37%.
 
 ## Formato del PDF de cotización
 
-Layout exacto (NO modificar sin autorización):
-1. Header: fondo #343331, logo VIALUX esquina superior izquierda, barra amarilla 4px
-2. Datos del cliente + "ATENDIDO POR: AUGUSTO ROBLES"
-3. Badge "SEÑALIZACIÓN VIAL" + folio
-4. Tabla de partidas (producto + flete como partidas separadas)
-5. Subtotales + IVA + Total
-6. Boxes: Tiempo de entrega + Forma de pago
-7. Especificaciones del producto (grid 2 columnas)
-8. Términos y condiciones
-9. Footer: fondo #343331, texto blanco centrado
+Layout exacto (NO modificar sin autorización). Rediseño julio 2026: alineado a la
+ficha técnica hecha en Claude Design — tamaño CARTA (816×1056px @ 0.75 escala a
+612×792pt), tipografía JetBrains Mono dominante, riel lateral numerado:
+
+1. Header: fondo #343331, logo izquierda; derecha "DOCUMENTO COMERCIAL · 2026 · FOLIO ..."
+   + "COTIZACIÓN COMERCIAL" (peso regular, tracking amplio, COMERCIAL en #EDBA1A); barra amarilla 5px
+2. Riel lateral izquierdo: secciones numeradas 00-04 (número amarillo + etiqueta
+   vertical rotada): 00 CLIENTE · 01 PARTIDAS · 02 CONDICIONES · 03 TÉCNICO · 04 TÉRMINOS
+3. 00 CLIENTE: "COTIZACIÓN PARA:" + nombre + atendido por + badge "SEÑALIZACIÓN VIAL" + folio; fecha/vigencia derecha
+4. 01 PARTIDAS: tabla (producto + flete como partidas), SKU VLX-22-* en dorado,
+   subtotal/IVA, regla amarilla, TOTAL en #C99B0E grande + "MXN · PESOS MEXICANOS"
+5. 02 CONDICIONES: boxes Tiempo de entrega + Forma de pago
+6. 03 TÉCNICO: grid 4×2 de especificaciones con celdas bordeadas, labels dorados
+7. 04 TÉRMINOS: políticas + strip NOTA con fondo #F0EFEB (precios sujetos a cambio al vencer vigencia)
+8. Footer doble: strip claro #F0EFEB con email/tel + strip #343331 con tagline
+- Footer anclado al fondo de la hoja vía spacer dinámico (generateQuotePdf mide
+  la altura en un iframe oculto y rellena el faltante hasta 1056px por página)
 - TODO el texto del PDF en MAYÚSCULAS
 - Nombre archivo: {FOLIO}_{CLIENTE}_{CANTIDAD}PZS.pdf
+- Verificación de altura: `npx vite-node scripts/measure-pdf.ts` + Chrome headless
+  (presupuesto 1056px por hoja; el peor caso refl+factura+flete debe caber en una)
 
 ## Identidad visual — VIALUX (Dirección B: Infraestructura Moderna)
 
-### Colores
+### Colores (paleta cálida — julio 2026, sin azules por decisión del usuario)
 - Amarillo tráfico: #EDBA1A (acentos, CTAs, badges)
-- Amarillo oscuro: #C99B0E (texto sobre blanco)
-- Grafito: #2D3036 (fondo de la app)
-- Grafito claro: #3D4148 (cards, surfaces)
-- Azul acero: #4A6274 (texto secundario)
-- Steel light: #6B8899 (labels)
-- Muted: #7A8090 (texto terciario)
-- Logo background: #343331 (header/footer)
-- Tab activo: bg-[#EDBA1A] text-[#1C1E22]
+- Amarillo oscuro: #C99B0E (texto/labels dorados sobre blanco)
+- Grafito cálido: #2B2A28 (fondo de la app)
+- Grafito claro cálido: #3A3936 (cards, surfaces)
+- Grafito ficha: #343331 (header/footer del PDF y de la app)
+- Piedra: #7C766A / Piedra clara: #A49E91 (labels, texto secundario)
+- Muted: #8C867A (texto terciario)
+- Negro cálido: #1B1A17 (texto sobre amarillo, paneles oscuros)
+- Badge ENVIADO: bg-[#F0EFEB] text-[#1B1A17] (ya no azul cielo)
+- Tab activo: bg-[#EDBA1A] text-[#1B1A17]
+- El azul acero (#4A6274/#6B8899) fue RETIRADO de app y PDF — no reintroducir
 
 ### Tipografía
 - Manrope (Google Fonts) — texto general

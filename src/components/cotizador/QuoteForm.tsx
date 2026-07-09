@@ -49,7 +49,7 @@ function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <Label className="text-[10px] uppercase tracking-[0.16em] text-[#6B8899]">
+      <Label className="text-[10px] uppercase tracking-[0.16em] text-[#A49E91]">
         {label}
       </Label>
       {children}
@@ -99,7 +99,7 @@ function ClientSearch({ onSelect }: { onSelect: (c: ClienteOption) => void }) {
                     <div className="font-semibold uppercase">{c.nombre}</div>
                     {c.empresa && <div className="text-xs text-muted-foreground">{c.empresa}</div>}
                     {c.contacto_nombre && (
-                      <div className="mt-0.5 text-[10px] text-[#6B8899]">
+                      <div className="mt-0.5 text-[10px] text-[#A49E91]">
                         Solicita: {c.contacto_nombre}
                         {c.contacto_telefono && ` · ${c.contacto_telefono}`}
                       </div>
@@ -179,7 +179,7 @@ export function QuoteForm({ state, update, errors = {} }: Props) {
               maxLength={5}
             />
             {state.cp.length === 5 && cpData && (
-              <p className="mt-1 font-mono text-[11px] uppercase tracking-wide text-[#6B8899]">
+              <p className="mt-1 font-mono text-[11px] uppercase tracking-wide text-[#A49E91]">
                 {cpData.municipio}, {cpData.estado}
               </p>
             )}
@@ -221,7 +221,7 @@ export function QuoteForm({ state, update, errors = {} }: Props) {
                 <div className="font-mono text-xs text-muted-foreground">
                   <span className="text-[#EDBA1A]">C/F</span>{" "}
                   {formatMoney(p.conFactura)} ·{" "}
-                  <span className="text-[#6B8899]">S/F</span>{" "}
+                  <span className="text-[#A49E91]">S/F</span>{" "}
                   {formatMoney(p.sinFactura)}
                 </div>
               </label>

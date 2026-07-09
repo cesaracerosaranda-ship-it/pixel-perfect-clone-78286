@@ -59,9 +59,9 @@ const ESTADO_LABEL: Record<Estado, string> = {
   perdido: "PERDIDO",
 };
 const ESTADO_CLASS: Record<Estado, string> = {
-  cotizado: "bg-[#EDBA1A] text-[#1C1E22]",
+  cotizado: "bg-[#EDBA1A] text-[#1B1A17]",
   cerrado: "bg-emerald-500 text-white",
-  enviado: "bg-sky-500 text-white",
+  enviado: "bg-[#F0EFEB] text-[#1B1A17]",
   perdido: "bg-red-500 text-white",
 };
 
@@ -168,7 +168,7 @@ function AgregarFleteModal({
 
         <div className="space-y-4 py-2">
           <div className="space-y-1.5">
-            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
               Paquetería
             </Label>
             <Input
@@ -179,7 +179,7 @@ function AgregarFleteModal({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
                 Modalidad
               </Label>
               <Select value={form.modalidad} onValueChange={(v) => f("modalidad", v as typeof form.modalidad)}>
@@ -191,7 +191,7 @@ function AgregarFleteModal({
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
                 Costo del flete (MXN)
               </Label>
               <Input
@@ -233,7 +233,7 @@ function AgregarFleteModal({
           <Button
             onClick={save}
             disabled={saving}
-            className="bg-[#EDBA1A] text-[#1C1E22] hover:bg-[#EDBA1A]/90"
+            className="bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#EDBA1A]/90"
           >
             {saving ? "Guardando..." : "Crear revisión"}
           </Button>
@@ -342,7 +342,7 @@ function RegistrarHistoricaModal({
         <div className="space-y-4 py-2">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
                 Fecha de la venta *
               </Label>
               <Input
@@ -353,7 +353,7 @@ function RegistrarHistoricaModal({
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
                 ¿Incluye factura?
               </Label>
               <div className="flex h-10 items-center gap-3 rounded-md border border-input bg-background px-3">
@@ -370,7 +370,7 @@ function RegistrarHistoricaModal({
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
                 Cliente *
               </Label>
               <Input
@@ -380,7 +380,7 @@ function RegistrarHistoricaModal({
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
                 Empresa
               </Label>
               <Input
@@ -392,7 +392,7 @@ function RegistrarHistoricaModal({
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
               Producto *
             </Label>
             <Select value={form.producto} onValueChange={(v) => f("producto", v as ProductoKey)}>
@@ -407,7 +407,7 @@ function RegistrarHistoricaModal({
 
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
                 Cantidad *
               </Label>
               <Input
@@ -419,7 +419,7 @@ function RegistrarHistoricaModal({
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
                 Precio unitario *
               </Label>
               <Input
@@ -431,7 +431,7 @@ function RegistrarHistoricaModal({
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
                 CP destino
               </Label>
               <Input
@@ -445,7 +445,7 @@ function RegistrarHistoricaModal({
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
               Notas internas
             </Label>
             <Textarea
@@ -481,7 +481,7 @@ function RegistrarHistoricaModal({
           <Button
             onClick={save}
             disabled={saving}
-            className="bg-[#EDBA1A] text-[#1C1E22] hover:bg-[#EDBA1A]/90"
+            className="bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#EDBA1A]/90"
           >
             {saving ? "Guardando..." : "Registrar venta"}
           </Button>
@@ -625,7 +625,7 @@ function HistorialPage() {
       <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold uppercase tracking-wider">Historial</h1>
-          <p className="text-xs uppercase tracking-[0.16em] text-[#6B8899]">
+          <p className="text-xs uppercase tracking-[0.16em] text-[#A49E91]">
             Registro de ventas y cotizaciones
           </p>
         </div>
@@ -669,11 +669,11 @@ function HistorialPage() {
         </div>
 
         {/* En proceso */}
-        <div className="rounded-xl border border-sky-500/20 bg-sky-500/5 p-4">
-          <div className="mb-1 text-[10px] uppercase tracking-[0.16em] text-sky-500">
+        <div className="rounded-xl border border-[#F0EFEB]/15 bg-[#F0EFEB]/[0.04] p-4">
+          <div className="mb-1 text-[10px] uppercase tracking-[0.16em] text-[#A49E91]">
             En proceso
           </div>
-          <div className="font-mono text-xl font-black text-sky-400 tabular-nums">
+          <div className="font-mono text-xl font-black text-[#F0EFEB] tabular-nums">
             {formatMoney(kpis.enProcesoMonto)}
           </div>
           <div className="mt-0.5 text-[10px] text-muted-foreground">
@@ -683,7 +683,7 @@ function HistorialPage() {
 
         {/* Total registros + perdidos */}
         <div className="rounded-xl border border-border bg-card p-4">
-          <div className="mb-1 text-[10px] uppercase tracking-[0.16em] text-[#6B8899]">
+          <div className="mb-1 text-[10px] uppercase tracking-[0.16em] text-[#A49E91]">
             Registros totales
           </div>
           <div className="font-mono text-2xl font-black tabular-nums">
@@ -722,7 +722,7 @@ function HistorialPage() {
 
       <div className="overflow-hidden rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
-          <thead className="border-b border-border bg-background/60 text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+          <thead className="border-b border-border bg-background/60 text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
             <tr>
               <th className="px-4 py-3.5 text-left font-bold">Folio</th>
               <th className="px-4 py-3.5 text-left font-bold">Fecha</th>
@@ -811,7 +811,7 @@ function HistorialPage() {
                             onClick={() => setFleteRow(r)}
                             title="Agregar flete (crear revisión)"
                           >
-                            <Truck className="h-4 w-4 text-[#6B8899]" />
+                            <Truck className="h-4 w-4 text-[#A49E91]" />
                           </Button>
                         )}
                         <Button

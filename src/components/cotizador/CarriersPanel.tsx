@@ -73,7 +73,7 @@ export function CarriersPanel({ cp, clientLat, clientLng }: Props) {
 
   if (isLoading) {
     return (
-      <section className="rounded-lg border border-border bg-[#3D4148] p-5">
+      <section className="rounded-lg border border-border bg-[#3A3936] p-5">
         <div className="flex items-center gap-2">
           <Loader2 className="h-3.5 w-3.5 animate-spin text-[#EDBA1A]" />
           <span className="text-xs uppercase tracking-[0.16em] text-[#EDBA1A]">
@@ -89,7 +89,7 @@ export function CarriersPanel({ cp, clientLat, clientLng }: Props) {
     const staticCarriers = carriersForCp(cp);
     if (staticCarriers.length === 0) return null;
     return (
-      <section className="rounded-lg border border-border bg-[#3D4148] p-5">
+      <section className="rounded-lg border border-border bg-[#3A3936] p-5">
         <div className="mb-3 flex items-center gap-2">
           <Truck className="h-3.5 w-3.5 text-[#EDBA1A]" />
           <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-[#EDBA1A]">
@@ -168,7 +168,7 @@ export function CarriersPanel({ cp, clientLat, clientLng }: Props) {
   if (sorted.length === 0) return null;
 
   return (
-    <section className="rounded-lg border border-border bg-[#3D4148] p-5">
+    <section className="rounded-lg border border-border bg-[#3A3936] p-5">
       <div className="mb-3 flex items-center gap-2">
         <Truck className="h-3.5 w-3.5 text-[#EDBA1A]" />
         <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-[#EDBA1A]">
