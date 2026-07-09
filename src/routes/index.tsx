@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, Mail, MessageCircle, Save, RotateCcw } from "lucide-react";
+import { Download, Mail, MessageCircle, Save, RotateCcw, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { QuoteForm } from "@/components/cotizador/QuoteForm";
 import { PriceSummary } from "@/components/cotizador/PriceSummary";
@@ -50,6 +50,7 @@ function CotizadorPage() {
   const navigate = useNavigate();
   const { state, setState, update, reset, calc } = useQuoteState();
   const [savedFolio, setSavedFolio] = useState<string | null>(null);
+  const [savedId, setSavedId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
 
@@ -130,16 +131,14 @@ function CotizadorPage() {
     return Object.keys(errs).length ? errs : null;
   };
 
-  const handleSave = async () => {
-    const errs = validate();
-    if (errs) { setFormErrors(errs); return; }
-    setFormErrors({});
-    try {
-      setSaving(true);
-      const [folio, clienteIdLinked] = await Promise.all([
-        ensureFolio(),
-        upsertCliente(state),
-      ]);
+  // Core save logic — idempotent: skips insert if already saved in this session
+  const persistQuote = async (silent = false): Promise<string> => {
+    const [folio, clienteIdLinked] = await Promise.all([
+      ensureFolio(),
+      upsertCliente(state),
+    ]);
+
+    if (!savedId) {
       const prod = PRODUCTOS[state.producto];
       const row: Omit<QuoteRow, "id" | "fecha"> = {
         folio,
@@ -170,9 +169,30 @@ function CotizadorPage() {
         folio_padre: state.folioPadre,
         notas_internas: state.notas,
       };
-      const { error } = await supabase.from("cotizaciones").insert(row);
+      const { data, error } = await supabase
+        .from("cotizaciones")
+        .insert(row)
+        .select("id")
+        .single();
       if (error) throw error;
-      toast.success(`Cotización ${folio} guardada`);
+      setSavedId(data.id);
+      if (!silent) toast.success(`Cotización ${folio} guardada`);
+    }
+
+    return folio;
+  };
+
+  const handleSave = async () => {
+    const errs = validate();
+    if (errs) { setFormErrors(errs); return; }
+    setFormErrors({});
+    if (savedId) {
+      toast.info("Cotización ya guardada — ver en Historial");
+      return;
+    }
+    try {
+      setSaving(true);
+      await persistQuote(false);
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
@@ -185,30 +205,51 @@ function CotizadorPage() {
     if (errs) { setFormErrors(errs); return; }
     setFormErrors({});
     try {
-      const folio = await ensureFolio();
+      setSaving(true);
+      const folio = await persistQuote(true); // auto-save silently
       await generateQuotePdf({ folio, state, calc, deliveryMsg });
+      if (!savedId) toast.success(`Cotización ${folio} guardada en Historial`);
     } catch (e) {
       toast.error((e as Error).message);
+    } finally {
+      setSaving(false);
     }
   };
 
   const handleWhatsApp = async () => {
     if (!state.telefono.trim()) return toast.error("Falta el teléfono del cliente");
-    const folio = await ensureFolio();
-    window.open(buildWhatsAppUrl(state, folio, calc.total), "_blank");
+    const errs = validate();
+    if (errs) { setFormErrors(errs); return; }
+    setFormErrors({});
+    try {
+      const folio = await persistQuote(true);
+      window.open(buildWhatsAppUrl(state, folio, calc.total), "_blank");
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
   };
 
   const handleMail = async () => {
-    const folio = await ensureFolio();
-    window.location.href = buildMailto(state, folio, calc.total);
+    const errs = validate();
+    if (errs) { setFormErrors(errs); return; }
+    setFormErrors({});
+    try {
+      const folio = await persistQuote(true);
+      window.location.href = buildMailto(state, folio, calc.total);
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
   };
 
   const handleReset = () => {
     reset();
     setSavedFolio(null);
+    setSavedId(null);
     setFormErrors({});
     toast.info("Formulario limpiado");
   };
+
+  const isSaved = !!savedId;
 
   return (
     <div className="mx-auto w-full max-w-7xl px-6 py-8">
@@ -220,7 +261,8 @@ function CotizadorPage() {
           </p>
         </div>
         {savedFolio && (
-          <div className="rounded-full bg-[#EDBA1A] px-4 py-1.5 font-mono text-xs font-bold text-[#1C1E22]">
+          <div className="flex items-center gap-2 rounded-full bg-[#EDBA1A] px-4 py-1.5 font-mono text-xs font-bold text-[#1C1E22]">
+            {isSaved && <CheckCircle2 className="h-3.5 w-3.5" />}
             {savedFolio}
           </div>
         )}
@@ -236,16 +278,29 @@ function CotizadorPage() {
             deliveryMsg={deliveryMsg}
           />
           <div className="grid grid-cols-2 gap-2">
-            <Button onClick={handlePdf} className="bg-[#EDBA1A] text-[#1C1E22] hover:bg-[#EDBA1A]/90">
+            <Button
+              onClick={handlePdf}
+              disabled={saving}
+              className="bg-[#EDBA1A] text-[#1C1E22] hover:bg-[#EDBA1A]/90"
+            >
               <Download className="mr-2 h-4 w-4" /> PDF
             </Button>
-            <Button onClick={handleSave} disabled={saving} variant="outline">
-              <Save className="mr-2 h-4 w-4" /> Guardar
+            <Button
+              onClick={handleSave}
+              disabled={saving || isSaved}
+              variant="outline"
+              className={isSaved ? "border-emerald-500/40 text-emerald-400" : ""}
+            >
+              {isSaved ? (
+                <><CheckCircle2 className="mr-2 h-4 w-4" /> Guardada</>
+              ) : (
+                <><Save className="mr-2 h-4 w-4" /> Guardar</>
+              )}
             </Button>
-            <Button onClick={handleWhatsApp} variant="outline">
+            <Button onClick={handleWhatsApp} disabled={saving} variant="outline">
               <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
             </Button>
-            <Button onClick={handleMail} variant="outline">
+            <Button onClick={handleMail} disabled={saving} variant="outline">
               <Mail className="mr-2 h-4 w-4" /> Correo
             </Button>
             <Button

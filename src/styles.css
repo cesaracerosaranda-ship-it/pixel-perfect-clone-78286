@@ -156,9 +156,28 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    background-image: radial-gradient(rgba(71, 75, 82, 0.28) 1px, transparent 1px);
+    background-size: 28px 28px;
   }
 
   .font-mono {
     font-family: var(--font-mono);
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #2D3036;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #474B52;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #EDBA1A;
+    transition: background 0.2s;
   }
 }

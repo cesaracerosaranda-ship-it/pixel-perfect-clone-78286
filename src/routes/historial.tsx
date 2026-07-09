@@ -561,6 +561,23 @@ function HistorialPage() {
     });
   }, [cotizacionesQuery.data, search, filter]);
 
+  const kpis = useMemo(() => {
+    const all = cotizacionesQuery.data ?? [];
+    const cerradas = all.filter((r) => r.estado === "cerrado");
+    const enProceso = all.filter(
+      (r) => r.estado === "cotizado" || r.estado === "enviado",
+    );
+    const perdidas = all.filter((r) => r.estado === "perdido");
+    return {
+      total: all.length,
+      valorCerrado: cerradas.reduce((s, r) => s + Number(r.total), 0),
+      cierres: cerradas.length,
+      enProcesoMonto: enProceso.reduce((s, r) => s + Number(r.total), 0),
+      enProceso: enProceso.length,
+      perdidas: perdidas.length,
+    };
+  }, [cotizacionesQuery.data]);
+
   const changeStatus = async (id: string, estado: Estado) => {
     if (estado === "cerrado") {
       const row = cotizacionesQuery.data?.find((r) => r.id === id);
@@ -604,27 +621,83 @@ function HistorialPage() {
 
   return (
     <div className="mx-auto w-full max-w-7xl px-6 py-8">
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+      {/* Page header */}
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold uppercase tracking-wider">Historial</h1>
           <p className="text-xs uppercase tracking-[0.16em] text-[#6B8899]">
             Registro de ventas y cotizaciones
           </p>
         </div>
-        <div className="flex items-center gap-2 rounded-md border border-[#EDBA1A]/40 bg-[#EDBA1A]/5 px-4 py-2">
-          <Package className="h-4 w-4 text-[#EDBA1A]" />
-          <div className="text-[10px] uppercase tracking-[0.16em] text-[#C99B0E]">
-            Inventario
+        <Button
+          onClick={() => setShowHistorica(true)}
+          variant="outline"
+          className="gap-2"
+        >
+          <History className="h-4 w-4" />
+          Registrar venta histórica
+        </Button>
+      </div>
+
+      {/* KPI cards */}
+      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
+        {/* Inventario */}
+        <div className="rounded-xl border border-[#EDBA1A]/25 bg-[#EDBA1A]/5 p-4">
+          <div className="mb-1 flex items-center gap-1.5">
+            <Package className="h-3 w-3 text-[#EDBA1A]" />
+            <span className="text-[10px] uppercase tracking-[0.16em] text-[#C99B0E]">
+              Inventario
+            </span>
           </div>
-          <div className="font-mono text-base font-bold text-[#EDBA1A]">
+          <div className="font-mono text-2xl font-black text-[#EDBA1A] tabular-nums">
             {inventarioQuery.data?.boyas_disponibles ?? "—"}
           </div>
-          <div className="text-xs text-muted-foreground">boyas</div>
+          <div className="mt-0.5 text-[10px] text-muted-foreground">boyas disponibles</div>
+        </div>
+
+        {/* Valor cerrado */}
+        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+          <div className="mb-1 text-[10px] uppercase tracking-[0.16em] text-emerald-600">
+            Ventas cerradas
+          </div>
+          <div className="font-mono text-xl font-black text-emerald-400 tabular-nums">
+            {formatMoney(kpis.valorCerrado)}
+          </div>
+          <div className="mt-0.5 text-[10px] text-muted-foreground">
+            {kpis.cierres} {kpis.cierres === 1 ? "cierre" : "cierres"}
+          </div>
+        </div>
+
+        {/* En proceso */}
+        <div className="rounded-xl border border-sky-500/20 bg-sky-500/5 p-4">
+          <div className="mb-1 text-[10px] uppercase tracking-[0.16em] text-sky-500">
+            En proceso
+          </div>
+          <div className="font-mono text-xl font-black text-sky-400 tabular-nums">
+            {formatMoney(kpis.enProcesoMonto)}
+          </div>
+          <div className="mt-0.5 text-[10px] text-muted-foreground">
+            {kpis.enProceso} cotizaci{kpis.enProceso === 1 ? "ón" : "ones"}
+          </div>
+        </div>
+
+        {/* Total registros + perdidos */}
+        <div className="rounded-xl border border-border bg-card p-4">
+          <div className="mb-1 text-[10px] uppercase tracking-[0.16em] text-[#6B8899]">
+            Registros totales
+          </div>
+          <div className="font-mono text-2xl font-black tabular-nums">
+            {kpis.total}
+          </div>
+          <div className="mt-0.5 text-[10px] text-muted-foreground">
+            {kpis.perdidas} {kpis.perdidas === 1 ? "perdida" : "perdidas"}
+          </div>
         </div>
       </div>
 
+      {/* Toolbar */}
       <div className="mb-4 flex flex-wrap gap-3">
-        <div className="relative flex-1 min-w-[240px]">
+        <div className="relative min-w-[240px] flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={search}
@@ -645,28 +718,20 @@ function HistorialPage() {
             <SelectItem value="perdido">Perdido</SelectItem>
           </SelectContent>
         </Select>
-        <Button
-          onClick={() => setShowHistorica(true)}
-          variant="outline"
-          className="gap-2"
-        >
-          <History className="h-4 w-4" />
-          Registrar venta histórica
-        </Button>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-border bg-card">
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
-          <thead className="bg-background/40 text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+          <thead className="border-b border-border bg-background/60 text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
             <tr>
-              <th className="px-4 py-3 text-left">Folio</th>
-              <th className="px-4 py-3 text-left">Fecha</th>
-              <th className="px-4 py-3 text-left">Cliente</th>
-              <th className="px-4 py-3 text-left">Empresa</th>
-              <th className="px-4 py-3 text-right">Cant.</th>
-              <th className="px-4 py-3 text-right">Total</th>
-              <th className="px-4 py-3 text-left">Estado</th>
-              <th className="px-4 py-3" />
+              <th className="px-4 py-3.5 text-left font-bold">Folio</th>
+              <th className="px-4 py-3.5 text-left font-bold">Fecha</th>
+              <th className="px-4 py-3.5 text-left font-bold">Cliente</th>
+              <th className="px-4 py-3.5 text-left font-bold">Empresa</th>
+              <th className="px-4 py-3.5 text-right font-bold">Cant.</th>
+              <th className="px-4 py-3.5 text-right font-bold">Total</th>
+              <th className="px-4 py-3.5 text-left font-bold">Estado</th>
+              <th className="px-4 py-3.5" />
             </tr>
           </thead>
           <tbody>
@@ -689,7 +754,7 @@ function HistorialPage() {
                   !r.incluye_flete &&
                   (r.estado === "cotizado" || r.estado === "enviado");
                 return (
-                  <tr key={r.id} className="border-t border-border hover:bg-muted/20">
+                  <tr key={r.id} className="border-t border-border transition-colors hover:bg-[#EDBA1A]/[0.04]">
                     {/* Folio + badges */}
                     <td className="px-4 py-3">
                       <div className="flex flex-wrap items-center gap-1.5">

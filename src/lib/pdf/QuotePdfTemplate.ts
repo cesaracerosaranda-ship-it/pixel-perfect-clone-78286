@@ -1,4 +1,6 @@
 import {
+  CONTACT_EMAIL,
+  CONTACT_TEL,
   EJECUTIVO,
   PRODUCTOS,
   SPECS,
@@ -71,14 +73,14 @@ export function renderQuoteHtml(args: {
 
   const fleteRow = state.incluyeFlete
     ? `<tr>
-        <td style="padding:16px 20px 16px 0;border-top:1px solid #E8E8E8;vertical-align:top;">
+        <td style="padding:12px 20px 12px 0;border-top:1px solid #E8E8E8;vertical-align:top;">
           <div style="font-weight:700;font-size:11.5px;">ENVÍO VÍA ${esc(
             (state.fletePaqueteria || "PAQUETERÍA").toUpperCase(),
           )} — ${esc(state.fleteModalidad)}${fleteDestino}</div>
         </td>
-        <td style="padding:16px 0;border-top:1px solid #E8E8E8;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11.5px;">1</td>
-        <td style="padding:16px 0;border-top:1px solid #E8E8E8;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11.5px;">—</td>
-        <td style="padding:16px 0;border-top:1px solid #E8E8E8;text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace;font-size:11.5px;">${formatMoney(
+        <td style="padding:12px 0;border-top:1px solid #E8E8E8;text-align:center;font-family:'JetBrains Mono',monospace;font-size:11.5px;">1</td>
+        <td style="padding:12px 0;border-top:1px solid #E8E8E8;text-align:right;font-family:'JetBrains Mono',monospace;font-size:11.5px;">—</td>
+        <td style="padding:12px 0;border-top:1px solid #E8E8E8;text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace;font-size:11.5px;">${formatMoney(
           calc.subtotalFlete,
         )}</td>
       </tr>`
@@ -110,12 +112,22 @@ export function renderQuoteHtml(args: {
   <div style="font-family:'Manrope',Arial,sans-serif;color:#1C1E22;background:#ffffff;width:794px;">
 
     <!-- HEADER -->
-    <div style="background:#343331;padding:28px 48px 30px;">
-      <img src="${logoDataUrl}" alt="VIALUX" style="height:auto;max-height:80px;width:auto;max-width:240px;display:block;" />
+    <div style="background:#343331;padding:24px 48px;">
+      <table style="width:100%;border-collapse:collapse;">
+        <tr>
+          <td style="vertical-align:bottom;padding:0;">
+            <img src="${logoDataUrl}" alt="VIALUX" style="height:auto;max-height:80px;width:auto;max-width:240px;display:block;" />
+          </td>
+          <td style="vertical-align:bottom;text-align:right;padding:0 0 4px;">
+            <div style="font-size:8px;letter-spacing:0.22em;color:#8A8F99;font-family:'JetBrains Mono',monospace;text-transform:uppercase;">DOCUMENTO COMERCIAL · 2026</div>
+            <div style="margin-top:5px;font-size:15px;font-weight:900;letter-spacing:0.08em;color:#ffffff;line-height:1;font-family:'Manrope',Arial,sans-serif;">COTIZACIÓN <span style="color:#EDBA1A;">COMERCIAL</span></div>
+          </td>
+        </tr>
+      </table>
     </div>
     <div style="height:5px;background:#EDBA1A;"></div>
 
-    <div style="padding:32px 48px 24px;">
+    <div style="padding:28px 48px 22px;">
 
       <!-- CLIENTE + FECHA -->
       <table style="width:100%;border-collapse:collapse;">
@@ -144,7 +156,7 @@ export function renderQuoteHtml(args: {
         </tr>
       </table>
 
-      <div style="height:1px;background:#1C1E22;margin-top:22px;"></div>
+      <div style="height:1px;background:#1C1E22;margin-top:18px;"></div>
 
       <!-- TABLA PRINCIPAL -->
       <table style="width:100%;border-collapse:collapse;margin-top:14px;font-size:11.5px;">
@@ -158,13 +170,13 @@ export function renderQuoteHtml(args: {
         </thead>
         <tbody>
           <tr>
-            <td style="padding:18px 20px 18px 0;border-top:1px solid #E8E8E8;vertical-align:top;">
+            <td style="padding:14px 20px 14px 0;border-top:1px solid #E8E8E8;vertical-align:top;">
               <div style="font-weight:700;line-height:1.35;font-size:11.5px;">${esc(prod.descripcion)}</div>
-              <div style="color:#9CA3AF;font-size:9.5px;margin-top:5px;letter-spacing:0.04em;font-family:'JetBrains Mono',monospace;">${esc(shortSpec(state.producto))}</div>
+              <div style="color:#9CA3AF;font-size:9px;margin-top:5px;letter-spacing:0.04em;font-family:'JetBrains Mono',monospace;"><span style="color:#EDBA1A;font-weight:700;">${esc(prod.sku)}</span> · ${esc(shortSpec(state.producto))}</div>
             </td>
-            <td style="padding:18px 0;border-top:1px solid #E8E8E8;text-align:center;font-family:'JetBrains Mono',monospace;">${formatInt(state.cantidad)}</td>
-            <td style="padding:18px 0;border-top:1px solid #E8E8E8;text-align:right;font-family:'JetBrains Mono',monospace;">${formatMoney(calc.precioUnitario)}</td>
-            <td style="padding:18px 0;border-top:1px solid #E8E8E8;text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace;">${formatMoney(calc.subtotalProducto)}</td>
+            <td style="padding:14px 0;border-top:1px solid #E8E8E8;text-align:center;font-family:'JetBrains Mono',monospace;">${formatInt(state.cantidad)}</td>
+            <td style="padding:14px 0;border-top:1px solid #E8E8E8;text-align:right;font-family:'JetBrains Mono',monospace;">${formatMoney(calc.precioUnitario)}</td>
+            <td style="padding:14px 0;border-top:1px solid #E8E8E8;text-align:right;font-weight:700;font-family:'JetBrains Mono',monospace;">${formatMoney(calc.subtotalProducto)}</td>
           </tr>
           ${fleteRow}
           <!-- Totales -->
@@ -187,11 +199,11 @@ export function renderQuoteHtml(args: {
       </table>
 
       <!-- Entrega + Pago -->
-      <table style="width:100%;border-collapse:separate;border-spacing:14px 0;margin-top:24px;">
+      <table style="width:100%;border-collapse:separate;border-spacing:14px 0;margin-top:18px;">
         <tr>
           <td style="width:50%;vertical-align:top;padding:0;">
             <div style="font-size:9.5px;letter-spacing:0.16em;font-weight:800;color:#1C1E22;margin-bottom:7px;text-transform:uppercase;">Tiempo de Entrega</div>
-            <div style="border:1px solid #E5E7EB;border-radius:8px;padding:18px 18px;">
+            <div style="border:1px solid #E5E7EB;border-radius:8px;padding:14px 18px;">
               <div style="font-weight:700;letter-spacing:0.04em;font-size:11.5px;">${deliveryMain}</div>
               ${deliverySub
                 ? `<div style="color:#6B7280;font-size:10.5px;margin-top:5px;">${deliverySub}</div>`
@@ -201,7 +213,7 @@ export function renderQuoteHtml(args: {
           </td>
           <td style="width:50%;vertical-align:top;padding:0;">
             <div style="font-size:9.5px;letter-spacing:0.16em;font-weight:800;color:#1C1E22;margin-bottom:7px;text-transform:uppercase;">Forma de Pago</div>
-            <div style="border:1px solid #E5E7EB;border-radius:8px;padding:18px 18px;">
+            <div style="border:1px solid #E5E7EB;border-radius:8px;padding:14px 18px;">
               <div style="font-weight:700;letter-spacing:0.04em;font-size:11.5px;">TRANSFERENCIA BANCARIA</div>
               <div style="color:#6B7280;font-size:10.5px;margin-top:5px;">PAGO ANTICIPADO REQUERIDO</div>
               <div style="color:#6B7280;font-size:10.5px;margin-top:3px;">DATOS BANCARIOS AL CONFIRMAR ORDEN</div>
@@ -211,7 +223,7 @@ export function renderQuoteHtml(args: {
       </table>
 
       <!-- Especificaciones -->
-      <div style="margin-top:24px;">
+      <div style="margin-top:18px;">
         <div style="font-size:9.5px;letter-spacing:0.16em;font-weight:800;color:#1C1E22;margin-bottom:8px;text-transform:uppercase;">Especificaciones del Producto</div>
         <div style="height:1px;background:#E8E8E8;"></div>
         <table style="width:100%;font-size:10.5px;border-collapse:collapse;margin-top:8px;">
@@ -226,7 +238,7 @@ export function renderQuoteHtml(args: {
       </div>
 
       <!-- Términos -->
-      <div style="margin-top:24px;">
+      <div style="margin-top:18px;">
         <div style="height:1px;background:#E8E8E8;"></div>
         <div style="font-size:9.5px;letter-spacing:0.16em;font-weight:800;color:#1C1E22;margin-top:12px;text-transform:uppercase;">Términos y Condiciones</div>
         <div style="margin-top:12px;font-size:10px;color:#6B7280;line-height:1.5;">
@@ -240,9 +252,9 @@ export function renderQuoteHtml(args: {
     </div>
 
     <!-- FOOTER -->
-    <div style="background:#343331;color:#fff;padding:16px 48px;text-align:center;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;">
+    <div style="background:#343331;color:#fff;padding:14px 48px;text-align:center;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;">
       <div style="font-weight:700;">SEÑALIZACIÓN VIAL DE PRECISIÓN · DISPONIBILIDAD INMEDIATA · ENVÍO NACIONAL</div>
-      <div style="color:#9aa3ad;margin-top:6px;font-size:9.5px;letter-spacing:0.22em;">MONTERREY, NUEVO LEÓN, MÉXICO</div>
+      <div style="color:#9aa3ad;margin-top:5px;font-size:9px;letter-spacing:0.2em;">${CONTACT_EMAIL} · TEL ${CONTACT_TEL} · MONTERREY, N.L.</div>
     </div>
 
   </div>

@@ -477,27 +477,51 @@ function ClientesPage() {
     0,
   );
 
+  const ticketPromedio =
+    (clientesQuery.data?.length ?? 0) > 0
+      ? totalHistorico / (clientesQuery.data?.length ?? 1)
+      : 0;
+
   return (
     <div className="mx-auto w-full max-w-7xl px-6 py-8">
-      {/* Header */}
-      <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+      {/* Page header */}
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold uppercase tracking-wider">Directorio</h1>
           <p className="text-xs uppercase tracking-[0.16em] text-[#6B8899]">
             Cartera de clientes y su historial
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="rounded-md border border-[#EDBA1A]/40 bg-[#EDBA1A]/5 px-4 py-2 text-center">
-            <div className="text-[10px] uppercase tracking-[0.16em] text-[#C99B0E]">Clientes</div>
-            <div className="font-mono text-xl font-bold text-[#EDBA1A]">
-              {clientesQuery.data?.length ?? "—"}
-            </div>
+      </div>
+
+      {/* KPI cards */}
+      <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <div className="rounded-xl border border-[#EDBA1A]/25 bg-[#EDBA1A]/5 p-4">
+          <div className="mb-1 text-[10px] uppercase tracking-[0.16em] text-[#C99B0E]">
+            Clientes activos
           </div>
-          <div className="rounded-md border border-border bg-card px-4 py-2 text-center">
-            <div className="text-[10px] uppercase tracking-[0.16em] text-[#6B8899]">Total histórico</div>
-            <div className="font-mono text-xl font-bold">{formatMoney(totalHistorico)}</div>
+          <div className="font-mono text-3xl font-black text-[#EDBA1A] tabular-nums">
+            {clientesQuery.data?.length ?? "—"}
           </div>
+          <div className="mt-0.5 text-[10px] text-muted-foreground">en directorio</div>
+        </div>
+        <div className="rounded-xl border border-border bg-card p-4">
+          <div className="mb-1 text-[10px] uppercase tracking-[0.16em] text-[#6B8899]">
+            Total histórico
+          </div>
+          <div className="font-mono text-2xl font-black text-white tabular-nums">
+            {formatMoney(totalHistorico)}
+          </div>
+          <div className="mt-0.5 text-[10px] text-muted-foreground">acumulado de cotizaciones</div>
+        </div>
+        <div className="rounded-xl border border-border bg-card p-4">
+          <div className="mb-1 text-[10px] uppercase tracking-[0.16em] text-[#6B8899]">
+            Ticket promedio
+          </div>
+          <div className="font-mono text-2xl font-black text-white tabular-nums">
+            {formatMoney(ticketPromedio)}
+          </div>
+          <div className="mt-0.5 text-[10px] text-muted-foreground">por cliente</div>
         </div>
       </div>
 
@@ -514,23 +538,23 @@ function ClientesPage() {
         </div>
         <Button
           onClick={() => setShowNew(true)}
-          className="bg-[#EDBA1A] text-[#1C1E22] hover:bg-[#EDBA1A]/90"
+          className="bg-[#EDBA1A] text-[#1C1E22] hover:bg-[#EDBA1A]/90 shrink-0"
         >
           <UserPlus className="mr-2 h-4 w-4" /> Nuevo Cliente
         </Button>
       </div>
 
       {/* Table */}
-      <div className="overflow-hidden rounded-lg border border-border bg-card">
+      <div className="overflow-hidden rounded-xl border border-border bg-card">
         <table className="w-full text-sm">
-          <thead className="bg-background/40 text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
+          <thead className="border-b border-border bg-background/60 text-[10px] uppercase tracking-[0.14em] text-[#6B8899]">
             <tr>
-              <th className="px-4 py-3 text-left">Cliente</th>
-              <th className="px-4 py-3 text-left">Teléfono</th>
-              <th className="px-4 py-3 text-right">Cotizaciones</th>
-              <th className="px-4 py-3 text-right">Total histórico</th>
-              <th className="px-4 py-3 text-left">Última cotización</th>
-              <th className="px-4 py-3" />
+              <th className="px-4 py-3.5 text-left font-bold">Cliente</th>
+              <th className="px-4 py-3.5 text-left font-bold">Teléfono</th>
+              <th className="px-4 py-3.5 text-right font-bold">Cotizaciones</th>
+              <th className="px-4 py-3.5 text-right font-bold">Total histórico</th>
+              <th className="px-4 py-3.5 text-left font-bold">Última cotización</th>
+              <th className="px-4 py-3.5" />
             </tr>
           </thead>
           <tbody>
@@ -550,7 +574,7 @@ function ClientesPage() {
               rows.map((c) => (
                 <tr
                   key={c.id}
-                  className="cursor-pointer border-t border-border hover:bg-muted/20"
+                  className="cursor-pointer border-t border-border transition-colors hover:bg-[#EDBA1A]/[0.04]"
                   onClick={() => setSelectedId(c.id)}
                 >
                   <td className="px-4 py-3">

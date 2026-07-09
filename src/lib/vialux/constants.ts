@@ -5,18 +5,23 @@ export const IVA_RATE = 0.16;
 
 export type ProductoKey = "boya" | "boya_clavos" | "boya_clavos_refl";
 
+export const CONTACT_EMAIL = "COTIZACIONES.VIALUXMTY@GMAIL.COM";
+export const CONTACT_TEL = "+52 81 3073 0586";
+
 export const PRODUCTOS: Record<
   ProductoKey,
-  { label: string; descripcion: string; conFactura: number; sinFactura: number }
+  { label: string; sku: string; descripcion: string; conFactura: number; sinFactura: number }
 > = {
   boya: {
     label: "Boya sola",
+    sku: "VLX-22-S",
     descripcion: "BOYAS METÁLICAS C 1/8 COLOR AMARILLO TRÁFICO",
     conFactura: 44,
     sinFactura: 47,
   },
   boya_clavos: {
     label: "Boya + clavos",
+    sku: "VLX-22-BC",
     descripcion:
       "BOYAS METÁLICAS C 1/8 COLOR AMARILLO TRÁFICO CON 4 CLAVOS DE ALTA RESISTENCIA",
     conFactura: 48,
@@ -24,6 +29,7 @@ export const PRODUCTOS: Record<
   },
   boya_clavos_refl: {
     label: "Boya + clavos + reflejantes",
+    sku: "VLX-22-BCR",
     descripcion:
       "BOYAS METÁLICAS C 1/8 COLOR AMARILLO TRÁFICO CON 4 CLAVOS DE ALTA RESISTENCIA Y 2 REFLEJANTES COLOR AMARILLO/PLATA",
     conFactura: 53,
