@@ -120,7 +120,7 @@ export function renderQuoteHtml(args: {
 </style>
 </head>
 <body>
-  <div style="font-family:'JetBrains Mono',monospace;color:#1B1A17;background:#ffffff;width:816px;">
+  <div style="font-family:'JetBrains Mono',monospace;color:#1B1A17;background:#ffffff;width:816px;height:1052px;display:flex;flex-direction:column;">
 
     <!-- HEADER -->
     <div style="background:#343331;padding:16px 40px;">
@@ -138,8 +138,8 @@ export function renderQuoteHtml(args: {
     </div>
     <div style="height:5px;background:#EDBA1A;"></div>
 
-    <!-- CUERPO CON RIEL LATERAL -->
-    <table style="width:100%;border-collapse:collapse;">
+    <!-- CUERPO CON RIEL LATERAL: flex:1 estira la tabla y reparte el sobrante entre secciones -->
+    <table style="width:100%;border-collapse:collapse;flex:1 1 auto;">
 
       <!-- 00 CLIENTE -->
       <tr>
@@ -278,7 +278,6 @@ export function renderQuoteHtml(args: {
 
     </table>
 
-    <!-- FOOTER-SPACER -->
 
     <!-- FOOTER: CONTACTO -->
     <div style="background:#F0EFEB;padding:10px 40px;text-align:center;font-size:8px;letter-spacing:0.18em;">

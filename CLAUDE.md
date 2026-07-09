@@ -62,8 +62,11 @@ ficha técnica hecha en Claude Design — tamaño CARTA (816×1056px @ 0.75 esca
 6. 03 TÉCNICO: grid 4×2 de especificaciones con celdas bordeadas, labels dorados
 7. 04 TÉRMINOS: políticas + strip NOTA con fondo #F0EFEB (precios sujetos a cambio al vencer vigencia)
 8. Footer doble: strip claro #F0EFEB con email/tel + strip #343331 con tagline
-- Footer anclado al fondo de la hoja vía spacer dinámico (generateQuotePdf mide
-  la altura en un iframe oculto y rellena el faltante hasta 1056px por página)
+- Footer anclado al fondo de la hoja vía CSS puro: el wrapper es flex column con
+  height:1052px y la tabla del cuerpo lleva flex:1 — el sobrante se reparte entre
+  las filas de sección (NO usar mediciones en runtime; ya falló en producción)
+- Logo: PNG con fondo transparente y colores planos (src/assets/vialux-logo.png);
+  html2canvas scale:3 para nitidez
 - TODO el texto del PDF en MAYÚSCULAS
 - Nombre archivo: {FOLIO}_{CLIENTE}_{CANTIDAD}PZS.pdf
 - Verificación de altura: `npx vite-node scripts/measure-pdf.ts` + Chrome headless
