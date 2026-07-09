@@ -38,15 +38,15 @@ export function InventarioBadge() {
   return (
     <div
       title={`Inventario: ${boyas ?? "—"} boyas disponibles`}
-      className={`flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 ${
+      className={`flex items-center gap-1.5 border px-2.5 py-1.5 ${
         isLow
           ? "border-red-500/40 bg-red-500/10"
-          : "border-[#EDBA1A]/25 bg-[#EDBA1A]/8"
+          : "border-[#EDBA1A]/25 bg-[#EDBA1A]/10"
       }`}
     >
       <Package className={`h-3.5 w-3.5 ${isLow ? "text-red-400" : "text-[#EDBA1A]"}`} />
       <span
-        className={`text-[10px] uppercase tracking-[0.14em] ${isLow ? "text-red-400" : "text-[#C99B0E]"}`}
+        className={`font-mono text-[9px] uppercase tracking-[0.2em] ${isLow ? "text-red-400" : "text-[#C99B0E]"}`}
       >
         Inv.
       </span>

@@ -51,45 +51,54 @@ Layout exacto (NO modificar sin autorización). Rediseño julio 2026: alineado a
 ficha técnica hecha en Claude Design — tamaño CARTA (816×1056px @ 0.75 escala a
 612×792pt), tipografía JetBrains Mono dominante, riel lateral numerado:
 
-1. Header: fondo #343331, logo izquierda; derecha "DOCUMENTO COMERCIAL · 2026 · FOLIO ..."
-   + "COTIZACIÓN COMERCIAL" (peso regular, tracking amplio, COMERCIAL en #EDBA1A); barra amarilla 5px
-2. Riel lateral izquierdo: secciones numeradas 00-04 (número amarillo + etiqueta
-   vertical rotada): 00 CLIENTE · 01 PARTIDAS · 02 CONDICIONES · 03 TÉCNICO · 04 TÉRMINOS
+1. Header: fondo #2E2B27, logo transparente 58px izquierda; derecha "DOCUMENTO
+   COMERCIAL · 2026 · FOLIO ..." + "COTIZACIÓN COMERCIAL" (peso 400, letter-spacing
+   4px, COMERCIAL en #F2B90D); barra amarilla #F2B90D 5px
+2. Riel lateral izquierdo de 88px: secciones numeradas 00-04 (número 13px #C79100 +
+   etiqueta vertical rotada 9px #9B968E): CLIENTE · PARTIDAS · CONDICIONES · TÉCNICO · TÉRMINOS
+   (en el PDF la rotación usa transform rotate(-90deg) translateX(-100%) — html2canvas
+   NO soporta writing-mode; en la app sí se usa writing-mode)
 3. 00 CLIENTE: "COTIZACIÓN PARA:" + nombre + atendido por + badge "SEÑALIZACIÓN VIAL" + folio; fecha/vigencia derecha
-4. 01 PARTIDAS: tabla (producto + flete como partidas), SKU VLX-22-* en dorado,
-   subtotal/IVA, regla amarilla, TOTAL en #C99B0E grande + "MXN · PESOS MEXICANOS"
+4. 01 PARTIDAS: grid (producto + flete como partidas), SKU VLX-22-* en #C79100,
+   subtotal/IVA, regla #F2B90D 288×3px, TOTAL 20px 800 #C79100 + "MXN · PESOS MEXICANOS"
 5. 02 CONDICIONES: boxes Tiempo de entrega + Forma de pago
 6. 03 TÉCNICO: grid 4×2 de especificaciones con celdas bordeadas, labels dorados
-7. 04 TÉRMINOS: políticas + strip NOTA con fondo #F0EFEB (precios sujetos a cambio al vencer vigencia)
-8. Footer doble: strip claro #F0EFEB con email/tel + strip #343331 con tagline
-- Footer anclado al fondo de la hoja vía CSS puro: el wrapper es flex column con
-  height:1052px y la tabla del cuerpo lleva flex:1 — el sobrante se reparte entre
-  las filas de sección (NO usar mediciones en runtime; ya falló en producción)
-- Logo: PNG con fondo transparente y colores planos (src/assets/vialux-logo.png);
-  html2canvas scale:3 para nitidez
+7. 04 TÉRMINOS: políticas + strip NOTA fondo #F1EFEA; la sección lleva flex:1 y
+   absorbe el espacio sobrante de la hoja (así el footer queda al borde inferior)
+8. Footer doble: strip #F1EFEA con email/tel + strip #2E2B27 con tagline
+- Wrapper: flex column min-height:1052px (NO height fija + overflow:hidden — eso
+  recorta contenido silenciosamente; NO mediciones en runtime — ya falló en producción)
+- Logo: src/assets/vialux-logo-t.png (transparente); html2canvas scale:3
+- Referencia visual definitiva: ~/Downloads/design_handoff_vialux/Cotización VIALUX.dc.html
 - TODO el texto del PDF en MAYÚSCULAS
 - Nombre archivo: {FOLIO}_{CLIENTE}_{CANTIDAD}PZS.pdf
 - Verificación de altura: `npx vite-node scripts/measure-pdf.ts` + Chrome headless
   (presupuesto 1056px por hoja; el peor caso refl+factura+flete debe caber en una)
 
-## Identidad visual — VIALUX (Dirección B: Infraestructura Moderna)
+## Identidad visual — VIALUX (tema claro "documento técnico", julio 2026)
 
-### Colores (paleta cálida — julio 2026, sin azules por decisión del usuario)
-- Amarillo tráfico: #EDBA1A (acentos, CTAs, badges)
-- Amarillo oscuro: #C99B0E (texto/labels dorados sobre blanco)
-- Grafito cálido: #2B2A28 (fondo de la app)
-- Grafito claro cálido: #3A3936 (cards, surfaces)
-- Grafito ficha: #343331 (header/footer del PDF y de la app)
-- Piedra: #7C766A / Piedra clara: #A49E91 (labels, texto secundario)
-- Muted: #8C867A (texto terciario)
-- Negro cálido: #1B1A17 (texto sobre amarillo, paneles oscuros)
-- Badge ENVIADO: bg-[#F0EFEB] text-[#1B1A17] (ya no azul cielo)
-- Tab activo: bg-[#EDBA1A] text-[#1B1A17]
-- El azul acero (#4A6274/#6B8899) fue RETIRADO de app y PDF — no reintroducir
+Rediseño completo desde Claude Design (handoff en ~/Downloads/design_handoff_vialux/).
+El shell (header/footer) permanece grafito #343331; el lienzo de contenido es claro.
+Lenguaje visual: riel lateral numerado (00/01/02...) con etiquetas verticales mono,
+grids bordeados, esquinas rectas (--radius: 0; solo toggles/radios circulares).
+
+### Tokens (app)
+- Papel (fondo): #FAF9F7 · Paneles: #FFFFFF · Texto: #2E2B27
+- Bordes: #E5E2DC (fuerte) / #EFEDE8 (filas de tabla) · Thead: #F5F3EF
+- Labels/secundario: #8A857C · Terciario: #7C766A
+- Amarillo superficie: #EDBA1A (tab activa, botón PDF, badges, avatares, pill COTIZADO)
+- Dorado texto sobre blanco: #C79100 / #C99B0E — NUNCA #EDBA1A como texto sobre blanco
+- Verde: #16A34A (texto) / #10B981 (pill CERRADO) · Rojo: #DC2626
+- Panel TOTAL del resumen: fondo #1B1A17 con monto #EDBA1A mono 28px
+- Pills cuadradas mono 8px: COTIZADO #EDBA1A/#1B1A17, CERRADO #10B981/blanco,
+  ENVIADO #E5E2DC/#1B1A17, PERDIDO #DC2626/blanco
+- Semáforo margen sobre blanco: ≥27% #16A34A · 20-26% #C79100 · <20% #DC2626
+- Logo: src/assets/vialux-logo-t.png (transparente) — shell 40px, PDF 58px
+- Componentes clave: RailSection/PageTitle en src/components/RailSection.tsx
 
 ### Tipografía
-- Manrope (Google Fonts) — texto general
-- JetBrains Mono — números, precios, folios, datos técnicos
+- Manrope (UI general) — JetBrains Mono (números, folios, labels, datos técnicos,
+  y TODO el PDF)
 
 ## Lógica de envío por CP
 

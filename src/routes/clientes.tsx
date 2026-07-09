@@ -21,6 +21,7 @@ import {
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney } from "@/lib/vialux/constants";
+import { RailSection, PageTitle } from "@/components/RailSection";
 import {
   Search,
   UserPlus,
@@ -66,9 +67,9 @@ type ClienteConStats = Cliente & {
 
 const ESTADO_CLASS: Record<string, string> = {
   cotizado: "bg-[#EDBA1A] text-[#1B1A17]",
-  cerrado: "bg-emerald-500 text-white",
-  enviado: "bg-[#F0EFEB] text-[#1B1A17]",
-  perdido: "bg-red-500 text-white",
+  cerrado: "bg-[#10B981] text-white",
+  enviado: "bg-[#E5E2DC] text-[#1B1A17]",
+  perdido: "bg-[#DC2626] text-white",
 };
 
 function initials(nombre: string) {
@@ -121,7 +122,7 @@ function ClientDetail({
     <div className="flex flex-col gap-6">
       <SheetHeader>
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#EDBA1A] font-mono text-xl font-bold text-[#1B1A17]">
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center bg-[#EDBA1A] font-mono text-xl font-bold text-[#1B1A17]">
             {initials(cliente.nombre)}
           </div>
           <div>
@@ -138,15 +139,15 @@ function ClientDetail({
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         <div className="rounded-md border border-border bg-background/40 p-3 text-center">
-          <div className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">Cotizaciones</div>
-          <div className="font-mono text-xl font-bold text-[#EDBA1A]">{cliente.total_cotizaciones}</div>
+          <div className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Cotizaciones</div>
+          <div className="font-mono text-xl font-bold text-[#C79100]">{cliente.total_cotizaciones}</div>
         </div>
         <div className="rounded-md border border-border bg-background/40 p-3 text-center">
-          <div className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">Total</div>
+          <div className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Total</div>
           <div className="font-mono text-base font-bold">{formatMoney(cliente.total_historico)}</div>
         </div>
         <div className="rounded-md border border-border bg-background/40 p-3 text-center">
-          <div className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">Promedio</div>
+          <div className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Promedio</div>
           <div className="font-mono text-base font-bold">{formatMoney(ticketPromedio)}</div>
         </div>
       </div>
@@ -166,10 +167,10 @@ function ClientDetail({
         ) : (
           <>
             <Button variant="outline" size="icon" onClick={save}>
-              <Check className="h-4 w-4 text-emerald-400" />
+              <Check className="h-4 w-4 text-[#16A34A]" />
             </Button>
             <Button variant="outline" size="icon" onClick={() => setEditing(false)}>
-              <X className="h-4 w-4 text-red-400" />
+              <X className="h-4 w-4 text-[#DC2626]" />
             </Button>
           </>
         )}
@@ -179,38 +180,38 @@ function ClientDetail({
       {editing ? (
         <div className="space-y-4 rounded-lg border border-border bg-card p-4">
           <div>
-            <div className="mb-2 text-[9px] font-bold uppercase tracking-[0.18em] text-[#EDBA1A]">Dirigida a (aparece en PDF)</div>
+            <div className="mb-2 font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-[#C79100]">Dirigida a (aparece en PDF)</div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">Empresa</Label>
+                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Empresa</Label>
                 <Input value={form.empresa} onChange={(e) => setForm((f) => ({ ...f, empresa: e.target.value }))} />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">Teléfono</Label>
+                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Teléfono</Label>
                 <Input value={form.telefono} onChange={(e) => setForm((f) => ({ ...f, telefono: e.target.value }))} className="font-mono" />
               </div>
             </div>
             <div className="mt-3 space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">Email</Label>
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Email</Label>
               <Input value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
             </div>
           </div>
           <div className="h-px bg-border" />
           <div>
-            <div className="mb-2 text-[9px] font-bold uppercase tracking-[0.18em] text-[#A49E91]">Contacto (quién solicita)</div>
+            <div className="mb-2 text-[9px] font-bold uppercase tracking-[0.18em] text-[#8A857C]">Contacto (quién solicita)</div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">Nombre</Label>
+                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Nombre</Label>
                 <Input value={form.contacto_nombre} onChange={(e) => setForm((f) => ({ ...f, contacto_nombre: e.target.value }))} placeholder="EJ. ANA MEDINA" />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">Teléfono</Label>
+                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Teléfono</Label>
                 <Input value={form.contacto_telefono} onChange={(e) => setForm((f) => ({ ...f, contacto_telefono: e.target.value }))} className="font-mono" placeholder="8112345678" />
               </div>
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">Notas internas</Label>
+            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Notas internas</Label>
             <Textarea value={form.notas} onChange={(e) => setForm((f) => ({ ...f, notas: e.target.value }))} rows={2} />
           </div>
         </div>
@@ -218,7 +219,7 @@ function ClientDetail({
         <div className="space-y-3 rounded-lg border border-border bg-card p-4 text-sm">
           {(cliente.telefono || cliente.empresa || cliente.email) && (
             <div>
-              <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#EDBA1A]">Dirigida a</div>
+              <div className="mb-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-[#C79100]">Dirigida a</div>
               <div className="space-y-1">
                 {cliente.empresa && (
                   <div className="flex justify-between">
@@ -243,7 +244,7 @@ function ClientDetail({
           )}
           {(cliente.contacto_nombre || cliente.contacto_telefono) && (
             <div>
-              <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#A49E91]">Contacto (quien solicita)</div>
+              <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#8A857C]">Contacto (quien solicita)</div>
               <div className="space-y-1">
                 {cliente.contacto_nombre && (
                   <div className="flex justify-between">
@@ -271,7 +272,7 @@ function ClientDetail({
 
       {/* Quotes */}
       <div>
-        <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[#A49E91]">
+        <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[#8A857C]">
           Cotizaciones
         </div>
         {cliente.cotizaciones.length === 0 ? (
@@ -284,7 +285,7 @@ function ClientDetail({
                 className="flex items-center justify-between rounded-md border border-border bg-background/40 px-3 py-2"
               >
                 <div>
-                  <div className="font-mono text-xs font-bold text-[#EDBA1A]">{q.folio}</div>
+                  <div className="font-mono text-xs font-bold text-[#C79100]">{q.folio}</div>
                   <div className="text-[11px] text-muted-foreground">
                     {new Date(q.fecha).toLocaleDateString("es-MX")} · {q.cantidad} pzas
                   </div>
@@ -292,7 +293,7 @@ function ClientDetail({
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-sm font-bold">{formatMoney(Number(q.total))}</span>
                   <span
-                    className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${ESTADO_CLASS[q.estado] ?? "bg-muted text-foreground"}`}
+                    className={`px-2 py-0.5 font-mono text-[8px] font-bold uppercase tracking-[0.12em] ${ESTADO_CLASS[q.estado] ?? "bg-muted text-foreground"}`}
                   >
                     {q.estado}
                   </span>
@@ -357,12 +358,12 @@ function NuevoClienteDialog({
         <div className="space-y-5 py-2">
           {/* Sección: Dirigida a */}
           <div>
-            <div className="mb-3 text-[9px] font-bold uppercase tracking-[0.18em] text-[#EDBA1A]">
+            <div className="mb-3 font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-[#C79100]">
               Dirigida a — aparece en el PDF
             </div>
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">Nombre *</Label>
+                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Nombre *</Label>
                 <Input
                   value={form.nombre}
                   onChange={f("nombre")}
@@ -372,16 +373,16 @@ function NuevoClienteDialog({
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">Empresa</Label>
+                  <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Empresa</Label>
                   <Input value={form.empresa} onChange={f("empresa")} placeholder="—" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">Teléfono</Label>
+                  <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Teléfono</Label>
                   <Input value={form.telefono} onChange={f("telefono")} placeholder="8112345678" className="font-mono" />
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">Email</Label>
+                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Email</Label>
                 <Input value={form.email} onChange={f("email")} placeholder="correo@ejemplo.com" />
               </div>
             </div>
@@ -395,16 +396,16 @@ function NuevoClienteDialog({
 
           {/* Sección: Contacto */}
           <div>
-            <div className="mb-3 text-[9px] font-bold uppercase tracking-[0.18em] text-[#A49E91]">
+            <div className="mb-3 text-[9px] font-bold uppercase tracking-[0.18em] text-[#8A857C]">
               Quién solicita la cotización
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">Nombre del contacto</Label>
+                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Nombre del contacto</Label>
                 <Input value={form.contacto_nombre} onChange={f("contacto_nombre")} placeholder="EJ. ANA MEDINA" />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">Teléfono del contacto</Label>
+                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Teléfono del contacto</Label>
                 <Input value={form.contacto_telefono} onChange={f("contacto_telefono")} placeholder="8112345678" className="font-mono" />
               </div>
             </div>
@@ -485,124 +486,127 @@ function ClientesPage() {
   return (
     <div className="mx-auto w-full max-w-7xl px-6 py-8">
       {/* Page header */}
-      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold uppercase tracking-wider">Directorio</h1>
-          <p className="text-xs uppercase tracking-[0.16em] text-[#A49E91]">
-            Cartera de clientes y su historial
-          </p>
-        </div>
-      </div>
+      <PageTitle
+        kicker="Módulo · Cartera"
+        title="Directorio"
+        right={
+          <Button
+            onClick={() => setShowNew(true)}
+            className="bg-[#EDBA1A] font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#1B1A17] hover:bg-[#EDBA1A]/90"
+          >
+            <UserPlus className="mr-1.5 h-3.5 w-3.5" /> Nuevo Cliente
+          </Button>
+        }
+      />
 
-      {/* KPI cards */}
-      <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <div className="rounded-xl border border-[#EDBA1A]/25 bg-[#EDBA1A]/5 p-4">
-          <div className="mb-1 text-[10px] uppercase tracking-[0.16em] text-[#C99B0E]">
-            Clientes activos
+      <div className="border border-border bg-card">
+        {/* 00 INDICADORES */}
+        <RailSection num="00" label="INDICADORES" padded={false}>
+          <div className="grid grid-cols-1 sm:grid-cols-3">
+            <div className="border-r border-border p-4 md:px-5">
+              <div className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">Clientes activos</div>
+              <div className="font-mono text-[22px] font-extrabold leading-none text-[#C79100] tabular-nums">
+                {clientesQuery.data?.length ?? "—"}
+              </div>
+              <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">EN DIRECTORIO</div>
+            </div>
+            <div className="border-r border-border p-4 md:px-5">
+              <div className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">Total histórico</div>
+              <div className="font-mono text-[22px] font-extrabold leading-none tabular-nums">
+                {formatMoney(totalHistorico)}
+              </div>
+              <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">ACUMULADO DE COTIZACIONES</div>
+            </div>
+            <div className="p-4 md:px-5">
+              <div className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">Ticket promedio</div>
+              <div className="font-mono text-[22px] font-extrabold leading-none tabular-nums">
+                {formatMoney(ticketPromedio)}
+              </div>
+              <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">POR CLIENTE</div>
+            </div>
           </div>
-          <div className="font-mono text-3xl font-black text-[#EDBA1A] tabular-nums">
-            {clientesQuery.data?.length ?? "—"}
-          </div>
-          <div className="mt-0.5 text-[10px] text-muted-foreground">en directorio</div>
-        </div>
-        <div className="rounded-xl border border-border bg-card p-4">
-          <div className="mb-1 text-[10px] uppercase tracking-[0.16em] text-[#A49E91]">
-            Total histórico
-          </div>
-          <div className="font-mono text-2xl font-black text-white tabular-nums">
-            {formatMoney(totalHistorico)}
-          </div>
-          <div className="mt-0.5 text-[10px] text-muted-foreground">acumulado de cotizaciones</div>
-        </div>
-        <div className="rounded-xl border border-border bg-card p-4">
-          <div className="mb-1 text-[10px] uppercase tracking-[0.16em] text-[#A49E91]">
-            Ticket promedio
-          </div>
-          <div className="font-mono text-2xl font-black text-white tabular-nums">
-            {formatMoney(ticketPromedio)}
-          </div>
-          <div className="mt-0.5 text-[10px] text-muted-foreground">por cliente</div>
-        </div>
-      </div>
+        </RailSection>
 
-      {/* Toolbar */}
-      <div className="mb-4 flex gap-3">
-        <div className="relative flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar por nombre, empresa o teléfono..."
-            className="pl-9"
-          />
-        </div>
-        <Button
-          onClick={() => setShowNew(true)}
-          className="bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#EDBA1A]/90 shrink-0"
-        >
-          <UserPlus className="mr-2 h-4 w-4" /> Nuevo Cliente
-        </Button>
-      </div>
-
-      {/* Table */}
-      <div className="overflow-hidden rounded-xl border border-border bg-card">
-        <table className="w-full text-sm">
-          <thead className="border-b border-border bg-background/60 text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
-            <tr>
-              <th className="px-4 py-3.5 text-left font-bold">Cliente</th>
-              <th className="px-4 py-3.5 text-left font-bold">Teléfono</th>
-              <th className="px-4 py-3.5 text-right font-bold">Cotizaciones</th>
-              <th className="px-4 py-3.5 text-right font-bold">Total histórico</th>
-              <th className="px-4 py-3.5 text-left font-bold">Última cotización</th>
-              <th className="px-4 py-3.5" />
-            </tr>
-          </thead>
-          <tbody>
-            {clientesQuery.isLoading ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
-                  Cargando...
-                </td>
-              </tr>
-            ) : rows.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
-                  {search ? "Sin resultados." : "Sin clientes todavía. ¡Agrega el primero!"}
-                </td>
-              </tr>
-            ) : (
-              rows.map((c) => (
-                <tr
-                  key={c.id}
-                  className="cursor-pointer border-t border-border transition-colors hover:bg-[#EDBA1A]/[0.04]"
-                  onClick={() => setSelectedId(c.id)}
-                >
-                  <td className="px-4 py-3">
-                    <div className="font-semibold uppercase">{c.nombre}</div>
-                    {c.empresa && (
-                      <div className="text-xs text-muted-foreground">{c.empresa}</div>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                    {c.telefono || "—"}
-                  </td>
-                  <td className="px-4 py-3 text-right font-mono">{c.total_cotizaciones}</td>
-                  <td className="px-4 py-3 text-right font-mono font-bold text-[#EDBA1A]">
-                    {formatMoney(c.total_historico)}
-                  </td>
-                  <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                    {c.ultima_cotizacion
-                      ? new Date(c.ultima_cotizacion).toLocaleDateString("es-MX")
-                      : "—"}
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
-                  </td>
+        {/* 01 DIRECTORIO */}
+        <RailSection num="01" label="DIRECTORIO" padded={false} last>
+          <div className="border-b border-border p-4">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="BUSCAR POR NOMBRE, EMPRESA O TELÉFONO..."
+                className="bg-background pl-9 font-mono text-xs"
+              />
+            </div>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="border-b border-border bg-[#F5F3EF] font-mono text-[8px] uppercase tracking-[0.2em] text-[#8A857C]">
+                <tr>
+                  <th className="px-4 py-3 text-left font-bold">Cliente</th>
+                  <th className="px-4 py-3 text-left font-bold">Teléfono</th>
+                  <th className="px-4 py-3 text-right font-bold">Cotizaciones</th>
+                  <th className="px-4 py-3 text-right font-bold">Total histórico</th>
+                  <th className="px-4 py-3 text-left font-bold">Última</th>
+                  <th className="px-4 py-3" />
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              </thead>
+              <tbody>
+                {clientesQuery.isLoading ? (
+                  <tr>
+                    <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
+                      Cargando...
+                    </td>
+                  </tr>
+                ) : rows.length === 0 ? (
+                  <tr>
+                    <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
+                      {search ? "Sin resultados." : "Sin clientes todavía. ¡Agrega el primero!"}
+                    </td>
+                  </tr>
+                ) : (
+                  rows.map((c) => (
+                    <tr
+                      key={c.id}
+                      className="cursor-pointer border-t border-[#EFEDE8] transition-colors hover:bg-[#EDBA1A]/[0.04]"
+                      onClick={() => setSelectedId(c.id)}
+                    >
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center bg-[#EDBA1A] font-mono text-[11px] font-extrabold text-[#1B1A17]">
+                            {initials(c.nombre)}
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold uppercase">{c.nombre}</div>
+                            <div className="text-[10px] text-muted-foreground">
+                              {c.empresa || "Sin empresa"}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 font-mono text-[10px] text-muted-foreground">
+                        {c.telefono || "—"}
+                      </td>
+                      <td className="px-4 py-3 text-right font-mono text-xs">{c.total_cotizaciones}</td>
+                      <td className="px-4 py-3 text-right font-mono text-xs font-bold text-[#C79100]">
+                        {formatMoney(c.total_historico)}
+                      </td>
+                      <td className="px-4 py-3 font-mono text-[10px] text-muted-foreground">
+                        {c.ultima_cotizacion
+                          ? new Date(c.ultima_cotizacion).toLocaleDateString("es-MX")
+                          : "—"}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <ChevronRight className="ml-auto h-4 w-4 text-muted-foreground" />
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </RailSection>
       </div>
 
       {/* Detail Sheet */}

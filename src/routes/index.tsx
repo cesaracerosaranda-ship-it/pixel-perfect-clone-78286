@@ -254,14 +254,14 @@ function CotizadorPage() {
   return (
     <div className="mx-auto w-full max-w-7xl px-6 py-8">
       <div className="mb-6 flex items-end justify-between">
-        <div>
-          <h1 className="text-2xl font-bold uppercase tracking-wider">Cotizador</h1>
-          <p className="text-xs uppercase tracking-[0.16em] text-[#A49E91]">
-            Captura los datos del cliente y genera la cotización
-          </p>
+        <div className="space-y-1">
+          <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#7C766A]">
+            Módulo · Cotizaciones
+          </div>
+          <h1 className="text-2xl font-extrabold uppercase tracking-[0.08em]">Cotizador</h1>
         </div>
         {savedFolio && (
-          <div className="flex items-center gap-2 rounded-full bg-[#EDBA1A] px-4 py-1.5 font-mono text-xs font-bold text-[#1B1A17]">
+          <div className="flex items-center gap-2 bg-[#EDBA1A] px-4 py-1.5 font-mono text-xs font-bold tracking-[0.06em] text-[#1B1A17]">
             {isSaved && <CheckCircle2 className="h-3.5 w-3.5" />}
             {savedFolio}
           </div>
@@ -281,34 +281,34 @@ function CotizadorPage() {
             <Button
               onClick={handlePdf}
               disabled={saving}
-              className="bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#EDBA1A]/90"
+              className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#EDBA1A]/90"
             >
-              <Download className="mr-2 h-4 w-4" /> PDF
+              <Download className="mr-1.5 h-3.5 w-3.5" /> PDF
             </Button>
             <Button
               onClick={handleSave}
               disabled={saving || isSaved}
               variant="outline"
-              className={isSaved ? "border-emerald-500/40 text-emerald-400" : ""}
+              className={`font-mono text-[10px] font-bold uppercase tracking-[0.2em] ${isSaved ? "border-[#16A34A]/40 text-[#16A34A]" : ""}`}
             >
               {isSaved ? (
-                <><CheckCircle2 className="mr-2 h-4 w-4" /> Guardada</>
+                <><CheckCircle2 className="mr-1.5 h-3.5 w-3.5" /> Guardada</>
               ) : (
-                <><Save className="mr-2 h-4 w-4" /> Guardar</>
+                <><Save className="mr-1.5 h-3.5 w-3.5" /> Guardar</>
               )}
             </Button>
-            <Button onClick={handleWhatsApp} disabled={saving} variant="outline">
-              <MessageCircle className="mr-2 h-4 w-4" /> WhatsApp
+            <Button onClick={handleWhatsApp} disabled={saving} variant="outline" className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#8A857C]">
+              <MessageCircle className="mr-1.5 h-3.5 w-3.5" /> WhatsApp
             </Button>
-            <Button onClick={handleMail} disabled={saving} variant="outline">
-              <Mail className="mr-2 h-4 w-4" /> Correo
+            <Button onClick={handleMail} disabled={saving} variant="outline" className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#8A857C]">
+              <Mail className="mr-1.5 h-3.5 w-3.5" /> Correo
             </Button>
             <Button
               onClick={handleReset}
               variant="ghost"
-              className="col-span-2 text-muted-foreground"
+              className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] col-span-2 text-muted-foreground"
             >
-              <RotateCcw className="mr-2 h-4 w-4" /> Nueva cotización
+              <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Nueva cotización
             </Button>
           </div>
         </div>

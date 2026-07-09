@@ -62,49 +62,51 @@
 }
 
 :root {
-  /* VIALUX dark theme — applied by default (industrial infrastructure aesthetic). */
-  --radius: 0.5rem;
-  /* Brand — paleta cálida alineada a la ficha técnica (sin tonos azules) */
+  /* VIALUX tema claro — "documento técnico" alineado a la ficha (julio 2026).
+     El shell (header/footer) permanece grafito #343331; solo el lienzo es claro. */
+  --radius: 0rem;
+  /* Brand */
   --vialux-yellow: #EDBA1A;
   --vialux-yellow-dark: #C99B0E;
-  --vialux-graphite: #2B2A28;
-  --vialux-graphite-2: #3A3936;
+  --vialux-gold: #C79100;
+  --vialux-paper: #FAF9F7;
+  --vialux-ink: #2E2B27;
   --vialux-graphite-3: #343331;
   --vialux-stone: #7C766A;
-  --vialux-stone-light: #A49E91;
+  --vialux-stone-light: #8A857C;
   --vialux-light: #F0EFEB;
 
-  --background: var(--vialux-graphite);
-  --foreground: #F0EFEB;
-  --card: var(--vialux-graphite-2);
-  --card-foreground: #F0EFEB;
-  --popover: var(--vialux-graphite-2);
-  --popover-foreground: #F0EFEB;
+  --background: var(--vialux-paper);
+  --foreground: var(--vialux-ink);
+  --card: #FFFFFF;
+  --card-foreground: var(--vialux-ink);
+  --popover: #FFFFFF;
+  --popover-foreground: var(--vialux-ink);
   --primary: var(--vialux-yellow);
-  --primary-foreground: #1C1E22;
-  --secondary: #4A4842;
-  --secondary-foreground: #F0EFEB;
-  --muted: #3A3936;
-  --muted-foreground: #8C867A;
-  --accent: var(--vialux-yellow-dark);
-  --accent-foreground: #1C1E22;
+  --primary-foreground: #1B1A17;
+  --secondary: #F5F3EF;
+  --secondary-foreground: var(--vialux-ink);
+  --muted: #F5F3EF;
+  --muted-foreground: #8A857C;
+  --accent: #F1EFEA;
+  --accent-foreground: var(--vialux-ink);
   --destructive: #DC2626;
   --destructive-foreground: #FAFAF9;
-  --border: #4A4842;
-  --input: #4A4842;
+  --border: #E5E2DC;
+  --input: #E5E2DC;
   --ring: var(--vialux-yellow);
   --chart-1: var(--vialux-yellow);
   --chart-2: var(--vialux-stone-light);
-  --chart-3: #5CB85C;
+  --chart-3: #16A34A;
   --chart-4: #F97316;
   --chart-5: var(--vialux-yellow-dark);
-  --sidebar: var(--vialux-graphite-3);
-  --sidebar-foreground: #F0EFEB;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: var(--vialux-ink);
   --sidebar-primary: var(--vialux-yellow);
-  --sidebar-primary-foreground: #1C1E22;
-  --sidebar-accent: var(--vialux-graphite-2);
-  --sidebar-accent-foreground: #F0EFEB;
-  --sidebar-border: #4A4842;
+  --sidebar-primary-foreground: #1B1A17;
+  --sidebar-accent: #F5F3EF;
+  --sidebar-accent-foreground: var(--vialux-ink);
+  --sidebar-border: #E5E2DC;
   --sidebar-ring: var(--vialux-yellow);
 
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
@@ -156,7 +158,7 @@
     color: var(--color-foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    background-image: radial-gradient(rgba(74, 72, 66, 0.3) 1px, transparent 1px);
+    background-image: radial-gradient(rgba(46, 43, 39, 0.07) 1px, transparent 1px);
     background-size: 28px 28px;
   }
 
@@ -170,10 +172,10 @@
     height: 5px;
   }
   ::-webkit-scrollbar-track {
-    background: #2B2A28;
+    background: #EFEDE8;
   }
   ::-webkit-scrollbar-thumb {
-    background: #4A4842;
+    background: #D8D5CE;
     border-radius: 4px;
   }
   ::-webkit-scrollbar-thumb:hover {

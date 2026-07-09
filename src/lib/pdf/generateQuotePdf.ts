@@ -1,6 +1,6 @@
 import { renderQuoteHtml } from "./QuotePdfTemplate";
 import type { QuoteState } from "@/hooks/useQuoteState";
-import logoUrl from "@/assets/vialux-logo.png";
+import logoUrl from "@/assets/vialux-logo-t.png";
 
 export type QuoteCalc = {
   precioUnitario: number;
@@ -45,7 +45,7 @@ export async function generateQuotePdf(args: {
     link.id = "vialux-pdf-fonts";
     link.rel = "stylesheet";
     link.href =
-      "https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;700;800&display=swap";
+      "https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;0,800;1,400&display=swap";
     document.head.appendChild(link);
   }
   await document.fonts.ready;

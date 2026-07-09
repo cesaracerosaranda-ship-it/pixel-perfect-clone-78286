@@ -37,13 +37,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Copy, Trash2, Search, Package, Truck, History } from "lucide-react";
+import { Copy, Trash2, Search, Truck, History } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney, IVA_RATE, PRODUCTOS } from "@/lib/vialux/constants";
 import type { ProductoKey } from "@/lib/vialux/constants";
 import { generateFolio } from "@/lib/vialux/quote-actions";
 import type { Tables } from "@/integrations/supabase/types";
+import { RailSection, PageTitle } from "@/components/RailSection";
 
 export const Route = createFileRoute("/historial")({
   component: HistorialPage,
@@ -60,9 +61,9 @@ const ESTADO_LABEL: Record<Estado, string> = {
 };
 const ESTADO_CLASS: Record<Estado, string> = {
   cotizado: "bg-[#EDBA1A] text-[#1B1A17]",
-  cerrado: "bg-emerald-500 text-white",
-  enviado: "bg-[#F0EFEB] text-[#1B1A17]",
-  perdido: "bg-red-500 text-white",
+  cerrado: "bg-[#10B981] text-white",
+  enviado: "bg-[#E5E2DC] text-[#1B1A17]",
+  perdido: "bg-[#DC2626] text-white",
 };
 
 // ─── Agregar Flete Modal (Escenario C) ───────────────────────────────────────
@@ -168,7 +169,7 @@ function AgregarFleteModal({
 
         <div className="space-y-4 py-2">
           <div className="space-y-1.5">
-            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
+            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
               Paquetería
             </Label>
             <Input
@@ -179,7 +180,7 @@ function AgregarFleteModal({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
                 Modalidad
               </Label>
               <Select value={form.modalidad} onValueChange={(v) => f("modalidad", v as typeof form.modalidad)}>
@@ -191,7 +192,7 @@ function AgregarFleteModal({
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
                 Costo del flete (MXN)
               </Label>
               <Input
@@ -222,7 +223,7 @@ function AgregarFleteModal({
               )}
               <div className="flex justify-between border-t border-border pt-1.5">
                 <span className="text-xs font-bold uppercase tracking-wide">Nuevo total</span>
-                <span className="font-mono font-bold text-[#EDBA1A]">{formatMoney(totalNuevo)}</span>
+                <span className="font-mono font-bold text-[#C79100]">{formatMoney(totalNuevo)}</span>
               </div>
             </div>
           )}
@@ -342,7 +343,7 @@ function RegistrarHistoricaModal({
         <div className="space-y-4 py-2">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
                 Fecha de la venta *
               </Label>
               <Input
@@ -353,7 +354,7 @@ function RegistrarHistoricaModal({
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
                 ¿Incluye factura?
               </Label>
               <div className="flex h-10 items-center gap-3 rounded-md border border-input bg-background px-3">
@@ -370,7 +371,7 @@ function RegistrarHistoricaModal({
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
                 Cliente *
               </Label>
               <Input
@@ -380,7 +381,7 @@ function RegistrarHistoricaModal({
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
                 Empresa
               </Label>
               <Input
@@ -392,7 +393,7 @@ function RegistrarHistoricaModal({
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
+            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
               Producto *
             </Label>
             <Select value={form.producto} onValueChange={(v) => f("producto", v as ProductoKey)}>
@@ -407,7 +408,7 @@ function RegistrarHistoricaModal({
 
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
                 Cantidad *
               </Label>
               <Input
@@ -419,7 +420,7 @@ function RegistrarHistoricaModal({
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
                 Precio unitario *
               </Label>
               <Input
@@ -431,7 +432,7 @@ function RegistrarHistoricaModal({
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
+              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
                 CP destino
               </Label>
               <Input
@@ -445,7 +446,7 @@ function RegistrarHistoricaModal({
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
+            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
               Notas internas
             </Label>
             <Textarea
@@ -470,7 +471,7 @@ function RegistrarHistoricaModal({
               )}
               <div className="flex justify-between border-t border-border pt-1.5">
                 <span className="text-xs font-bold uppercase tracking-wide">Total</span>
-                <span className="font-mono font-bold text-[#EDBA1A]">{formatMoney(total)}</span>
+                <span className="font-mono font-bold text-[#C79100]">{formatMoney(total)}</span>
               </div>
             </div>
           )}
@@ -622,238 +623,223 @@ function HistorialPage() {
   return (
     <div className="mx-auto w-full max-w-7xl px-6 py-8">
       {/* Page header */}
-      <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold uppercase tracking-wider">Historial</h1>
-          <p className="text-xs uppercase tracking-[0.16em] text-[#A49E91]">
-            Registro de ventas y cotizaciones
-          </p>
-        </div>
-        <Button
-          onClick={() => setShowHistorica(true)}
-          variant="outline"
-          className="gap-2"
-        >
-          <History className="h-4 w-4" />
-          Registrar venta histórica
-        </Button>
-      </div>
+      <PageTitle
+        kicker="Módulo · Registro"
+        title="Historial"
+        right={
+          <Button
+            onClick={() => setShowHistorica(true)}
+            variant="outline"
+            className="gap-2 font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#8A857C]"
+          >
+            <History className="h-3.5 w-3.5" />
+            + Registrar venta histórica
+          </Button>
+        }
+      />
 
-      {/* KPI cards */}
-      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-4">
-        {/* Inventario */}
-        <div className="rounded-xl border border-[#EDBA1A]/25 bg-[#EDBA1A]/5 p-4">
-          <div className="mb-1 flex items-center gap-1.5">
-            <Package className="h-3 w-3 text-[#EDBA1A]" />
-            <span className="text-[10px] uppercase tracking-[0.16em] text-[#C99B0E]">
-              Inventario
-            </span>
+      <div className="border border-border bg-card">
+        {/* 00 INDICADORES */}
+        <RailSection num="00" label="INDICADORES" padded={false}>
+          <div className="grid grid-cols-2 md:grid-cols-4">
+            <div className="border-r border-border p-4 md:px-5">
+              <div className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">Inventario</div>
+              <div className="font-mono text-[22px] font-extrabold leading-none text-[#C79100] tabular-nums">
+                {inventarioQuery.data?.boyas_disponibles ?? "—"}
+              </div>
+              <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">BOYAS DISPONIBLES</div>
+            </div>
+            <div className="border-r border-border p-4 md:px-5">
+              <div className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">Ventas cerradas</div>
+              <div className="font-mono text-[22px] font-extrabold leading-none text-[#16A34A] tabular-nums">
+                {formatMoney(kpis.valorCerrado)}
+              </div>
+              <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">
+                {kpis.cierres} {kpis.cierres === 1 ? "CIERRE" : "CIERRES"}
+              </div>
+            </div>
+            <div className="border-r border-border p-4 md:px-5">
+              <div className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">En proceso</div>
+              <div className="font-mono text-[22px] font-extrabold leading-none tabular-nums">
+                {formatMoney(kpis.enProcesoMonto)}
+              </div>
+              <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">
+                {kpis.enProceso} {kpis.enProceso === 1 ? "COTIZACIÓN" : "COTIZACIONES"}
+              </div>
+            </div>
+            <div className="p-4 md:px-5">
+              <div className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">Registros totales</div>
+              <div className="font-mono text-[22px] font-extrabold leading-none tabular-nums">
+                {kpis.total}
+              </div>
+              <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">
+                {kpis.perdidas} {kpis.perdidas === 1 ? "PERDIDA" : "PERDIDAS"}
+              </div>
+            </div>
           </div>
-          <div className="font-mono text-2xl font-black text-[#EDBA1A] tabular-nums">
-            {inventarioQuery.data?.boyas_disponibles ?? "—"}
-          </div>
-          <div className="mt-0.5 text-[10px] text-muted-foreground">boyas disponibles</div>
-        </div>
+        </RailSection>
 
-        {/* Valor cerrado */}
-        <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
-          <div className="mb-1 text-[10px] uppercase tracking-[0.16em] text-emerald-600">
-            Ventas cerradas
+        {/* 01 REGISTRO */}
+        <RailSection num="01" label="REGISTRO" padded={false} last>
+          <div className="flex flex-wrap gap-3 border-b border-border p-4">
+            <div className="relative min-w-[240px] flex-1">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="BUSCAR POR CLIENTE, EMPRESA O FOLIO..."
+                className="bg-background pl-9 font-mono text-xs"
+              />
+            </div>
+            <Select value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
+              <SelectTrigger className="w-[200px] bg-background font-mono text-xs uppercase">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todos los estados</SelectItem>
+                <SelectItem value="cotizado">Cotizado</SelectItem>
+                <SelectItem value="enviado">Enviado</SelectItem>
+                <SelectItem value="cerrado">Cerrado</SelectItem>
+                <SelectItem value="perdido">Perdido</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <div className="font-mono text-xl font-black text-emerald-400 tabular-nums">
-            {formatMoney(kpis.valorCerrado)}
-          </div>
-          <div className="mt-0.5 text-[10px] text-muted-foreground">
-            {kpis.cierres} {kpis.cierres === 1 ? "cierre" : "cierres"}
-          </div>
-        </div>
-
-        {/* En proceso */}
-        <div className="rounded-xl border border-[#F0EFEB]/15 bg-[#F0EFEB]/[0.04] p-4">
-          <div className="mb-1 text-[10px] uppercase tracking-[0.16em] text-[#A49E91]">
-            En proceso
-          </div>
-          <div className="font-mono text-xl font-black text-[#F0EFEB] tabular-nums">
-            {formatMoney(kpis.enProcesoMonto)}
-          </div>
-          <div className="mt-0.5 text-[10px] text-muted-foreground">
-            {kpis.enProceso} cotizaci{kpis.enProceso === 1 ? "ón" : "ones"}
-          </div>
-        </div>
-
-        {/* Total registros + perdidos */}
-        <div className="rounded-xl border border-border bg-card p-4">
-          <div className="mb-1 text-[10px] uppercase tracking-[0.16em] text-[#A49E91]">
-            Registros totales
-          </div>
-          <div className="font-mono text-2xl font-black tabular-nums">
-            {kpis.total}
-          </div>
-          <div className="mt-0.5 text-[10px] text-muted-foreground">
-            {kpis.perdidas} {kpis.perdidas === 1 ? "perdida" : "perdidas"}
-          </div>
-        </div>
-      </div>
-
-      {/* Toolbar */}
-      <div className="mb-4 flex flex-wrap gap-3">
-        <div className="relative min-w-[240px] flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Buscar por cliente, empresa o folio..."
-            className="pl-9"
-          />
-        </div>
-        <Select value={filter} onValueChange={(v) => setFilter(v as typeof filter)}>
-          <SelectTrigger className="w-[200px]">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos los estados</SelectItem>
-            <SelectItem value="cotizado">Cotizado</SelectItem>
-            <SelectItem value="enviado">Enviado</SelectItem>
-            <SelectItem value="cerrado">Cerrado</SelectItem>
-            <SelectItem value="perdido">Perdido</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      <div className="overflow-hidden rounded-xl border border-border bg-card">
-        <table className="w-full text-sm">
-          <thead className="border-b border-border bg-background/60 text-[10px] uppercase tracking-[0.14em] text-[#A49E91]">
-            <tr>
-              <th className="px-4 py-3.5 text-left font-bold">Folio</th>
-              <th className="px-4 py-3.5 text-left font-bold">Fecha</th>
-              <th className="px-4 py-3.5 text-left font-bold">Cliente</th>
-              <th className="px-4 py-3.5 text-left font-bold">Empresa</th>
-              <th className="px-4 py-3.5 text-right font-bold">Cant.</th>
-              <th className="px-4 py-3.5 text-right font-bold">Total</th>
-              <th className="px-4 py-3.5 text-left font-bold">Estado</th>
-              <th className="px-4 py-3.5" />
-            </tr>
-          </thead>
-          <tbody>
-            {cotizacionesQuery.isLoading ? (
-              <tr>
-                <td colSpan={8} className="px-4 py-10 text-center text-muted-foreground">
-                  Cargando...
-                </td>
-              </tr>
-            ) : rows.length === 0 ? (
-              <tr>
-                <td colSpan={8} className="px-4 py-10 text-center text-muted-foreground">
-                  Sin cotizaciones todavía.
-                </td>
-              </tr>
-            ) : (
-              rows.map((r) => {
-                const estado = r.estado as Estado;
-                const canAddFlete =
-                  !r.incluye_flete &&
-                  (r.estado === "cotizado" || r.estado === "enviado");
-                return (
-                  <tr key={r.id} className="border-t border-border transition-colors hover:bg-[#EDBA1A]/[0.04]">
-                    {/* Folio + badges */}
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <span className="font-mono text-xs font-bold text-[#EDBA1A]">
-                          {r.folio}
-                        </span>
-                        {r.es_historica && (
-                          <span className="rounded-full bg-gray-500/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-gray-400">
-                            HISTÓRICA
-                          </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
-                      {new Date(r.fecha).toLocaleDateString("es-MX")}
-                    </td>
-                    <td className="px-4 py-3 font-semibold uppercase">
-                      {r.cliente_nombre}
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {r.cliente_empresa || "—"}
-                    </td>
-                    <td className="px-4 py-3 text-right font-mono">{r.cantidad}</td>
-                    <td className="px-4 py-3 text-right font-mono font-bold">
-                      {formatMoney(Number(r.total))}
-                    </td>
-                    <td className="px-4 py-3">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <button
-                            className={`rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider ${ESTADO_CLASS[estado]}`}
-                          >
-                            {ESTADO_LABEL[estado]}
-                          </button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          {(Object.keys(ESTADO_LABEL) as Estado[]).map((e) => (
-                            <DropdownMenuItem
-                              key={e}
-                              onClick={() => changeStatus(r.id, e)}
-                            >
-                              {ESTADO_LABEL[e]}
-                            </DropdownMenuItem>
-                          ))}
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex justify-end gap-1">
-                        {canAddFlete && (
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => setFleteRow(r)}
-                            title="Agregar flete (crear revisión)"
-                          >
-                            <Truck className="h-4 w-4 text-[#A49E91]" />
-                          </Button>
-                        )}
-                        <Button
-                          size="icon"
-                          variant="ghost"
-                          onClick={() => duplicate(r.id)}
-                          title="Duplicar en cotizador"
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                        <AlertDialog>
-                          <AlertDialogTrigger asChild>
-                            <Button size="icon" variant="ghost" title="Eliminar">
-                              <Trash2 className="h-4 w-4 text-red-400" />
-                            </Button>
-                          </AlertDialogTrigger>
-                          <AlertDialogContent>
-                            <AlertDialogHeader>
-                              <AlertDialogTitle>Eliminar cotización</AlertDialogTitle>
-                              <AlertDialogDescription>
-                                ¿Eliminar {r.folio}? Esta acción no se puede deshacer.
-                              </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                              <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                              <AlertDialogAction
-                                onClick={() => removeRow(r.id)}
-                                className="bg-red-500 hover:bg-red-600"
-                              >
-                                Eliminar
-                              </AlertDialogAction>
-                            </AlertDialogFooter>
-                          </AlertDialogContent>
-                        </AlertDialog>
-                      </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="border-b border-border bg-[#F5F3EF] font-mono text-[8px] uppercase tracking-[0.2em] text-[#8A857C]">
+                <tr>
+                  <th className="px-4 py-3 text-left font-bold">Folio</th>
+                  <th className="px-4 py-3 text-left font-bold">Fecha</th>
+                  <th className="px-4 py-3 text-left font-bold">Cliente</th>
+                  <th className="px-4 py-3 text-left font-bold">Empresa</th>
+                  <th className="px-4 py-3 text-right font-bold">Cant.</th>
+                  <th className="px-4 py-3 text-right font-bold">Total</th>
+                  <th className="px-4 py-3 text-left font-bold">Estado</th>
+                  <th className="px-4 py-3" />
+                </tr>
+              </thead>
+              <tbody>
+                {cotizacionesQuery.isLoading ? (
+                  <tr>
+                    <td colSpan={8} className="px-4 py-10 text-center text-muted-foreground">
+                      Cargando...
                     </td>
                   </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
+                ) : rows.length === 0 ? (
+                  <tr>
+                    <td colSpan={8} className="px-4 py-10 text-center text-muted-foreground">
+                      Sin cotizaciones todavía.
+                    </td>
+                  </tr>
+                ) : (
+                  rows.map((r) => {
+                    const estado = r.estado as Estado;
+                    const canAddFlete =
+                      !r.incluye_flete &&
+                      (r.estado === "cotizado" || r.estado === "enviado");
+                    return (
+                      <tr key={r.id} className="border-t border-[#EFEDE8] transition-colors hover:bg-[#EDBA1A]/[0.04]">
+                        {/* Folio + badges */}
+                        <td className="px-4 py-3">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span className="font-mono text-xs font-bold text-[#C79100]">
+                              {r.folio}
+                            </span>
+                            {r.es_historica && (
+                              <span className="bg-[#F1EFEA] px-1.5 py-0.5 font-mono text-[8px] font-bold uppercase tracking-wider text-[#8A857C]">
+                                HISTÓRICA
+                              </span>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
+                          {new Date(r.fecha).toLocaleDateString("es-MX")}
+                        </td>
+                        <td className="px-4 py-3 text-xs font-bold uppercase">
+                          {r.cliente_nombre}
+                        </td>
+                        <td className="px-4 py-3 text-xs text-muted-foreground">
+                          {r.cliente_empresa || "—"}
+                        </td>
+                        <td className="px-4 py-3 text-right font-mono text-xs">{r.cantidad}</td>
+                        <td className="px-4 py-3 text-right font-mono text-xs font-bold">
+                          {formatMoney(Number(r.total))}
+                        </td>
+                        <td className="px-4 py-3">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <button
+                                className={`px-2 py-1 font-mono text-[8px] font-bold uppercase tracking-[0.12em] ${ESTADO_CLASS[estado]}`}
+                              >
+                                {ESTADO_LABEL[estado]}
+                              </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent>
+                              {(Object.keys(ESTADO_LABEL) as Estado[]).map((e) => (
+                                <DropdownMenuItem
+                                  key={e}
+                                  onClick={() => changeStatus(r.id, e)}
+                                >
+                                  {ESTADO_LABEL[e]}
+                                </DropdownMenuItem>
+                              ))}
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <div className="flex justify-end gap-1">
+                            {canAddFlete && (
+                              <Button
+                                size="icon"
+                                variant="ghost"
+                                onClick={() => setFleteRow(r)}
+                                title="Agregar flete (crear revisión)"
+                              >
+                                <Truck className="h-4 w-4 text-[#8A857C]" />
+                              </Button>
+                            )}
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => duplicate(r.id)}
+                              title="Duplicar en cotizador"
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                            <AlertDialog>
+                              <AlertDialogTrigger asChild>
+                                <Button size="icon" variant="ghost" title="Eliminar">
+                                  <Trash2 className="h-4 w-4 text-[#DC2626]" />
+                                </Button>
+                              </AlertDialogTrigger>
+                              <AlertDialogContent>
+                                <AlertDialogHeader>
+                                  <AlertDialogTitle>Eliminar cotización</AlertDialogTitle>
+                                  <AlertDialogDescription>
+                                    ¿Eliminar {r.folio}? Esta acción no se puede deshacer.
+                                  </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                  <AlertDialogAction
+                                    onClick={() => removeRow(r.id)}
+                                    className="bg-[#DC2626] hover:bg-[#DC2626]/90"
+                                  >
+                                    Eliminar
+                                  </AlertDialogAction>
+                                </AlertDialogFooter>
+                              </AlertDialogContent>
+                            </AlertDialog>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+        </RailSection>
       </div>
 
       {fleteRow && (
