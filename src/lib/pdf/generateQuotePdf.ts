@@ -34,7 +34,7 @@ export async function generateQuotePdf(args: {
   state: QuoteState;
   calc: QuoteCalc;
   deliveryMsg: string;
-}) {
+}): Promise<{ filename: string; blob: Blob }> {
   const { folio, state, calc } = args;
 
   // Precarga Manrope y JetBrains Mono en el documento principal para que
@@ -64,7 +64,7 @@ export async function generateQuotePdf(args: {
   // Pasamos el HTML como string — html2pdf 0.14 maneja su propio overlay
   // con posicionamiento y dimensiones correctas. Evita el problema de
   // offsetWidth=0 cuando el container se inyecta manualmente fuera del viewport.
-  await html2pdf()
+  const worker = html2pdf()
     .from(html, "string")
     .set({
       margin: 0,
@@ -74,8 +74,14 @@ export async function generateQuotePdf(args: {
       // Carta: 612×792pt; el HTML mide 816px de ancho → escala exacta 0.75,
       // presupuesto de altura por página: 1056px.
       jsPDF: { unit: "pt", format: "letter", orientation: "portrait" },
-    })
-    .save();
+    });
+
+  // Descarga el archivo y además regresa el blob para archivarlo en el
+  // expediente documental del cliente.
+  const pdf = await worker.toPdf().get("pdf");
+  pdf.save(filename);
+  const blob: Blob = pdf.output("blob");
 
   void calc;
+  return { filename, blob };
 }

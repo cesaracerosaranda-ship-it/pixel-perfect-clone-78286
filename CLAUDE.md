@@ -115,8 +115,14 @@ Cualquier otro CP = CONSOLIDADO — 3 A 5 DÍAS HÁBILES
 
 ## Supabase schema
 
-Tablas principales: `cotizaciones`, `folio_counter`, `inventario`
-RLS: público (sin auth) — app interna
+Tablas principales: `cotizaciones`, `folio_counter`, `inventario`, `clientes`,
+`documentos` (expediente documental por cliente: guía de envío, comprobante de
+pago, factura, cotización de flete, PDF de cotización auto-archivado).
+Storage: bucket público `documentos` (rutas `{cliente_id}/{ts}_{archivo}`).
+RLS: público (sin auth) — app interna.
+OJO: Lovable NO auto-aplica migraciones externas del repo — hay que pedirle a
+Lovable que ejecute el SQL de supabase/migrations/ cuando se agregue una
+(pendiente julio 2026: 20260710120000_documentos_expediente.sql).
 
 ## Reglas de negocio críticas
 

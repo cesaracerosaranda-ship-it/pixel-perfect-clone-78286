@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,6 +18,13 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney } from "@/lib/vialux/constants";
@@ -30,7 +37,19 @@ import {
   Pencil,
   Check,
   X,
+  Upload,
+  Trash2,
+  Loader2,
 } from "lucide-react";
+import {
+  DOC_TIPOS,
+  docTipoLabel,
+  documentoUrl,
+  eliminarDocumento,
+  listDocumentos,
+  subirDocumento,
+  type Documento,
+} from "@/lib/vialux/documentos";
 
 export const Route = createFileRoute("/clientes")({
   component: ClientesPage,
@@ -312,6 +331,179 @@ function ClientDetail({
           </div>
         )}
       </div>
+
+      <DocumentosSection cliente={cliente} />
+    </div>
+  );
+}
+
+// ─── Expediente documental ────────────────────────────────────────────────────
+
+function DocumentosSection({ cliente }: { cliente: ClienteConStats }) {
+  const qc = useQueryClient();
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [tipo, setTipo] = useState<string>("guia_envio");
+  const [cotizacionId, setCotizacionId] = useState<string>("none");
+  const [subiendo, setSubiendo] = useState(false);
+
+  const docsQuery = useQuery({
+    queryKey: ["documentos", cliente.id],
+    queryFn: () => listDocumentos(cliente.id),
+  });
+
+  const folioDe = (id: string | null) =>
+    id ? cliente.cotizaciones.find((q) => q.id === id)?.folio ?? null : null;
+
+  const onUpload = async (file: File | null | undefined) => {
+    if (!file) return;
+    setSubiendo(true);
+    try {
+      await subirDocumento({
+        clienteId: cliente.id,
+        cotizacionId: cotizacionId === "none" ? null : cotizacionId,
+        tipo,
+        file,
+      });
+      toast.success("Documento archivado en el expediente");
+      qc.invalidateQueries({ queryKey: ["documentos", cliente.id] });
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setSubiendo(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
+  };
+
+  const onDelete = async (d: Documento) => {
+    if (!window.confirm(`¿Eliminar "${d.nombre_archivo}" del expediente?`)) return;
+    try {
+      await eliminarDocumento(d);
+      toast.success("Documento eliminado");
+      qc.invalidateQueries({ queryKey: ["documentos", cliente.id] });
+    } catch (e) {
+      toast.error((e as Error).message);
+    }
+  };
+
+  const docs = docsQuery.data ?? [];
+
+  return (
+    <div>
+      <div className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#8A857C]">
+        Expediente documental
+      </div>
+
+      {/* Controles de carga */}
+      <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_auto]">
+        <Select value={tipo} onValueChange={setTipo}>
+          <SelectTrigger className="bg-background font-mono text-[10px] uppercase">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {DOC_TIPOS.filter((t) => t.value !== "cotizacion").map((t) => (
+              <SelectItem key={t.value} value={t.value}>
+                {t.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={cotizacionId} onValueChange={setCotizacionId}>
+          <SelectTrigger className="bg-background font-mono text-[10px] uppercase">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="none">SIN FOLIO</SelectItem>
+            {cliente.cotizaciones.map((q) => (
+              <SelectItem key={q.id} value={q.id}>
+                {q.folio}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Button
+          variant="outline"
+          disabled={subiendo}
+          onClick={() => fileRef.current?.click()}
+          className="font-mono text-[9px] font-bold uppercase tracking-[0.15em] text-[#8A857C]"
+        >
+          {subiendo ? (
+            <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <Upload className="mr-1.5 h-3.5 w-3.5" />
+          )}
+          Subir
+        </Button>
+        <input
+          ref={fileRef}
+          type="file"
+          className="hidden"
+          accept=".pdf,.png,.jpg,.jpeg,.webp,.xml,.heic"
+          onChange={(e) => onUpload(e.target.files?.[0])}
+        />
+      </div>
+
+      {/* Lista */}
+      {docsQuery.isLoading ? (
+        <p className="text-xs text-muted-foreground">Cargando expediente...</p>
+      ) : docsQuery.isError ? (
+        <p className="text-xs text-[#DC2626]">{(docsQuery.error as Error).message}</p>
+      ) : docs.length === 0 ? (
+        <p className="text-xs text-muted-foreground">
+          Sin documentos aún. Sube guías de envío, comprobantes de pago, facturas o
+          cotizaciones de flete — los PDF de cotización se archivan solos al generarlos.
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {docs.map((d) => {
+            const folio = folioDe(d.cotizacion_id);
+            return (
+              <div
+                key={d.id}
+                className="flex items-center justify-between gap-3 border border-border bg-background/40 px-3 py-2"
+              >
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-1.5">
+                    <span
+                      className={`px-1.5 py-0.5 font-mono text-[8px] font-bold uppercase tracking-wider ${
+                        d.tipo === "cotizacion"
+                          ? "bg-[#EDBA1A] text-[#1B1A17]"
+                          : "bg-[#F1EFEA] text-[#8A857C]"
+                      }`}
+                    >
+                      {docTipoLabel(d.tipo)}
+                    </span>
+                    {folio && (
+                      <span className="font-mono text-[9px] font-bold text-[#C79100]">
+                        {folio}
+                      </span>
+                    )}
+                  </div>
+                  <a
+                    href={documentoUrl(d)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-1 block truncate text-xs font-semibold hover:underline"
+                  >
+                    {d.nombre_archivo}
+                  </a>
+                  <div className="font-mono text-[9px] text-muted-foreground">
+                    {new Date(d.created_at).toLocaleDateString("es-MX")}
+                    {d.size_bytes ? ` · ${Math.max(1, Math.round(d.size_bytes / 1024))} KB` : ""}
+                  </div>
+                </div>
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => onDelete(d)}
+                  title="Eliminar documento"
+                >
+                  <Trash2 className="h-4 w-4 text-[#DC2626]" />
+                </Button>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

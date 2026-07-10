@@ -16,6 +16,7 @@ import {
 } from "@/lib/vialux/quote-actions";
 import { generateQuotePdf } from "@/lib/pdf/generateQuotePdf";
 import { upsertCliente } from "@/lib/vialux/clientes";
+import { archivarCotizacionPdf } from "@/lib/vialux/documentos";
 
 export const Route = createFileRoute("/")({
   component: CotizadorPage,
@@ -112,7 +113,9 @@ function CotizadorPage() {
   };
 
   // Core save logic — idempotent: skips insert if already saved in this session
-  const persistQuote = async (silent = false): Promise<string> => {
+  const persistQuote = async (
+    silent = false,
+  ): Promise<{ folio: string; cotizacionId: string | null; clienteId: string | null }> => {
     const [folio, clienteIdLinked] = await Promise.all([
       ensureFolio(),
       upsertCliente({
@@ -122,6 +125,7 @@ function CotizadorPage() {
       }),
     ]);
 
+    let cotizacionId = savedId;
     if (!savedId) {
       const prod = PRODUCTOS[state.producto];
       const row: Omit<QuoteRow, "id" | "fecha"> = {
@@ -159,11 +163,12 @@ function CotizadorPage() {
         .select("id")
         .single();
       if (error) throw error;
+      cotizacionId = data.id;
       setSavedId(data.id);
       if (!silent) toast.success(`Cotización ${folio} guardada`);
     }
 
-    return folio;
+    return { folio, cotizacionId, clienteId: clienteIdLinked };
   };
 
   const handleSave = async () => {
@@ -190,9 +195,23 @@ function CotizadorPage() {
     setFormErrors({});
     try {
       setSaving(true);
-      const folio = await persistQuote(true); // auto-save silently
-      await generateQuotePdf({ folio, state, calc, deliveryMsg });
+      const { folio, cotizacionId, clienteId } = await persistQuote(true); // auto-save silently
+      const { filename, blob } = await generateQuotePdf({ folio, state, calc, deliveryMsg });
       if (!savedId) toast.success(`Cotización ${folio} guardada en Historial`);
+      if (clienteId && cotizacionId) {
+        try {
+          const archivado = await archivarCotizacionPdf({
+            clienteId,
+            cotizacionId,
+            blob,
+            nombre: filename,
+          });
+          if (archivado) toast.success("PDF archivado en el expediente del cliente");
+        } catch (e) {
+          // El PDF ya se descargó; el expediente es best-effort
+          toast.info(`PDF descargado; no se archivó en el expediente: ${(e as Error).message}`);
+        }
+      }
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
@@ -206,7 +225,7 @@ function CotizadorPage() {
     if (errs) { setFormErrors(errs); return; }
     setFormErrors({});
     try {
-      const folio = await persistQuote(true);
+      const { folio } = await persistQuote(true);
       window.open(buildWhatsAppUrl(state, folio, calc.total), "_blank");
     } catch (e) {
       toast.error((e as Error).message);
@@ -218,7 +237,7 @@ function CotizadorPage() {
     if (errs) { setFormErrors(errs); return; }
     setFormErrors({});
     try {
-      const folio = await persistQuote(true);
+      const { folio } = await persistQuote(true);
       window.location.href = buildMailto(state, folio, calc.total);
     } catch (e) {
       toast.error((e as Error).message);
