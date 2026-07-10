@@ -25,6 +25,9 @@ export type Documento = {
   created_at: string;
 };
 
+/** Documento con URL firmada lista para abrir (el bucket es privado). */
+export type DocumentoConUrl = Documento & { url: string | null };
+
 // La tabla `documentos` todavía no está en los tipos generados de Supabase
 // (se crea vía migración); este cast evita pelear con el codegen.
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -39,14 +42,26 @@ function migracionHint(msg: string): Error {
   return new Error(msg);
 }
 
-export async function listDocumentos(clienteId: string): Promise<Documento[]> {
+export async function listDocumentos(clienteId: string): Promise<DocumentoConUrl[]> {
   const { data, error } = await db()
     .from("documentos")
     .select("*")
     .eq("cliente_id", clienteId)
     .order("created_at", { ascending: false });
   if (error) throw migracionHint(error.message);
-  return (data ?? []) as Documento[];
+  const docs = (data ?? []) as Documento[];
+  if (docs.length === 0) return [];
+
+  // El bucket es privado (el workspace de Lovable bloquea buckets públicos):
+  // se generan URLs firmadas por lote, válidas 1 hora — más que suficiente
+  // porque la lista se regenera al abrir la ficha del cliente.
+  const { data: signed } = await supabase.storage
+    .from("documentos")
+    .createSignedUrls(docs.map((d) => d.storage_path), 3600);
+  const byPath = new Map(
+    (signed ?? []).filter((s) => s.path && s.signedUrl).map((s) => [s.path as string, s.signedUrl]),
+  );
+  return docs.map((d) => ({ ...d, url: byPath.get(d.storage_path) ?? null }));
 }
 
 export async function subirDocumento(args: {
@@ -106,11 +121,6 @@ export async function archivarCotizacionPdf(args: {
     nombre: args.nombre,
   });
   return true;
-}
-
-export function documentoUrl(d: Documento): string {
-  return supabase.storage.from("documentos").getPublicUrl(d.storage_path).data
-    .publicUrl;
 }
 
 export async function eliminarDocumento(d: Documento): Promise<void> {

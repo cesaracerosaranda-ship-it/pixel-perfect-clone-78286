@@ -44,7 +44,6 @@ import {
 import {
   DOC_TIPOS,
   docTipoLabel,
-  documentoUrl,
   eliminarDocumento,
   listDocumentos,
   subirDocumento,
@@ -478,14 +477,20 @@ function DocumentosSection({ cliente }: { cliente: ClienteConStats }) {
                       </span>
                     )}
                   </div>
-                  <a
-                    href={documentoUrl(d)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-1 block truncate text-xs font-semibold hover:underline"
-                  >
-                    {d.nombre_archivo}
-                  </a>
+                  {d.url ? (
+                    <a
+                      href={d.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 block truncate text-xs font-semibold hover:underline"
+                    >
+                      {d.nombre_archivo}
+                    </a>
+                  ) : (
+                    <span className="mt-1 block truncate text-xs font-semibold">
+                      {d.nombre_archivo}
+                    </span>
+                  )}
                   <div className="font-mono text-[9px] text-muted-foreground">
                     {new Date(d.created_at).toLocaleDateString("es-MX")}
                     {d.size_bytes ? ` · ${Math.max(1, Math.round(d.size_bytes / 1024))} KB` : ""}

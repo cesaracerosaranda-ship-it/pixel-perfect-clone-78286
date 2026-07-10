@@ -118,11 +118,13 @@ Cualquier otro CP = CONSOLIDADO — 3 A 5 DÍAS HÁBILES
 Tablas principales: `cotizaciones`, `folio_counter`, `inventario`, `clientes`,
 `documentos` (expediente documental por cliente: guía de envío, comprobante de
 pago, factura, cotización de flete, PDF de cotización auto-archivado).
-Storage: bucket público `documentos` (rutas `{cliente_id}/{ts}_{archivo}`).
+Storage: bucket PRIVADO `documentos` (el workspace de Lovable bloquea buckets
+públicos) — los archivos se abren con createSignedUrls (1 h), NUNCA getPublicUrl.
+Rutas: `{cliente_id}/{ts}_{archivo}`.
 RLS: público (sin auth) — app interna.
 OJO: Lovable NO auto-aplica migraciones externas del repo — hay que pedirle a
 Lovable que ejecute el SQL de supabase/migrations/ cuando se agregue una
-(pendiente julio 2026: 20260710120000_documentos_expediente.sql).
+(la de documentos ya fue aplicada, julio 2026).
 
 ## Reglas de negocio críticas
 
