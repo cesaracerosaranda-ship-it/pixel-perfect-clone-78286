@@ -28,11 +28,6 @@ export type Documento = {
 /** Documento con URL firmada lista para abrir (el bucket es privado). */
 export type DocumentoConUrl = Documento & { url: string | null };
 
-// La tabla `documentos` todavía no está en los tipos generados de Supabase
-// (se crea vía migración); este cast evita pelear con el codegen.
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const db = () => supabase as any;
-
 function migracionHint(msg: string): Error {
   if (/bucket|documentos.*schema cache|not found|does not exist/i.test(msg)) {
     return new Error(
@@ -43,7 +38,7 @@ function migracionHint(msg: string): Error {
 }
 
 export async function listDocumentos(clienteId: string): Promise<DocumentoConUrl[]> {
-  const { data, error } = await db()
+  const { data, error } = await supabase
     .from("documentos")
     .select("*")
     .eq("cliente_id", clienteId)
@@ -83,7 +78,7 @@ export async function subirDocumento(args: {
     .upload(path, args.file, { contentType: mime });
   if (upErr) throw migracionHint(upErr.message);
 
-  const { error } = await db().from("documentos").insert({
+  const { error } = await supabase.from("documentos").insert({
     cliente_id: args.clienteId,
     cotizacion_id: args.cotizacionId ?? null,
     tipo: args.tipo,
@@ -106,7 +101,7 @@ export async function archivarCotizacionPdf(args: {
   blob: Blob;
   nombre: string;
 }): Promise<boolean> {
-  const { data } = await db()
+  const { data } = await supabase
     .from("documentos")
     .select("id")
     .eq("cotizacion_id", args.cotizacionId)
@@ -125,6 +120,6 @@ export async function archivarCotizacionPdf(args: {
 
 export async function eliminarDocumento(d: Documento): Promise<void> {
   await supabase.storage.from("documentos").remove([d.storage_path]);
-  const { error } = await db().from("documentos").delete().eq("id", d.id);
+  const { error } = await supabase.from("documentos").delete().eq("id", d.id);
   if (error) throw new Error(error.message);
 }
