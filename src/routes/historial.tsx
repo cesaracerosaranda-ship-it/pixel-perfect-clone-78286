@@ -45,6 +45,7 @@ import type { ProductoKey } from "@/lib/vialux/constants";
 import { generateFolio } from "@/lib/vialux/quote-actions";
 import type { Tables } from "@/integrations/supabase/types";
 import { RailSection, PageTitle } from "@/components/RailSection";
+import { upsertCliente } from "@/lib/vialux/clientes";
 
 export const Route = createFileRoute("/historial")({
   component: HistorialPage,
@@ -290,13 +291,20 @@ function RegistrarHistoricaModal({
 
     setSaving(true);
     try {
-      const folio = await generateFolio(0, null);
+      const [folio, clienteId] = await Promise.all([
+        generateFolio(0, null),
+        upsertCliente({
+          nombre: form.cliente_nombre,
+          empresa: form.cliente_empresa,
+        }),
+      ]);
       const [year, month, day] = form.fecha.split("-").map(Number);
       const fechaISO = new Date(year, month - 1, day, 12, 0, 0).toISOString();
 
       const { error } = await supabase.from("cotizaciones").insert({
         folio,
         fecha: fechaISO,
+        cliente_id: clienteId,
         cliente_nombre: form.cliente_nombre.trim().toUpperCase(),
         cliente_empresa: (form.cliente_empresa || "").trim().toUpperCase(),
         cp_destino: form.cp_destino.trim() || null,

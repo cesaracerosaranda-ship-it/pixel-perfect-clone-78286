@@ -15,6 +15,7 @@ import {
   type QuoteRow,
 } from "@/lib/vialux/quote-actions";
 import { generateQuotePdf } from "@/lib/pdf/generateQuotePdf";
+import { upsertCliente } from "@/lib/vialux/clientes";
 
 export const Route = createFileRoute("/")({
   component: CotizadorPage,
@@ -23,27 +24,6 @@ export const Route = createFileRoute("/")({
     clienteId: typeof s.clienteId === "string" ? s.clienteId : undefined,
   }),
 });
-
-async function upsertCliente(state: QuoteState): Promise<string | null> {
-  if (!state.cliente.trim()) return null;
-  const nombre = state.cliente.trim().toUpperCase();
-  const { data: existing } = await supabase
-    .from("clientes")
-    .select("id")
-    .eq("nombre", nombre)
-    .maybeSingle();
-  if (existing) return existing.id;
-  const { data: created } = await supabase
-    .from("clientes")
-    .insert({
-      nombre,
-      empresa: (state.empresa || "").trim().toUpperCase(),
-      telefono: state.telefono.trim(),
-    })
-    .select("id")
-    .single();
-  return created?.id ?? null;
-}
 
 function CotizadorPage() {
   const { duplicate, clienteId } = Route.useSearch();
@@ -135,7 +115,11 @@ function CotizadorPage() {
   const persistQuote = async (silent = false): Promise<string> => {
     const [folio, clienteIdLinked] = await Promise.all([
       ensureFolio(),
-      upsertCliente(state),
+      upsertCliente({
+        nombre: state.cliente,
+        empresa: state.empresa,
+        telefono: state.telefono,
+      }),
     ]);
 
     if (!savedId) {

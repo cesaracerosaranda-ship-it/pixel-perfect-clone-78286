@@ -56,6 +56,8 @@ type CotizacionRow = {
   estado: string;
   cantidad: number;
   producto: string;
+  precio_unitario: number;
+  es_historica: boolean | null;
 };
 
 type ClienteConStats = Cliente & {
@@ -285,9 +287,16 @@ function ClientDetail({
                 className="flex items-center justify-between rounded-md border border-border bg-background/40 px-3 py-2"
               >
                 <div>
-                  <div className="font-mono text-xs font-bold text-[#C79100]">{q.folio}</div>
-                  <div className="text-[11px] text-muted-foreground">
-                    {new Date(q.fecha).toLocaleDateString("es-MX")} · {q.cantidad} pzas
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-mono text-xs font-bold text-[#C79100]">{q.folio}</span>
+                    {q.es_historica && (
+                      <span className="bg-[#F1EFEA] px-1.5 py-0.5 font-mono text-[8px] font-bold uppercase tracking-wider text-[#8A857C]">
+                        HISTÓRICA
+                      </span>
+                    )}
+                  </div>
+                  <div className="font-mono text-[10px] text-muted-foreground">
+                    {new Date(q.fecha).toLocaleDateString("es-MX")} · {q.cantidad} pzas × {formatMoney(Number(q.precio_unitario))}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -441,7 +450,7 @@ function ClientesPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("clientes")
-        .select(`*, cotizaciones(id, folio, fecha, total, estado, cantidad, producto)`)
+        .select(`*, cotizaciones(id, folio, fecha, total, estado, cantidad, producto, precio_unitario, es_historica)`)
         .order("nombre", { ascending: true });
       if (error) throw error;
       return (data ?? []).map((c) => {
