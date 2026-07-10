@@ -54,19 +54,21 @@ ficha técnica hecha en Claude Design — tamaño CARTA (816×1056px @ 0.75 esca
 1. Header: fondo #2E2B27, logo transparente 58px izquierda; derecha "DOCUMENTO
    COMERCIAL · 2026 · FOLIO ..." + "COTIZACIÓN COMERCIAL" (peso 400, letter-spacing
    4px, COMERCIAL en #F2B90D); barra amarilla #F2B90D 5px
-2. Riel lateral izquierdo de 88px: secciones numeradas 00-04 (número 13px #C79100 +
-   etiqueta vertical rotada 9px #9B968E): CLIENTE · PARTIDAS · CONDICIONES · TÉCNICO · TÉRMINOS
-   (en el PDF la rotación usa transform rotate(-90deg) translateX(-100%) — html2canvas
-   NO soporta writing-mode; en la app sí se usa writing-mode)
+2. Riel lateral izquierdo de 88px: secciones numeradas 00-04, número 13px #C79100 +
+   etiqueta vertical 7.5px #9B968E CENTRADOS JUNTOS en la sección (petición de César):
+   CLIENTE · PARTIDAS · CONDICIONES · TÉCNICO · TÉRMINOS. En el PDF la rotación usa
+   transform rotate(-90deg) translate(-50%,-50%) en un wrapper de altura calculada
+   (~6px/carácter) — html2canvas NO soporta writing-mode; en la app sí se usa
 3. 00 CLIENTE: "COTIZACIÓN PARA:" + nombre + atendido por + badge "SEÑALIZACIÓN VIAL" + folio; fecha/vigencia derecha
 4. 01 PARTIDAS: grid (producto + flete como partidas), SKU VLX-22-* en #C79100,
    subtotal/IVA, regla #F2B90D 288×3px, TOTAL 20px 800 #C79100 + "MXN · PESOS MEXICANOS"
 5. 02 CONDICIONES: boxes Tiempo de entrega + Forma de pago
 6. 03 TÉCNICO: grid 4×2 de especificaciones con celdas bordeadas, labels dorados
-7. 04 TÉRMINOS: políticas + strip NOTA fondo #F1EFEA; la sección lleva flex:1 y
-   absorbe el espacio sobrante de la hoja (así el footer queda al borde inferior)
+7. 04 TÉRMINOS: políticas (10px, lh 1.75) + strip NOTA fondo #F1EFEA; la sección
+   lleva flex:1 y su contenido justify-content:space-evenly — absorbe el sobrante
+   de la hoja SIN dejar franja blanca al fondo. Vigencia sin italic
 8. Footer doble: strip #F1EFEA con email/tel + strip #2E2B27 con tagline
-- Wrapper: flex column min-height:1052px (NO height fija + overflow:hidden — eso
+- Wrapper: flex column min-height:1055px = 791.25pt de 792pt (NO height fija + overflow:hidden — eso
   recorta contenido silenciosamente; NO mediciones en runtime — ya falló en producción)
 - Logo: src/assets/vialux-logo-t.png (transparente); html2canvas scale:3
 - Referencia visual definitiva: ~/Downloads/design_handoff_vialux/Cotización VIALUX.dc.html

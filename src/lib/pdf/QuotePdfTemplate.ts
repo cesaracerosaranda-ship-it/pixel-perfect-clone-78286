@@ -43,14 +43,17 @@ function shortSpec(key: QuoteState["producto"]) {
   }
 }
 
-// Riel lateral: número + etiqueta vertical. La referencia usa writing-mode,
-// pero html2canvas no lo pinta bien — se replica con transform rotate(-90deg),
-// que sí está soportado, anclado abajo del contenedor para leer de abajo hacia arriba.
+// Riel lateral: número + etiqueta vertical centrados juntos en la sección.
+// La referencia usa writing-mode, pero html2canvas no lo pinta bien — se replica
+// con transform: rotate(-90deg) translate(-50%,-50%) dentro de un wrapper cuya
+// altura se calcula del largo del texto (mono 7.5px + tracking 1.5px ≈ 6px/carácter),
+// para que el grupo fluya centrado sin chocar con el número ni salirse del recuadro.
 function rail(num: string, label: string) {
-  return `<div style="border-right:1px solid ${BORDER};padding:16px 0 0;display:flex;flex-direction:column;align-items:center;">
+  const len = Math.ceil(label.length * 6) + 6;
+  return `<div style="border-right:1px solid ${BORDER};padding:10px 0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;">
     <div style="font-size:13px;font-weight:700;color:${GOLD};">${num}</div>
-    <div style="position:relative;width:12px;flex:1;">
-      <div style="position:absolute;top:10px;left:11px;transform:rotate(-90deg) translateX(-100%);transform-origin:0 0;white-space:nowrap;font-size:9px;letter-spacing:3px;color:${GRAY};">${label}</div>
+    <div style="position:relative;width:12px;height:${len}px;">
+      <div style="position:absolute;top:50%;left:50%;transform:rotate(-90deg) translate(-50%,-50%);transform-origin:0 0;white-space:nowrap;font-size:7.5px;letter-spacing:1.5px;color:${GRAY};">${label}</div>
     </div>
   </div>`;
 }
@@ -131,7 +134,7 @@ export function renderQuoteHtml(args: {
 </style>
 </head>
 <body>
-  <div style="font-family:'JetBrains Mono',monospace;width:816px;min-height:1052px;background:#FFFFFF;color:${INK};display:flex;flex-direction:column;">
+  <div style="font-family:'JetBrains Mono',monospace;width:816px;min-height:1055px;background:#FFFFFF;color:${INK};display:flex;flex-direction:column;">
 
     <!-- HEADER -->
     <div style="background:${INK};color:#FFFFFF;padding:16px 40px 14px;">
@@ -164,7 +167,7 @@ export function renderQuoteHtml(args: {
         </div>
         <div style="text-align:right;display:flex;flex-direction:column;gap:5px;flex-shrink:0;padding-top:14px;">
           <div style="font-size:13px;font-weight:700;letter-spacing:1.5px;">${fechaLarga(hoy)}</div>
-          <div style="font-size:10px;font-style:italic;color:${GRAY};">VÁLIDA HASTA ${fechaLarga(vence)}</div>
+          <div style="font-size:10px;color:${GRAY};">VÁLIDA HASTA ${fechaLarga(vence)}</div>
         </div>
       </div>
     </div>
@@ -232,13 +235,14 @@ export function renderQuoteHtml(args: {
       </div>
     </div>
 
-    <!-- 04 · TÉRMINOS (flex:1 absorbe el espacio restante de la hoja) -->
+    <!-- 04 · TÉRMINOS (flex:1 absorbe el espacio restante; el contenido se
+         reparte verticalmente para no dejar vacío al fondo) -->
     <div style="display:grid;grid-template-columns:88px 1fr;flex:1;">
       ${rail("04", "TÉRMINOS")}
-      <div style="padding:14px 40px 14px 32px;display:flex;flex-direction:column;gap:9px;">
-        <div style="font-size:9px;line-height:1.65;color:#4A463F;"><span style="color:${GOLD};font-weight:700;letter-spacing:1px;">POLÍTICA DE CAMBIOS Y DEVOLUCIONES —</span> UNA VEZ ENTREGADO EL PRODUCTO, NO SE ACEPTAN CAMBIOS NI DEVOLUCIONES, SALVO DEFECTO DE FABRICACIÓN NOTIFICADO AL MOMENTO DE LA ENTREGA.</div>
-        <div style="font-size:9px;line-height:1.65;color:#4A463F;"><span style="color:${GOLD};font-weight:700;letter-spacing:1px;">ACEPTACIÓN DE LOS TÉRMINOS —</span> LA ACEPTACIÓN DE ESTA COTIZACIÓN IMPLICA CONFORMIDAD TOTAL CON LOS TÉRMINOS ESTABLECIDOS. LA ORDEN DEBE RECIBIRSE POR ESCRITO.</div>
-        <div style="background:${STRIP};padding:8px 12px;font-size:8.5px;line-height:1.65;color:${GRAY_DARK};"><span style="font-weight:700;color:${INK};">NOTA:</span> PRECIOS SUJETOS A CAMBIO SIN PREVIO AVISO UNA VEZ VENCIDA LA VIGENCIA DE ESTA COTIZACIÓN.</div>
+      <div style="padding:14px 40px 14px 32px;display:flex;flex-direction:column;justify-content:space-evenly;">
+        <div style="font-size:10px;line-height:1.75;color:#4A463F;"><span style="color:${GOLD};font-weight:700;letter-spacing:1px;">POLÍTICA DE CAMBIOS Y DEVOLUCIONES —</span> UNA VEZ ENTREGADO EL PRODUCTO, NO SE ACEPTAN CAMBIOS NI DEVOLUCIONES, SALVO DEFECTO DE FABRICACIÓN NOTIFICADO AL MOMENTO DE LA ENTREGA.</div>
+        <div style="font-size:10px;line-height:1.75;color:#4A463F;"><span style="color:${GOLD};font-weight:700;letter-spacing:1px;">ACEPTACIÓN DE LOS TÉRMINOS —</span> LA ACEPTACIÓN DE ESTA COTIZACIÓN IMPLICA CONFORMIDAD TOTAL CON LOS TÉRMINOS ESTABLECIDOS. LA ORDEN DEBE RECIBIRSE POR ESCRITO.</div>
+        <div style="background:${STRIP};padding:10px 14px;font-size:9.5px;line-height:1.7;color:${GRAY_DARK};"><span style="font-weight:700;color:${INK};">NOTA:</span> PRECIOS SUJETOS A CAMBIO SIN PREVIO AVISO UNA VEZ VENCIDA LA VIGENCIA DE ESTA COTIZACIÓN.</div>
       </div>
     </div>
 
