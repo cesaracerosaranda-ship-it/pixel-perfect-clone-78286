@@ -24,7 +24,7 @@ export async function upsertCliente(input: {
     .maybeSingle();
 
   if (existing) {
-    const patch: Record<string, string> = {};
+    const patch: { telefono?: string; empresa?: string } = {};
     if (telefono && telefono !== existing.telefono) patch.telefono = telefono;
     if (empresa && empresa !== existing.empresa) patch.empresa = empresa;
     if (Object.keys(patch).length) {

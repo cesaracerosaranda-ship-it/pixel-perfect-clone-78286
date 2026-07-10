@@ -232,6 +232,60 @@ export type Database = {
           },
         ]
       }
+      documentos: {
+        Row: {
+          cliente_id: string
+          cotizacion_id: string | null
+          created_at: string
+          id: string
+          mime_type: string | null
+          nombre_archivo: string
+          notas: string
+          size_bytes: number | null
+          storage_path: string
+          tipo: string
+        }
+        Insert: {
+          cliente_id: string
+          cotizacion_id?: string | null
+          created_at?: string
+          id?: string
+          mime_type?: string | null
+          nombre_archivo: string
+          notas?: string
+          size_bytes?: number | null
+          storage_path: string
+          tipo?: string
+        }
+        Update: {
+          cliente_id?: string
+          cotizacion_id?: string | null
+          created_at?: string
+          id?: string
+          mime_type?: string | null
+          nombre_archivo?: string
+          notas?: string
+          size_bytes?: number | null
+          storage_path?: string
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "documentos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "documentos_cotizacion_id_fkey"
+            columns: ["cotizacion_id"]
+            isOneToOne: false
+            referencedRelation: "cotizaciones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       folio_counter: {
         Row: {
           id: number
