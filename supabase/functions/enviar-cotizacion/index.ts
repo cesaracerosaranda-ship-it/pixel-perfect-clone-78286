@@ -59,8 +59,12 @@ function buildHtml(args: {
   folio: string;
   totalFmt: string;
   vigencia: string;
+  logoUrl: string | null;
 }): string {
   const P = `margin:0 0 16px;font-family:${SANS};font-size:14px;line-height:1.6;color:${INK};`;
+  const brand = args.logoUrl
+    ? `<img src="${args.logoUrl}" alt="VIALUX" height="36" style="display:block;height:36px;width:auto;border:0;">`
+    : `<span style="font-family:${SANS};font-size:20px;font-weight:bold;color:#FFFFFF;letter-spacing:3px;">VIALUX</span>`;
   return `<!DOCTYPE html>
 <html>
 <body style="margin:0;padding:0;background:${STRIP};">
@@ -71,7 +75,7 @@ function buildHtml(args: {
       <!-- Header -->
       <tr><td style="background:${INK};padding:18px 28px;">
         <table width="100%" cellpadding="0" cellspacing="0"><tr>
-          <td style="font-family:${SANS};font-size:20px;font-weight:bold;color:#FFFFFF;letter-spacing:3px;">VIALUX</td>
+          <td>${brand}</td>
           <td align="right" style="font-family:${MONO};font-size:10px;letter-spacing:2px;color:${GRAY};">COTIZACIÓN <span style="color:${YELLOW};">COMERCIAL</span></td>
         </tr></table>
       </td></tr>
@@ -191,6 +195,16 @@ Deno.serve(async (req) => {
     if (e2 || !file) return json({ error: "No se pudo leer el PDF" }, 500);
     const pdfBytes = new Uint8Array(await file.arrayBuffer());
 
+    // Logo hospedado en el bucket (liga firmada de 1 año); si falla,
+    // la plantilla cae al wordmark de texto
+    let logoUrl: string | null = null;
+    try {
+      const { data: signedLogo } = await supabase.storage
+        .from("documentos")
+        .createSignedUrl("_brand/vialux-logo-email.png", 60 * 60 * 24 * 365);
+      logoUrl = signedLogo?.signedUrl ?? null;
+    } catch (_) { /* sin logo, con texto */ }
+
     // Plantilla comercial VIALUX
     const cantidad = new Intl.NumberFormat("es-MX").format(cot.cantidad);
     const totalFmt = new Intl.NumberFormat("es-MX", {
@@ -217,7 +231,7 @@ Augusto Robles
 Ventas · VIALUX
 Tel. +52 81 3073 0586
 cotizaciones@vialuxmty.com`;
-    const html = buildHtml({ cantidad, desc, folio: cot.folio, totalFmt, vigencia: "7" });
+    const html = buildHtml({ cantidad, desc, folio: cot.folio, totalFmt, vigencia: "7", logoUrl });
 
     const client = new SMTPClient({
       connection: {
