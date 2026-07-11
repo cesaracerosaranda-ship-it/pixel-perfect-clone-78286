@@ -68,7 +68,7 @@ function SectionLabel({ children }: { children: React.ReactNode }) {
 }
 
 type ClienteOption = {
-  id: string; nombre: string; empresa: string; telefono: string;
+  id: string; nombre: string; empresa: string; telefono: string; email: string;
   contacto_nombre: string; contacto_telefono: string;
 };
 
@@ -80,7 +80,7 @@ function ClientSearch({ onSelect }: { onSelect: (c: ClienteOption) => void }) {
     if (!open) return;
     supabase
       .from("clientes")
-      .select("id, nombre, empresa, telefono, contacto_nombre, contacto_telefono")
+      .select("id, nombre, empresa, telefono, email, contacto_nombre, contacto_telefono")
       .order("nombre")
       .then(({ data }) => setClientes((data as ClienteOption[]) ?? []));
   }, [open]);
@@ -154,6 +154,7 @@ export function QuoteForm({ state, update, errors = {} }: Props) {
                 update("cliente", c.nombre);
                 update("empresa", c.empresa);
                 update("telefono", c.telefono);
+                update("email", c.email || "");
               }}
             />
           </div>
@@ -179,6 +180,15 @@ export function QuoteForm({ state, update, errors = {} }: Props) {
                 value={state.telefono}
                 onChange={(e) => update("telefono", e.target.value)}
                 placeholder="8112345678"
+                className="bg-background font-mono"
+              />
+            </Field>
+            <Field label="Correo electrónico">
+              <Input
+                type="email"
+                value={state.email}
+                onChange={(e) => update("email", e.target.value)}
+                placeholder="correo@ejemplo.com"
                 className="bg-background font-mono"
               />
             </Field>

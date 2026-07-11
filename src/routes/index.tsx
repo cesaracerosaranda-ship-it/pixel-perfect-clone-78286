@@ -16,7 +16,7 @@ import {
 } from "@/lib/vialux/quote-actions";
 import { generateQuotePdf } from "@/lib/pdf/generateQuotePdf";
 import { upsertCliente } from "@/lib/vialux/clientes";
-import { archivarCotizacionPdf } from "@/lib/vialux/documentos";
+import { archivarCotizacionPdf, ligaPdfCotizacion } from "@/lib/vialux/documentos";
 
 export const Route = createFileRoute("/")({
   component: CotizadorPage,
@@ -45,12 +45,22 @@ function CotizadorPage() {
         .eq("id", duplicate)
         .maybeSingle();
       if (!data) return;
+      let emailCliente = "";
+      if (data.cliente_id) {
+        const { data: cli } = await supabase
+          .from("clientes")
+          .select("email")
+          .eq("id", data.cliente_id)
+          .maybeSingle();
+        emailCliente = cli?.email ?? "";
+      }
       const parentFolio = data.folio_padre ?? data.folio;
       const next: QuoteState = {
         ...initialQuote,
         cliente: data.cliente_nombre,
         empresa: data.cliente_empresa ?? "",
         telefono: data.cliente_telefono ?? "",
+        email: emailCliente,
         cp: data.cp_destino ?? "",
         producto: (data.producto as QuoteState["producto"]) ?? "boya_clavos",
         cantidad: data.cantidad,
@@ -89,6 +99,7 @@ function CotizadorPage() {
         cliente: data.nombre,
         empresa: data.empresa ?? "",
         telefono: data.telefono ?? "",
+        email: data.email ?? "",
       }));
       void navigate({ to: "/", search: {} as never, replace: true });
       toast.success(`Cliente ${data.nombre} cargado`);
@@ -122,6 +133,7 @@ function CotizadorPage() {
         nombre: state.cliente,
         empresa: state.empresa,
         telefono: state.telefono,
+        email: state.email,
       }),
     ]);
 
@@ -219,16 +231,48 @@ function CotizadorPage() {
     }
   };
 
+  // Garantiza que el PDF esté archivado en el expediente y regresa una liga
+  // firmada de 30 días para compartir. Best-effort: si algo falla, se comparte
+  // el mensaje sin liga (comportamiento anterior).
+  const obtenerLigaPdf = async (
+    folio: string,
+    cotizacionId: string | null,
+    clienteId: string | null,
+  ): Promise<string | null> => {
+    if (!cotizacionId || !clienteId) return null;
+    try {
+      let url = await ligaPdfCotizacion(cotizacionId);
+      if (!url) {
+        const { filename, blob } = await generateQuotePdf({
+          folio,
+          state,
+          calc,
+          deliveryMsg,
+          download: false,
+        });
+        await archivarCotizacionPdf({ clienteId, cotizacionId, blob, nombre: filename });
+        url = await ligaPdfCotizacion(cotizacionId);
+      }
+      return url;
+    } catch {
+      return null;
+    }
+  };
+
   const handleWhatsApp = async () => {
     if (!state.telefono.trim()) return toast.error("Falta el teléfono del cliente");
     const errs = validate();
     if (errs) { setFormErrors(errs); return; }
     setFormErrors({});
     try {
-      const { folio } = await persistQuote(true);
-      window.open(buildWhatsAppUrl(state, folio, calc.total), "_blank");
+      setSaving(true);
+      const { folio, cotizacionId, clienteId } = await persistQuote(true);
+      const pdfUrl = await obtenerLigaPdf(folio, cotizacionId, clienteId);
+      window.open(buildWhatsAppUrl(state, folio, calc.total, pdfUrl), "_blank");
     } catch (e) {
       toast.error((e as Error).message);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -237,10 +281,14 @@ function CotizadorPage() {
     if (errs) { setFormErrors(errs); return; }
     setFormErrors({});
     try {
-      const { folio } = await persistQuote(true);
-      window.location.href = buildMailto(state, folio, calc.total);
+      setSaving(true);
+      const { folio, cotizacionId, clienteId } = await persistQuote(true);
+      const pdfUrl = await obtenerLigaPdf(folio, cotizacionId, clienteId);
+      window.location.href = buildMailto(state, folio, calc.total, pdfUrl);
     } catch (e) {
       toast.error((e as Error).message);
+    } finally {
+      setSaving(false);
     }
   };
 

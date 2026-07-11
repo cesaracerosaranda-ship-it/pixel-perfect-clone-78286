@@ -118,6 +118,29 @@ export async function archivarCotizacionPdf(args: {
   return true;
 }
 
+/**
+ * Liga firmada de larga vigencia (30 días) al PDF archivado de una cotización,
+ * pensada para compartirse por WhatsApp o correo. Devuelve null si la
+ * cotización aún no tiene PDF archivado.
+ */
+export async function ligaPdfCotizacion(
+  cotizacionId: string,
+  expiresSec = 60 * 60 * 24 * 30,
+): Promise<string | null> {
+  const { data } = await supabase
+    .from("documentos")
+    .select("storage_path")
+    .eq("cotizacion_id", cotizacionId)
+    .eq("tipo", "cotizacion")
+    .limit(1);
+  const path = data?.[0]?.storage_path;
+  if (!path) return null;
+  const { data: signed } = await supabase.storage
+    .from("documentos")
+    .createSignedUrl(path, expiresSec);
+  return signed?.signedUrl ?? null;
+}
+
 export async function eliminarDocumento(d: Documento): Promise<void> {
   await supabase.storage.from("documentos").remove([d.storage_path]);
   const { error } = await supabase.from("documentos").delete().eq("id", d.id);

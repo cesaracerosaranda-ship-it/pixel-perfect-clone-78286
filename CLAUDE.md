@@ -15,7 +15,10 @@ Aplicación web interna para VIALUX, empresa de señalización vial industrial e
 ## Módulos actuales
 
 ### 1. Cotizador (página principal)
-- Formulario: cliente, empresa, teléfono, CP, producto, cantidad, factura, precio especial, flete
+- Formulario: cliente, empresa, teléfono, correo, CP, producto, cantidad, factura, precio especial, flete
+- Botones WhatsApp/Correo: generan y archivan el PDF si hace falta e incluyen en el
+  mensaje una liga firmada de 30 días al PDF (ligaPdfCotizacion en lib/vialux/documentos.ts);
+  el mailto usa el correo capturado como destinatario
 - 3 configuraciones de producto con precios diferenciados (con/sin factura)
 - Folio secuencial automático: VX-{AÑO}-{NNNN} (arranca en 0012)
 - Lógica de envío local MTY (CP 64-67) vs consolidado

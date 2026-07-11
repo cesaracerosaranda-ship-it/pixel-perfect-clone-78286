@@ -10,6 +10,7 @@ export type QuoteState = {
   cliente: string;
   empresa: string;
   telefono: string;
+  email: string;
   cp: string;
   municipio: string;
   estadoNombre: string;
@@ -31,6 +32,7 @@ export const initialQuote: QuoteState = {
   cliente: "",
   empresa: "",
   telefono: "",
+  email: "",
   cp: "",
   municipio: "",
   estadoNombre: "",

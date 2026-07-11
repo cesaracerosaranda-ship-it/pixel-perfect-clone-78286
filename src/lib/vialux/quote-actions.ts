@@ -45,18 +45,33 @@ export type QuoteRow = {
   es_historica?: boolean;
 };
 
-export function buildWhatsAppUrl(state: QuoteState, folio: string, total: number) {
+export function buildWhatsAppUrl(
+  state: QuoteState,
+  folio: string,
+  total: number,
+  pdfUrl?: string | null,
+) {
   const tel = (state.telefono || "").replace(/\D/g, "");
+  const liga = pdfUrl ? `\n\nDescargue su cotización en PDF aquí:\n${pdfUrl}` : "";
   const msg = `Hola ${state.cliente}, le comparto la cotización ${folio} de VIALUX por un total de ${formatMoney(
     total,
-  )} MXN. Vigencia: ${VIGENCIA_DIAS} días. — Augusto Robles.`;
+  )} MXN. Vigencia: ${VIGENCIA_DIAS} días.${liga}\n\n— Augusto Robles · VIALUX`;
   return `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
 }
 
-export function buildMailto(state: QuoteState, folio: string, total: number) {
+export function buildMailto(
+  state: QuoteState,
+  folio: string,
+  total: number,
+  pdfUrl?: string | null,
+) {
   const subject = `Cotización ${folio} — VIALUX`;
-  const body = `Estimado(a) ${state.cliente},\n\nAdjunto encontrará la cotización ${folio} de VIALUX por un total de ${formatMoney(
+  const liga = pdfUrl
+    ? `\n\nPuede descargar su cotización en PDF en la siguiente liga:\n${pdfUrl}`
+    : "";
+  const body = `Estimado(a) ${state.cliente},\n\nLe comparto la cotización ${folio} de VIALUX por un total de ${formatMoney(
     total,
-  )} MXN.\nVigencia: ${VIGENCIA_DIAS} días naturales.\n\nQuedo atento,\nAugusto Robles\nVIALUX — Señalización Vial`;
-  return `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  )} MXN.\nVigencia: ${VIGENCIA_DIAS} días naturales.${liga}\n\nQuedo atento,\nAugusto Robles\nVIALUX — Señalización Vial`;
+  const to = encodeURIComponent((state.email || "").trim());
+  return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }

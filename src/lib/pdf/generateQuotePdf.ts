@@ -34,6 +34,8 @@ export async function generateQuotePdf(args: {
   state: QuoteState;
   calc: QuoteCalc;
   deliveryMsg: string;
+  /** false = solo genera el blob (para archivar/compartir) sin descargarlo */
+  download?: boolean;
 }): Promise<{ filename: string; blob: Blob }> {
   const { folio, state, calc } = args;
 
@@ -79,7 +81,7 @@ export async function generateQuotePdf(args: {
   // Descarga el archivo y además regresa el blob para archivarlo en el
   // expediente documental del cliente.
   const pdf = await worker.toPdf().get("pdf");
-  pdf.save(filename);
+  if (args.download !== false) pdf.save(filename);
   const blob: Blob = pdf.output("blob");
 
   void calc;
