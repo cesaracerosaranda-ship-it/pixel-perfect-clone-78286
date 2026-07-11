@@ -125,9 +125,16 @@ Storage: bucket PRIVADO `documentos` (el workspace de Lovable bloquea buckets
 públicos) — los archivos se abren con createSignedUrls (1 h), NUNCA getPublicUrl.
 Rutas: `{cliente_id}/{ts}_{archivo}`.
 RLS: público (sin auth) — app interna.
+Edge Functions: `enviar-cotizacion` (supabase/functions/) — envía la cotización
+por correo desde el Gmail de VIALUX (SMTP smtp.gmail.com:465 vía denomailer) con
+el PDF del expediente adjunto, plantilla comercial real de la empresa, y pasa el
+estado a "enviado". Secretos requeridos: GMAIL_USER y GMAIL_APP_PASSWORD
+(contraseña de aplicación de Google). El botón Correo del cotizador la invoca y
+cae a mailto+liga si no está configurada.
 OJO: Lovable NO auto-aplica migraciones externas del repo — hay que pedirle a
 Lovable que ejecute el SQL de supabase/migrations/ cuando se agregue una
-(la de documentos ya fue aplicada, julio 2026).
+(la de documentos ya fue aplicada, julio 2026). Verificar igualmente que
+despliegue las edge functions nuevas del repo.
 
 ## Reglas de negocio críticas
 

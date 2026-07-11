@@ -279,12 +279,29 @@ function CotizadorPage() {
   const handleMail = async () => {
     const errs = validate();
     if (errs) { setFormErrors(errs); return; }
+    if (!state.email.trim()) return toast.error("Falta el correo del cliente");
     setFormErrors({});
     try {
       setSaving(true);
       const { folio, cotizacionId, clienteId } = await persistQuote(true);
+      // Garantiza el PDF archivado (la función lo adjunta desde el expediente)
       const pdfUrl = await obtenerLigaPdf(folio, cotizacionId, clienteId);
-      window.location.href = buildMailto(state, folio, calc.total, pdfUrl);
+
+      // Envío automático desde el Gmail de VIALUX con el PDF adjunto
+      try {
+        const { data, error } = await supabase.functions.invoke("enviar-cotizacion", {
+          body: { cotizacion_id: cotizacionId },
+        });
+        if (error) throw new Error(error.message);
+        if (data?.error) throw new Error(data.error);
+        toast.success(`Cotización ${folio} enviada a ${data?.email ?? state.email} con el PDF adjunto`);
+        return;
+      } catch {
+        // Fallback: la función no está desplegada/configurada aún —
+        // se abre el borrador tradicional con la liga de descarga
+        window.location.href = buildMailto(state, folio, calc.total, pdfUrl);
+        toast.info("Envío automático no disponible — se abrió el borrador de correo");
+      }
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
