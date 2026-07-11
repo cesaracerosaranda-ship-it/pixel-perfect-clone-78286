@@ -71,7 +71,7 @@ export function buildMailto(
     : "";
   const body = `Estimado(a) ${state.cliente},\n\nLe comparto la cotización ${folio} de VIALUX por un total de ${formatMoney(
     total,
-  )} MXN.\nVigencia: ${VIGENCIA_DIAS} días naturales.${liga}\n\nQuedo atento,\nAugusto Robles\nVIALUX — Señalización Vial`;
+  )} MXN.\nVigencia: ${VIGENCIA_DIAS} días naturales.${liga}\n\nSaludos cordiales,\n\nAugusto Robles\nVentas · VIALUX\nTel. +52 81 3073 0586\ncotizaciones@vialuxmty.com`;
   const to = encodeURIComponent((state.email || "").trim());
   return `mailto:${to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }

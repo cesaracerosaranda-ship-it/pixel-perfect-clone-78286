@@ -5,7 +5,7 @@ export const IVA_RATE = 0.16;
 
 export type ProductoKey = "boya" | "boya_clavos" | "boya_clavos_refl";
 
-export const CONTACT_EMAIL = "COTIZACIONES.VIALUXMTY@GMAIL.COM";
+export const CONTACT_EMAIL = "COTIZACIONES@VIALUXMTY.COM";
 export const CONTACT_TEL = "+52 81 3073 0586";
 
 export const PRODUCTOS: Record<
