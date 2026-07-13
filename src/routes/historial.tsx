@@ -37,7 +37,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Copy, Trash2, Search, Truck, History } from "lucide-react";
+import { Copy, Trash2, Search, Truck, History, Pencil, Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney, IVA_RATE, PRODUCTOS } from "@/lib/vialux/constants";
@@ -500,6 +500,110 @@ function RegistrarHistoricaModal({
   );
 }
 
+// ─── Actualizar Inventario Modal ─────────────────────────────────────────────
+
+function ActualizarInventarioModal({
+  open,
+  onOpenChange,
+  actual,
+  onDone,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  actual: number;
+  onDone: () => void;
+}) {
+  const [valor, setValor] = useState(actual);
+  const [saving, setSaving] = useState(false);
+
+  // Al abrir, arranca del valor vigente
+  useEffect(() => {
+    if (open) setValor(actual);
+  }, [open, actual]);
+
+  const save = async () => {
+    const n = Math.round(valor);
+    if (!Number.isFinite(n) || n < 0) {
+      toast.error("Ingresa una cantidad válida (0 o mayor)");
+      return;
+    }
+    setSaving(true);
+    const { error } = await supabase
+      .from("inventario")
+      .update({ boyas_disponibles: n })
+      .eq("id", 1);
+    setSaving(false);
+    if (error) {
+      toast.error(error.message);
+      return;
+    }
+    toast.success(`Inventario actualizado: ${n.toLocaleString("es-MX")} boyas disponibles`);
+    onOpenChange(false);
+    onDone();
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <DialogTitle className="uppercase tracking-wider">
+            Actualizar inventario
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-4 py-2">
+          <div className="space-y-1.5">
+            <Label className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#8A857C]">
+              Boyas disponibles
+            </Label>
+            <div className="flex items-stretch">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => setValor((v) => Math.max(0, Math.round(v) - 50))}
+              >
+                <Minus className="h-4 w-4" />
+              </Button>
+              <Input
+                type="number"
+                min={0}
+                value={Number.isFinite(valor) ? valor : ""}
+                onChange={(e) => setValor(Number(e.target.value))}
+                className="border-x-0 bg-muted text-center font-mono font-bold"
+                autoFocus
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => setValor((v) => Math.max(0, Math.round(v) + 50))}
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+          <p className="font-mono text-[10px] leading-relaxed text-[#7C766A]">
+            AL CERRAR UNA VENTA EL SISTEMA DESCUENTA SOLO. USA ESTO PARA REGISTRAR
+            REABASTECIMIENTOS O CORRECCIONES DE CONTEO.
+          </p>
+        </div>
+
+        <DialogFooter>
+          <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
+          <Button
+            onClick={save}
+            disabled={saving}
+            className="bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#EDBA1A]/90"
+          >
+            {saving ? "Guardando..." : "Actualizar"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 function HistorialPage() {
@@ -509,6 +613,7 @@ function HistorialPage() {
   const [filter, setFilter] = useState<"all" | Estado>("all");
   const [fleteRow, setFleteRow] = useState<CotizacionRow | null>(null);
   const [showHistorica, setShowHistorica] = useState(false);
+  const [showInventario, setShowInventario] = useState(false);
 
   const cotizacionesQuery = useQuery({
     queryKey: ["cotizaciones"],
@@ -650,8 +755,17 @@ function HistorialPage() {
         {/* 00 INDICADORES */}
         <RailSection num="00" label="INDICADORES" padded={false}>
           <div className="grid grid-cols-2 md:grid-cols-4">
-            <div className="border-r border-border p-4 md:px-5">
-              <div className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">Inventario</div>
+            <div className="group border-r border-border p-4 md:px-5">
+              <div className="mb-1.5 flex items-center justify-between gap-2">
+                <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">Inventario</span>
+                <button
+                  onClick={() => setShowInventario(true)}
+                  title="Actualizar inventario"
+                  className="text-[#8A857C] opacity-40 transition-opacity hover:text-[#C79100] group-hover:opacity-100"
+                >
+                  <Pencil className="h-3 w-3" />
+                </button>
+              </div>
               <div className="font-mono text-[22px] font-extrabold leading-none text-[#C79100] tabular-nums">
                 {inventarioQuery.data?.boyas_disponibles ?? "—"}
               </div>
@@ -863,6 +977,13 @@ function HistorialPage() {
         open={showHistorica}
         onOpenChange={setShowHistorica}
         onDone={invalidate}
+      />
+
+      <ActualizarInventarioModal
+        open={showInventario}
+        onOpenChange={setShowInventario}
+        actual={inventarioQuery.data?.boyas_disponibles ?? 0}
+        onDone={() => qc.invalidateQueries({ queryKey: ["inventario"] })}
       />
     </div>
   );
