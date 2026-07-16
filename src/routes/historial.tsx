@@ -502,42 +502,106 @@ function RegistrarHistoricaModal({
 
 // ─── Actualizar Inventario Modal ─────────────────────────────────────────────
 
+function StepperInput({
+  label,
+  value,
+  onChange,
+  paso,
+  autoFocus,
+}: {
+  label: string;
+  value: number;
+  onChange: (v: number) => void;
+  paso: number;
+  autoFocus?: boolean;
+}) {
+  return (
+    <div className="space-y-1.5">
+      <Label className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#8A857C]">
+        {label}
+      </Label>
+      <div className="flex items-stretch">
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={() => onChange(Math.max(0, Math.round(value) - paso))}
+        >
+          <Minus className="h-4 w-4" />
+        </Button>
+        <Input
+          type="number"
+          min={0}
+          value={Number.isFinite(value) ? value : ""}
+          onChange={(e) => onChange(Number(e.target.value))}
+          className="border-x-0 bg-muted text-center font-mono font-bold"
+          autoFocus={autoFocus}
+        />
+        <Button
+          type="button"
+          variant="outline"
+          size="icon"
+          onClick={() => onChange(Math.max(0, Math.round(value) + paso))}
+        >
+          <Plus className="h-4 w-4" />
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 function ActualizarInventarioModal({
   open,
   onOpenChange,
-  actual,
+  boyasActual,
+  clavosActual,
+  clavosSupported,
   onDone,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
-  actual: number;
+  boyasActual: number;
+  clavosActual: number;
+  clavosSupported: boolean;
   onDone: () => void;
 }) {
-  const [valor, setValor] = useState(actual);
+  const [boyas, setBoyas] = useState(boyasActual);
+  const [clavos, setClavos] = useState(clavosActual);
   const [saving, setSaving] = useState(false);
 
-  // Al abrir, arranca del valor vigente
+  // Al abrir, arranca de los valores vigentes
   useEffect(() => {
-    if (open) setValor(actual);
-  }, [open, actual]);
+    if (open) {
+      setBoyas(boyasActual);
+      setClavos(clavosActual);
+    }
+  }, [open, boyasActual, clavosActual]);
 
   const save = async () => {
-    const n = Math.round(valor);
-    if (!Number.isFinite(n) || n < 0) {
-      toast.error("Ingresa una cantidad válida (0 o mayor)");
+    const b = Math.round(boyas);
+    const c = Math.round(clavos);
+    if (!Number.isFinite(b) || b < 0 || (clavosSupported && (!Number.isFinite(c) || c < 0))) {
+      toast.error("Ingresa cantidades válidas (0 o mayor)");
       return;
     }
     setSaving(true);
-    const { error } = await supabase
-      .from("inventario")
-      .update({ boyas_disponibles: n })
-      .eq("id", 1);
+    // clavos_disponibles solo se escribe si la columna existe (post-migración);
+    // así la edición de boyas nunca se rompe si aún no se aplica.
+    const payload: { boyas_disponibles: number; clavos_disponibles?: number } = {
+      boyas_disponibles: b,
+    };
+    if (clavosSupported) payload.clavos_disponibles = c;
+    const { error } = await supabase.from("inventario").update(payload).eq("id", 1);
     setSaving(false);
     if (error) {
       toast.error(error.message);
       return;
     }
-    toast.success(`Inventario actualizado: ${n.toLocaleString("es-MX")} boyas disponibles`);
+    toast.success(
+      clavosSupported
+        ? `Inventario actualizado: ${b.toLocaleString("es-MX")} boyas, ${c.toLocaleString("es-MX")} clavos`
+        : `Inventario actualizado: ${b.toLocaleString("es-MX")} boyas disponibles`,
+    );
     onOpenChange(false);
     onDone();
   };
@@ -552,40 +616,26 @@ function ActualizarInventarioModal({
         </DialogHeader>
 
         <div className="space-y-4 py-2">
-          <div className="space-y-1.5">
-            <Label className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#8A857C]">
-              Boyas disponibles
-            </Label>
-            <div className="flex items-stretch">
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => setValor((v) => Math.max(0, Math.round(v) - 50))}
-              >
-                <Minus className="h-4 w-4" />
-              </Button>
-              <Input
-                type="number"
-                min={0}
-                value={Number.isFinite(valor) ? valor : ""}
-                onChange={(e) => setValor(Number(e.target.value))}
-                className="border-x-0 bg-muted text-center font-mono font-bold"
-                autoFocus
+          <div className={clavosSupported ? "grid grid-cols-2 gap-3" : ""}>
+            <StepperInput
+              label="Boyas disponibles"
+              value={boyas}
+              onChange={setBoyas}
+              paso={50}
+              autoFocus
+            />
+            {clavosSupported && (
+              <StepperInput
+                label="Clavos disponibles"
+                value={clavos}
+                onChange={setClavos}
+                paso={200}
               />
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => setValor((v) => Math.max(0, Math.round(v) + 50))}
-              >
-                <Plus className="h-4 w-4" />
-              </Button>
-            </div>
+            )}
           </div>
           <p className="font-mono text-[10px] leading-relaxed text-[#7C766A]">
-            AL CERRAR UNA VENTA EL SISTEMA DESCUENTA SOLO. USA ESTO PARA REGISTRAR
-            REABASTECIMIENTOS O CORRECCIONES DE CONTEO.
+            AL CERRAR UNA VENTA EL SISTEMA DESCUENTA LAS BOYAS SOLO. USA ESTO PARA
+            REGISTRAR REABASTECIMIENTOS O CORRECCIONES DE CONTEO.
           </p>
         </div>
 
@@ -639,6 +689,16 @@ function HistorialPage() {
       return data;
     },
   });
+
+  // clavos_disponibles existe solo tras la migración; se detecta por la presencia
+  // de la llave en la fila (.select("*")). Antes de la migración, la UI de clavos
+  // se muestra en "—" y no se escribe, para no romper la edición de boyas.
+  const invData = inventarioQuery.data as
+    | { boyas_disponibles: number; clavos_disponibles?: number }
+    | null
+    | undefined;
+  const clavosSupported = !!invData && "clavos_disponibles" in invData;
+  const clavosDisponibles = invData?.clavos_disponibles ?? 0;
 
   useEffect(() => {
     const ch = supabase
@@ -766,10 +826,20 @@ function HistorialPage() {
                   <Pencil className="h-3 w-3" />
                 </button>
               </div>
-              <div className="font-mono text-[22px] font-extrabold leading-none text-[#C79100] tabular-nums">
-                {inventarioQuery.data?.boyas_disponibles ?? "—"}
+              <div className="flex items-end gap-4">
+                <div>
+                  <div className="font-mono text-[22px] font-extrabold leading-none text-[#C79100] tabular-nums">
+                    {inventarioQuery.data?.boyas_disponibles ?? "—"}
+                  </div>
+                  <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">BOYAS</div>
+                </div>
+                <div className="border-l border-border pl-4">
+                  <div className="font-mono text-[22px] font-extrabold leading-none text-[#C79100] tabular-nums">
+                    {clavosSupported ? clavosDisponibles.toLocaleString("es-MX") : "—"}
+                  </div>
+                  <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">CLAVOS</div>
+                </div>
               </div>
-              <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">BOYAS DISPONIBLES</div>
             </div>
             <div className="border-r border-border p-4 md:px-5">
               <div className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">Ventas cerradas</div>
@@ -982,7 +1052,9 @@ function HistorialPage() {
       <ActualizarInventarioModal
         open={showInventario}
         onOpenChange={setShowInventario}
-        actual={inventarioQuery.data?.boyas_disponibles ?? 0}
+        boyasActual={inventarioQuery.data?.boyas_disponibles ?? 0}
+        clavosActual={clavosDisponibles}
+        clavosSupported={clavosSupported}
         onDone={() => qc.invalidateQueries({ queryKey: ["inventario"] })}
       />
     </div>
