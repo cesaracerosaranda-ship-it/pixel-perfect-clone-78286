@@ -116,6 +116,20 @@ CP 64-67 (Nuevo León) = ENVÍO LOCAL:
 Cualquier otro CP = CONSOLIDADO — 3 A 5 DÍAS HÁBILES
 ```
 
+### Distancias y ocurres (julio 2026)
+- `codigos_postales` (32,467 CPs) tiene coordenada REAL por CP (GeoNames MX).
+  Antes compartían la coordenada del estado → distancias falsas. Corregido en
+  supabase/codigos_postales.csv + migración 20260711130000_fix_cp_coordinates.sql
+  (la tabla es de solo-lectura vía RLS; la corrección debe aplicarla Lovable).
+- `carrier_coverage`: las sucursales/ocurres reales tienen coordenada; las filas
+  de "cobertura estatal" genérica se dejaron sin coordenada (aparecen como
+  "contactar" en vez de "0 km" falso). Es tabla escribible con la anon key.
+- CarriersPanel: dado el CP del cliente, lista paqueterías con km a su sucursal
+  más cercana y recomienda OCURRE si >50 km. CpDistanceTool: compara el CP del
+  cliente contra un CP alterno para ofrecer otro punto de entrega. Helper de
+  distancia en src/lib/vialux/geo.ts (Haversine). AMBOS dependen de las
+  coordenadas correctas — aplicar la migración para que sean exactos.
+
 ## Supabase schema
 
 Tablas principales: `cotizaciones`, `folio_counter`, `inventario`, `clientes`,

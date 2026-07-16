@@ -31,6 +31,7 @@ import { PRODUCTOS, formatMoney } from "@/lib/vialux/constants";
 import type { QuoteState } from "@/hooks/useQuoteState";
 import { useCpLookup } from "@/hooks/useCpLookup";
 import { CarriersPanel } from "./CarriersPanel";
+import { CpDistanceTool } from "./CpDistanceTool";
 import { RailSection } from "@/components/RailSection";
 
 type Props = {
@@ -409,6 +410,14 @@ export function QuoteForm({ state, update, errors = {} }: Props) {
       </div>
 
       <CarriersPanel cp={state.cp} clientLat={cpData?.lat ?? null} clientLng={cpData?.lng ?? null} />
+
+      <CpDistanceTool
+        originCp={state.cp}
+        originMunicipio={cpData?.municipio ?? ""}
+        originEstado={cpData?.estado ?? ""}
+        originLat={cpData?.lat ?? null}
+        originLng={cpData?.lng ?? null}
+      />
     </div>
   );
 }
