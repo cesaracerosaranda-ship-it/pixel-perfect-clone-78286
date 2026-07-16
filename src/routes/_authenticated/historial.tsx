@@ -47,7 +47,7 @@ import type { Tables } from "@/integrations/supabase/types";
 import { RailSection, PageTitle } from "@/components/RailSection";
 import { upsertCliente } from "@/lib/vialux/clientes";
 
-export const Route = createFileRoute("/historial")({
+export const Route = createFileRoute("/_authenticated/historial")({
   component: HistorialPage,
 });
 

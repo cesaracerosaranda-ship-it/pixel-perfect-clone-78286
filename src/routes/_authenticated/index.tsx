@@ -18,7 +18,7 @@ import { generateQuotePdf } from "@/lib/pdf/generateQuotePdf";
 import { upsertCliente } from "@/lib/vialux/clientes";
 import { archivarCotizacionPdf, ligaPdfCotizacion } from "@/lib/vialux/documentos";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/_authenticated/")({
   component: CotizadorPage,
   validateSearch: (s: Record<string, unknown>) => ({
     duplicate: typeof s.duplicate === "string" ? s.duplicate : undefined,

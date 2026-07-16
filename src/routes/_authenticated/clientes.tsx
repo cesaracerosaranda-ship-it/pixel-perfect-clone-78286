@@ -50,7 +50,7 @@ import {
   type Documento,
 } from "@/lib/vialux/documentos";
 
-export const Route = createFileRoute("/clientes")({
+export const Route = createFileRoute("/_authenticated/clientes")({
   component: ClientesPage,
 });
 
