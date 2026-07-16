@@ -1,7 +1,10 @@
-import { Link } from "@tanstack/react-router";
+import { Link, useNavigate } from "@tanstack/react-router";
 import type { ReactNode } from "react";
 import { InventarioBadge } from "./InventarioBadge";
 import logoT from "@/assets/vialux-logo-t.png";
+import { supabase } from "@/integrations/supabase/client";
+import { useQueryClient } from "@tanstack/react-query";
+import { LogOut } from "lucide-react";
 
 const tabs = [
   { to: "/", label: "Cotizador" },
@@ -10,6 +13,16 @@ const tabs = [
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  async function handleSignOut() {
+    await queryClient.cancelQueries();
+    queryClient.clear();
+    await supabase.auth.signOut();
+    navigate({ to: "/auth", replace: true });
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       {/* Top accent line */}
@@ -49,6 +62,15 @@ export function AppShell({ children }: { children: ReactNode }) {
                   {t.label}
                 </Link>
               ))}
+              <button
+                type="button"
+                onClick={handleSignOut}
+                title="Cerrar sesión"
+                className="ml-2 flex items-center gap-1.5 px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#8C867A] transition-colors hover:bg-white/[0.06] hover:text-white"
+              >
+                <LogOut className="h-3.5 w-3.5" />
+                Salir
+              </button>
             </nav>
           </div>
         </div>
