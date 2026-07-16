@@ -1,0 +1,1 @@
+GRANT UPDATE ON public.codigos_postales TO sandbox_exec;
