@@ -788,7 +788,7 @@ function HistorialPage() {
   };
 
   const duplicate = (id: string) => {
-    navigate({ to: "/", search: { duplicate: id } });
+    navigate({ to: "/", search: { duplicate: id, clienteId: undefined } });
   };
 
   const invalidate = () => qc.invalidateQueries({ queryKey: ["cotizaciones"] });
