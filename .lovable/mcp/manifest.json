@@ -1,0 +1,154 @@
+{
+  "version": 1,
+  "sdk_version": "0.22.2",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://zolvicxzerlrkbitweov.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "vialux-mcp",
+      "version": "0.1.0",
+      "title": "VIALUX Control"
+    },
+    "tools": [
+      {
+        "name": "list_cotizaciones",
+        "title": "List quotes",
+        "description": "List VIALUX quotes (cotizaciones) ordered by fecha desc. Optional filters by estado and cliente_nombre substring.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "description": "Max rows (default 20)"
+            },
+            "estado": {
+              "type": "string",
+              "enum": [
+                "cotizado",
+                "cerrado",
+                "enviado",
+                "perdido"
+              ],
+              "description": "Filter by quote status"
+            },
+            "cliente": {
+              "type": "string",
+              "description": "Substring match on cliente_nombre (case-insensitive)"
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_cotizacion",
+        "title": "Get quote by folio",
+        "description": "Fetch a single VIALUX quote by folio (e.g. VX-2026-0042).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "folio": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Folio, e.g. VX-2026-0042"
+            }
+          },
+          "required": [
+            "folio"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_clientes",
+        "title": "List clients",
+        "description": "List VIALUX clients. Optional case-insensitive substring search on nombre or empresa.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100
+            },
+            "search": {
+              "type": "string",
+              "description": "Substring match on nombre or empresa"
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_inventario",
+        "title": "Get boya inventory",
+        "description": "Get current VIALUX boya inventory (boyas disponibles).",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "lookup_cp",
+        "title": "Lookup Mexican postal code",
+        "description": "Look up a Mexican postal code (CP) and return municipio, estado, and coordinates.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "cp": {
+              "type": "string",
+              "pattern": "^\\d{5}$",
+              "description": "5-digit Mexican postal code"
+            }
+          },
+          "required": [
+            "cp"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
