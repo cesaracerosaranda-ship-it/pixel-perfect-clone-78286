@@ -304,16 +304,19 @@ export type Database = {
       inventario: {
         Row: {
           boyas_disponibles: number
+          clavos_disponibles: number
           id: number
           updated_at: string
         }
         Insert: {
           boyas_disponibles?: number
+          clavos_disponibles?: number
           id?: number
           updated_at?: string
         }
         Update: {
           boyas_disponibles?: number
+          clavos_disponibles?: number
           id?: number
           updated_at?: string
         }
