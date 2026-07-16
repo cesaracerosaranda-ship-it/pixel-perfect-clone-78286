@@ -1,96 +1,72 @@
+# Plan: Auth del equipo VIALUX + servidor MCP con OAuth
 
-# VIALUX Control — Plan de implementación
+## Contexto
 
-App web para VIALUX (señalización vial, Monterrey) con dos módulos: **Cotizador** e **Historial de Ventas**, usando Lovable Cloud como backend.
+Hoy VIALUX es una app interna sin login, con RLS pública en todas las tablas. Para exponer un MCP protegido con OAuth (ChatGPT/Claude conectan como usuario real), la app necesita:
 
-## 1. Backend (Lovable Cloud)
+1. Autenticación de usuarios (login con Google + correo/contraseña).
+2. Todas las tablas del negocio pasan a "solo usuarios autenticados" (mismo comportamiento: todos ven todo, pero requieren sesión).
+3. Servidor MCP con las herramientas de VIALUX.
 
-Habilitar Lovable Cloud y crear migración con:
+## Cambios en la app
 
-- `cotizaciones` — tabla principal (folio único, datos cliente, producto, cálculos, flete, estado, revisión, folio_padre, notas).
-- `folio_counter` — fila única (id=1, last_number=11) para folios secuenciales.
-- `inventario` — fila única (id=1, boyas_disponibles=750).
-- RPC `next_folio(year int)` que incrementa `last_number` atómicamente y devuelve `VX-{year}-{0000}`.
-- RLS: políticas públicas (sin auth, como pide el spec).
-- Realtime habilitado en `cotizaciones` e `inventario`.
+### 1. Auth (Google + correo/contraseña)
+- Habilitar Google + Email en Lovable Cloud (`configure_social_auth`).
+- Crear ruta pública `/auth` (login/signup con Google prominente + correo/contraseña).
+- Crear layout `src/routes/_authenticated/route.tsx` (gestionado por la integración: `ssr:false`, redirige a `/auth`).
+- **Mover TODAS las rutas actuales bajo `_authenticated/`**: `index.tsx` (cotizador), `historial.tsx`, `clientes.tsx`. Home protegida = cotizador.
+- Agregar UI mínima de "cerrar sesión" en el AppShell.
+- Sin roles: cualquier usuario autenticado ve todo (igual que hoy).
 
-## 2. Diseño y tokens
+### 2. RLS: público → authenticated
+Migración que reemplaza las políticas `public` actuales por políticas `TO authenticated` en: `cotizaciones`, `clientes`, `documentos`, `inventario`, `folio_counter`, `carrier_coverage`, `codigos_postales`. Ajusta también las 4 policies del bucket `documentos` en storage.
 
-Editar `src/styles.css` con la paleta VIALUX en oklch + tokens semánticos:
-- `--background` grafito `#2D3036`, `--card` `#3D4148`, `--primary` amarillo `#EDBA1A`, `--primary-foreground` grafito, acentos `#C99B0E`, steel `#4A6274/#6B8899`, header/footer `#343331`, borde `#4A4A4A`.
-- Fuentes: **Manrope** (UI) y **JetBrains Mono** (números/folios) cargadas vía Google Fonts en `__root.tsx` head links + `font-family` aplicado en `body` / utility `.font-mono`.
-- Tema oscuro por defecto (clase `dark` en `<html>`).
+Efecto: la app funciona igual para el equipo logueado; deja de ser accesible anónimamente (que es justo el punto).
 
-## 3. Estructura de rutas (TanStack Start)
+### 3. Servidor MCP (`@lovable.dev/mcp-js`)
+- Instalar `@lovable.dev/mcp-js` (agregar al `minimumReleaseAgeExcludes` de `bunfig.toml`).
+- Activar OAuth server con `supabase--configure_oauth_server`.
+- Crear ruta de consentimiento `src/routes/[.]lovable.oauth.consent.tsx` (usa la sesión Supabase existente; el `/auth` recién creado preserva `next` para volver a esta URL).
+- `src/lib/mcp/index.ts` con `auth.oauth.issuer` apuntando al issuer directo de Supabase.
+- Plugin `mcpPlugin()` en `vite.config.ts`, endpoint público `/mcp`.
 
-```
-src/routes/
-  __root.tsx        → shell + AppShell con header (logo + tabs) y footer
-  index.tsx         → Cotizador
-  historial.tsx     → Registro de ventas
-```
+### 4. Herramientas MCP iniciales (todas usan la sesión OAuth del usuario → RLS aplica)
+Cada tool corre con el token del usuario que conectó — mismos permisos que en la app.
 
-AppShell vive en `src/components/AppShell.tsx` y se monta dentro de `RootComponent`; las tabs usan `<Link>` con `activeProps` (amarillo activo, gris inactivo).
+Lectura:
+- `list_cotizaciones` — filtros por estado/cliente/folio, límite.
+- `get_cotizacion` — detalle por folio o id.
+- `list_clientes` — buscar por nombre/empresa.
+- `get_inventario` — boyas disponibles.
+- `buscar_cp` — municipio/estado/coordenadas por CP.
 
-## 4. Módulo Cotizador (`/`)
+Escritura (con `annotations.destructiveHint`):
+- `crear_cotizacion` — genera folio, calcula totales, guarda draft "cotizado".
+- `actualizar_estado_cotizacion` — cotizado → enviado/cerrado/perdido (dispara trigger de inventario).
+- `crear_cliente` — alta rápida.
 
-Componentes en `src/components/cotizador/`:
-- `QuoteForm.tsx` — formulario completo (cliente, CP, producto radio, cantidad, factura toggle, precio especial, notas, revisión, flete con subcampos).
-- `PriceSummary.tsx` — subtotales, IVA, total, margen con semáforo (verde ≥27%, amarillo 20–26%, rojo <20%).
-- `DeliveryNotice.tsx` — mensaje según CP (NL 64–67 con bandas por cantidad, resto = consolidado).
-- `QuoteActions.tsx` — botones: Descargar PDF, WhatsApp, Correo, Guardar, Nueva.
+No incluyo tools que manden correo ni generen PDF por ahora (requieren edge function/PDF en cliente; se pueden agregar después si las pides).
 
-Hooks en `src/hooks/`:
-- `useQuoteState.ts` — estado del formulario y cálculos (precio según producto+factura, subtotales, IVA solo si factura, total, margen vs costo base $32).
-- `useFolio.ts` — llama RPC `next_folio` al guardar; añade `-R{n}` para revisiones.
-- `useSaveQuote.ts` — inserta en `cotizaciones`.
+### 5. Favicon
+La app no tiene favicon custom; agrego uno simple con la "V" amarilla de VIALUX para que aparezca en el conector.
 
-Tabla de precios hardcoded:
-```
-boya:                 { conFactura: 44, sinFactura: 47 }
-boya_clavos:          { conFactura: 48, sinFactura: 51 }
-boya_clavos_refl:     { conFactura: 53, sinFactura: 56 }
-```
+## Cambios que verás
 
-## 5. Generación de PDF
+- Al abrir la app te pedirá login. Todo el equipo debe crearse cuenta (una sola vez).
+- Desde ChatGPT/Claude podrás "Añadir conector VIALUX MCP", firmarás con tu cuenta VIALUX, y podrás pedirle cosas como *"lista las cotizaciones cerradas de junio"* o *"crea una cotización para Itzare Dayan de 500 boyas con clavos, con factura, CP 64000"*.
 
-- Dependencias: `bun add html2pdf.js` (corre en el cliente, sin SSR).
-- `src/lib/pdf/QuotePdfTemplate.tsx` — JSX exacto del layout (header grafito + barra amarilla, datos cliente, tabla partidas con fila opcional de flete, subtotales, dos boxes Tiempo/Forma de pago, grid 8 specs, términos, footer).
-- `src/lib/pdf/generateQuotePdf.ts` — renderiza el template a un nodo oculto y llama `html2pdf` con nombre `{FOLIO}_{CLIENTE}_{N}PZS.pdf` (todo en MAYÚSCULAS, espacios→`_`).
-- Import dinámico para evitar romper SSR.
+## Fuera de alcance de esta primera entrega
 
-## 6. Módulo Historial (`/historial`)
-
-`src/components/historial/`:
-- `InventoryBadge.tsx` — banner superior con `boyas_disponibles` (suscripción realtime).
-- `QuotesTable.tsx` — tabla con folio, fecha, cliente, empresa, cantidad, total, pill de estado, notas.
-- `StatusPill.tsx` — colores: cotizado=amarillo, cerrado=verde, enviado=azul, perdido=rojo; click abre dropdown para cambiar.
-- `QuoteFilters.tsx` — buscador (cliente/folio) + filtro por estado.
-- `QuoteDetailDialog.tsx` — ver detalle.
-- Acciones: duplicar (prefilla cotizador vía query param o store), eliminar (AlertDialog).
-
-Hook `useQuotes.ts` con React Query + canal realtime.
-
-## 7. WhatsApp / Correo
-
-- WhatsApp: `https://wa.me/{tel}?text=...` con mensaje corto (folio, total, vigencia 7 días).
-- Correo: `mailto:` con asunto `Cotización {FOLIO} — VIALUX` y cuerpo resumen.
-
-## 8. Constantes y reglas
-
-`src/lib/vialux/constants.ts`:
-- `EJECUTIVO = "AUGUSTO ROBLES"`, `COSTO_BASE = 32`, `VIGENCIA_DIAS = 7`.
-- Descripciones de producto, specs técnicas, mensajes de entrega, prefijos CP NL.
+- Roles admin/ventas (elegiste "login simple"; si luego quieres restringir escrituras solo agrega la capa `user_roles`).
+- Que las herramientas MCP manden correo o generen PDF automáticamente.
+- Migrar históricos de usuarios (no hay: arrancamos desde cero).
 
 ## Detalles técnicos
 
-- Stack: TanStack Start + React 19 + Tailwind v4 + shadcn/ui + Lovable Cloud (Supabase).
-- Validación: Zod en el form.
-- Estado server: `@tanstack/react-query` (ya disponible).
-- Realtime: cliente browser de Supabase (`@/integrations/supabase/client`).
-- Migración SQL: archivo nuevo bajo `supabase/migrations/` con tablas, RLS, función `next_folio`, seeds (folio=11, inventario=750), y `ALTER PUBLICATION supabase_realtime`.
-- Logo: necesito que subas el SVG/PNG del logo VIALUX (o confirmes que genere un placeholder).
+- Middleware `attachSupabaseAuth` ya está registrado en `src/start.ts` (bien).
+- `SUPABASE_JWKS` ya está en secretos (bien para verificación de tokens OAuth).
+- Issuer OAuth = `https://zolvicxzerlrkbitweov.supabase.co/auth/v1` (directo, no proxy).
+- Tools MCP construyen un Supabase client por request con el token del `ctx.getToken()` para que RLS respete la identidad del usuario OAuth.
+- La edge function `enviar-cotizacion` sigue funcionando igual (usa service-role internamente).
 
-## Pregunta antes de implementar
-
-¿Subes el **logo de VIALUX** (PNG/SVG) para usarlo en header y PDF, o prefieres que genere un placeholder amarillo/grafito temporal?
+¿Le doy?
