@@ -77,6 +77,14 @@ export function renderQuoteHtml(args: {
     : "";
   const fleteDestino = state.cp ? `, A CP ${esc(state.cp)}${lugarDestino}` : "";
 
+  // Línea de empresa bajo el nombre del cliente (útil cuando el cliente es
+  // "A QUIEN CORRESPONDA" y la cotización va dirigida a una empresa).
+  const empresaClean = (state.empresa || "").trim();
+  const empresaLine =
+    empresaClean && empresaClean !== "-" && empresaClean !== "—"
+      ? `<div style="font-size:10px;letter-spacing:1px;color:${GRAY_DARK};"><span style="color:${GOLD};font-weight:700;">EMPRESA:</span> ${esc(empresaClean.toUpperCase())}</div>`
+      : "";
+
   // Sección TIEMPO DE ENTREGA: comportamiento diferenciado por escenario
   const isLocalCp = /^6[4-7]/.test(state.cp || "");
   const deliveryMain = state.incluyeFlete
@@ -155,10 +163,11 @@ export function renderQuoteHtml(args: {
     <!-- 00 · CLIENTE -->
     <div style="display:grid;grid-template-columns:88px 1fr;border-bottom:1px solid ${BORDER};">
       ${rail("00", "CLIENTE")}
-      <div style="padding:14px 40px 14px 32px;display:flex;justify-content:space-between;gap:24px;">
-        <div style="display:flex;flex-direction:column;gap:6px;min-width:0;">
+      <div style="padding:11px 40px 11px 32px;display:flex;justify-content:space-between;gap:24px;">
+        <div style="display:flex;flex-direction:column;gap:5px;min-width:0;">
           <div style="font-size:9px;letter-spacing:3px;color:${GRAY};">COTIZACIÓN PARA:</div>
           <div style="font-size:22px;font-weight:800;letter-spacing:0.5px;line-height:1.15;">${esc(state.cliente.toUpperCase())}</div>
+          ${empresaLine}
           <div style="font-size:10px;letter-spacing:1px;color:${GRAY_DARK};">ATENDIDO POR: ${EJECUTIVO}</div>
           <div style="display:flex;align-items:center;gap:12px;margin-top:4px;">
             <div style="background:${YELLOW};color:${INK};font-size:9px;font-weight:700;letter-spacing:2px;padding:5px 10px;">SEÑALIZACIÓN VIAL</div>

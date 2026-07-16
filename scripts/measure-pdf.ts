@@ -9,7 +9,7 @@ const logoDataUrl = `data:image/png;base64,${logo}`;
 
 const baseState: QuoteState = {
   cliente: "JOAQUIN DEL ANGEL AZUETA",
-  empresa: "",
+  empresa: "MANUFACTURAS VIALES DE SEÑALES Y LINEAS",
   telefono: "",
   cp: "92800",
   municipio: "",
