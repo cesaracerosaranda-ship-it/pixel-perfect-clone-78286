@@ -37,7 +37,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       <header className="border-b border-[#3A3936] bg-[#343331]">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-6 px-6 py-3">
           {/* Brand */}
-          <Link to="/" className="block">
+          <Link to="/" search={{ duplicate: undefined, clienteId: undefined }} className="block">
             <img src={logoT} alt="VIALUX" className="h-10 w-auto" />
           </Link>
 
