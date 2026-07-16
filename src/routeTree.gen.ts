@@ -9,11 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
 import { Route as AuthenticatedHistorialRouteImport } from './routes/_authenticated/historial'
 import { Route as AuthenticatedClientesRouteImport } from './routes/_authenticated/clientes'
 
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
   id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
@@ -36,10 +42,12 @@ const AuthenticatedClientesRoute = AuthenticatedClientesRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
+  '/auth': typeof AuthRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/historial': typeof AuthenticatedHistorialRoute
 }
 export interface FileRoutesByTo {
+  '/auth': typeof AuthRoute
   '/clientes': typeof AuthenticatedClientesRoute
   '/historial': typeof AuthenticatedHistorialRoute
   '/': typeof AuthenticatedIndexRoute
@@ -47,18 +55,20 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
   '/_authenticated/clientes': typeof AuthenticatedClientesRoute
   '/_authenticated/historial': typeof AuthenticatedHistorialRoute
   '/_authenticated/': typeof AuthenticatedIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/clientes' | '/historial'
+  fullPaths: '/' | '/auth' | '/clientes' | '/historial'
   fileRoutesByTo: FileRoutesByTo
-  to: '/clientes' | '/historial' | '/'
+  to: '/auth' | '/clientes' | '/historial' | '/'
   id:
     | '__root__'
     | '/_authenticated'
+    | '/auth'
     | '/_authenticated/clientes'
     | '/_authenticated/historial'
     | '/_authenticated/'
@@ -66,10 +76,18 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_authenticated': {
       id: '/_authenticated'
       path: ''
@@ -118,6 +136,7 @@ const AuthenticatedRouteRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
