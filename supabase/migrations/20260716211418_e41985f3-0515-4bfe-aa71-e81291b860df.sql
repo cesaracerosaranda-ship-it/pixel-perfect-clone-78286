@@ -1,0 +1,1 @@
+REVOKE UPDATE ON public.codigos_postales FROM sandbox_exec;
