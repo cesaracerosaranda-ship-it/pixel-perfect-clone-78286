@@ -47,7 +47,7 @@ import type { Tables } from "@/integrations/supabase/types";
 import { RailSection, PageTitle } from "@/components/RailSection";
 import { upsertCliente } from "@/lib/vialux/clientes";
 
-export const Route = createFileRoute("/historial")({
+export const Route = createFileRoute("/_authenticated/historial")({
   component: HistorialPage,
 });
 
@@ -591,7 +591,7 @@ function ActualizarInventarioModal({
       boyas_disponibles: b,
     };
     if (clavosSupported) payload.clavos_disponibles = c;
-    const { error } = await supabase.from("inventario").update(payload).eq("id", 1);
+    const { error } = await supabase.from("inventario").update(payload as never).eq("id", 1);
     setSaving(false);
     if (error) {
       toast.error(error.message);
