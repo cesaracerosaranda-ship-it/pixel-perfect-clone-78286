@@ -1,6 +1,41 @@
 import { supabase } from "@/integrations/supabase/client";
-import { formatMoney, VIGENCIA_DIAS } from "./constants";
+import { formatInt, formatMoney, PRODUCTOS, VIGENCIA_DIAS } from "./constants";
 import type { QuoteState } from "@/hooks/useQuoteState";
+
+/**
+ * Texto corto para acompañar la cotización por WhatsApp: el vendedor descarga
+ * el PDF, lo adjunta en el chat y pega este resumen. No incluye liga (el PDF
+ * va como archivo adjunto).
+ */
+export function buildWhatsAppResumen(
+  state: QuoteState,
+  folio: string,
+  calc: { precioUnitario: number; total: number },
+  deliveryMsg: string,
+): string {
+  const prod = PRODUCTOS[state.producto];
+  const totalNota = state.requiereFactura ? "(IVA incluido)" : "(sin factura)";
+  const entrega = (deliveryMsg || "").trim();
+  const resumen = [
+    `• Producto: ${prod.label.toUpperCase()} (${prod.sku})`,
+    `• Cantidad: ${formatInt(state.cantidad)} pzas`,
+    `• Precio: ${formatMoney(calc.precioUnitario)} c/u`,
+    `• Total: ${formatMoney(calc.total)} MXN ${totalNota}`,
+    entrega ? `• Entrega: ${entrega}` : null,
+    `• Vigencia: ${VIGENCIA_DIAS} días`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+  return [
+    `Hola, le comparto la cotización ${folio} de VIALUX.`,
+    "",
+    "📋 Resumen:",
+    resumen,
+    "",
+    "Adjunto el PDF con el detalle completo. Quedo atento a cualquier duda.",
+    "— Augusto Robles · VIALUX",
+  ].join("\n");
+}
 
 export async function generateFolio(revision: number, parent?: string | null): Promise<string> {
   if (revision > 0 && parent) {

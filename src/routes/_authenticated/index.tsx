@@ -1,8 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, Mail, MessageCircle, Save, RotateCcw, CheckCircle2 } from "lucide-react";
+import { Download, Mail, MessageCircle, Save, RotateCcw, CheckCircle2, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { QuoteForm } from "@/components/cotizador/QuoteForm";
 import { PriceSummary } from "@/components/cotizador/PriceSummary";
 import { initialQuote, useQuoteState, type QuoteState } from "@/hooks/useQuoteState";
@@ -10,6 +16,7 @@ import { deliveryMessage, PRODUCTOS } from "@/lib/vialux/constants";
 import { supabase } from "@/integrations/supabase/client";
 import {
   buildMailto,
+  buildWhatsAppResumen,
   buildWhatsAppUrl,
   generateFolio,
   type QuoteRow,
@@ -34,6 +41,8 @@ function CotizadorPage() {
   const [savedId, setSavedId] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
+  const [waResumen, setWaResumen] = useState<string | null>(null);
+  const [copiado, setCopiado] = useState(false);
 
   // Prefill if duplicating
   useEffect(() => {
@@ -224,10 +233,32 @@ function CotizadorPage() {
           toast.info(`PDF descargado; no se archivó en el expediente: ${(e as Error).message}`);
         }
       }
+      // Texto para acompañar la cotización por WhatsApp (descargar PDF +
+      // adjuntarlo + pegar este resumen). Se abre en un diálogo para copiar.
+      const resumen = buildWhatsAppResumen(state, folio, calc, deliveryMsg);
+      setCopiado(false);
+      setWaResumen(resumen);
+      try {
+        await navigator.clipboard.writeText(resumen);
+        setCopiado(true);
+      } catch {
+        /* el usuario puede copiar desde el diálogo */
+      }
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
       setSaving(false);
+    }
+  };
+
+  const copiarResumen = async () => {
+    if (!waResumen) return;
+    try {
+      await navigator.clipboard.writeText(waResumen);
+      setCopiado(true);
+      toast.success("Texto copiado — pégalo en WhatsApp");
+    } catch {
+      toast.error("No se pudo copiar; selecciona y copia manualmente");
     }
   };
 
@@ -381,6 +412,45 @@ function CotizadorPage() {
           </div>
         </div>
       </div>
+
+      {/* Texto para WhatsApp tras descargar el PDF */}
+      <Dialog open={!!waResumen} onOpenChange={(v) => !v && setWaResumen(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="uppercase tracking-wider">
+              Texto para WhatsApp
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 py-1">
+            <p className="font-mono text-[10px] leading-relaxed text-[#7C766A]">
+              PDF DESCARGADO. ADJÚNTALO EN WHATSAPP Y PEGA ESTE TEXTO
+              {copiado ? " (YA COPIADO)" : ""}.
+            </p>
+            <textarea
+              readOnly
+              value={waResumen ?? ""}
+              rows={11}
+              onFocus={(e) => e.currentTarget.select()}
+              className="w-full resize-none border border-border bg-background p-3 text-xs leading-relaxed focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#EDBA1A]"
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setWaResumen(null)}>
+                Cerrar
+              </Button>
+              <Button
+                onClick={copiarResumen}
+                className="bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#EDBA1A]/90"
+              >
+                {copiado ? (
+                  <><Check className="mr-1.5 h-4 w-4" /> Copiado</>
+                ) : (
+                  <><Copy className="mr-1.5 h-4 w-4" /> Copiar texto</>
+                )}
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
