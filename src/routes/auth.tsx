@@ -30,6 +30,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [resetting, setResetting] = useState(false);
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
@@ -49,6 +50,25 @@ function AuthPage() {
     if (result.error) {
       toast.error(result.error.message ?? "No se pudo iniciar sesión con Google");
       setBusy(false);
+    }
+  }
+
+  async function handleForgotPassword() {
+    if (!email) {
+      toast.error("Escribe tu correo primero");
+      return;
+    }
+    setResetting(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      toast.success("Te enviamos un correo con el enlace para restablecer la contraseña.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "No se pudo enviar el correo");
+    } finally {
+      setResetting(false);
     }
   }
 
@@ -144,6 +164,17 @@ function AuthPage() {
         >
           {mode === "signin" ? "¿No tienes cuenta? Crear una" : "¿Ya tienes cuenta? Iniciar sesión"}
         </button>
+
+        {mode === "signin" && (
+          <button
+            type="button"
+            onClick={handleForgotPassword}
+            disabled={resetting}
+            className="mt-2 w-full text-center text-xs text-[#8A857C] hover:text-[#2E2B27] disabled:opacity-50"
+          >
+            {resetting ? "Enviando…" : "¿Olvidaste tu contraseña?"}
+          </button>
+        )}
       </div>
     </div>
   );
