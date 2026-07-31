@@ -127,7 +127,13 @@ function RootComponent() {
   const { queryClient } = Route.useRouteContext();
   const router = useRouter();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const bare = pathname === "/auth" || pathname === "/reset-password" || pathname.startsWith("/.lovable/");
+  // Rutas públicas que se ven sin el menú de la app (las abre gente de fuera:
+  // pantalla de acceso y el aviso de privacidad que exige Meta).
+  const bare =
+    pathname === "/auth" ||
+    pathname === "/reset-password" ||
+    pathname === "/privacidad" ||
+    pathname.startsWith("/.lovable/");
 
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
