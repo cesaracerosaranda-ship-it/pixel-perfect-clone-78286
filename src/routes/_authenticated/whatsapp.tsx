@@ -24,7 +24,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { PageTitle } from "@/components/RailSection";
 import { formatMoney } from "@/lib/vialux/constants";
 import { mismoTelefono } from "@/lib/vialux/telefono";
-import { Search, MessageCircle, User, Link2, Calculator, X } from "lucide-react";
+import { Search, MessageCircle, Link2, Calculator, X, Send, Loader2 } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/whatsapp")({
   component: WhatsAppPage,
@@ -250,6 +250,8 @@ function WhatsAppPage() {
   const qc = useQueryClient();
   const [search, setSearch] = useState("");
   const [selId, setSelId] = useState<string | null>(null);
+  const [borrador, setBorrador] = useState("");
+  const [enviando, setEnviando] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const convQuery = useQuery({
@@ -322,6 +324,7 @@ function WhatsAppPage() {
 
   const abrir = async (c: Conversacion) => {
     setSelId(c.id);
+    setBorrador(""); // el borrador no se arrastra entre conversaciones
     if (c.no_leidos > 0) {
       await supabase.from("wa_conversaciones").update({ no_leidos: 0 }).eq("id", c.id);
       qc.invalidateQueries({ queryKey: ["wa_conversaciones"] });
@@ -335,6 +338,26 @@ function WhatsAppPage() {
       .eq("id", id);
     if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["wa_conversaciones"] });
+  };
+
+  const enviar = async () => {
+    const texto = borrador.trim();
+    if (!selId || !texto) return;
+    setEnviando(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("whatsapp-enviar", {
+        body: { conversacion_id: selId, texto },
+      });
+      if (error) throw new Error(error.message);
+      if (data?.error) throw new Error(data.error);
+      setBorrador("");
+      qc.invalidateQueries({ queryKey: ["wa_mensajes"] });
+      qc.invalidateQueries({ queryKey: ["wa_conversaciones"] });
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setEnviando(false);
+    }
   };
 
   const ligarCliente = async (id: string, clienteId: string | null) => {
@@ -528,14 +551,31 @@ function WhatsAppPage() {
                 <div ref={bottomRef} />
               </div>
 
-              {/* Composer (envío se habilita al conectar el número de producción) */}
+              {/* Composer */}
               <div className="border-t border-border bg-card p-3">
-                <div className="flex items-center gap-2 border border-border bg-muted px-3 py-2 text-muted-foreground">
-                  <User className="h-3.5 w-3.5" />
-                  <span className="font-mono text-[10px] uppercase tracking-wide">
-                    El envío desde aquí se habilita al conectar el número de producción
-                  </span>
-                </div>
+                <form
+                  onSubmit={(e) => { e.preventDefault(); enviar(); }}
+                  className="flex items-center gap-2"
+                >
+                  <Input
+                    value={borrador}
+                    onChange={(e) => setBorrador(e.target.value)}
+                    placeholder="Escribe un mensaje…"
+                    disabled={enviando}
+                    className="bg-background"
+                  />
+                  <Button
+                    type="submit"
+                    disabled={enviando || !borrador.trim()}
+                    className="shrink-0 bg-[#EDBA1A] font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#1B1A17] hover:bg-[#EDBA1A]/90"
+                  >
+                    {enviando ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <><Send className="mr-1.5 h-3.5 w-3.5" /> Enviar</>
+                    )}
+                  </Button>
+                </form>
               </div>
             </>
           )}
