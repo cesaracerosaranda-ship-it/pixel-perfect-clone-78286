@@ -348,7 +348,19 @@ function WhatsAppPage() {
       const { data, error } = await supabase.functions.invoke("whatsapp-enviar", {
         body: { conversacion_id: selId, texto },
       });
-      if (error) throw new Error(error.message);
+      if (error) {
+        // Ante un status != 2xx, supabase-js sólo expone "non-2xx status code".
+        // El motivo real (token vencido, fuera de la ventana de 24 h, etc.) viene
+        // en el cuerpo de la respuesta, que llega en error.context.
+        let motivo = error.message;
+        try {
+          const body = await (error as { context?: Response }).context?.json();
+          if (body?.error) motivo = body.error as string;
+        } catch {
+          /* si no se puede leer el cuerpo, queda el mensaje genérico */
+        }
+        throw new Error(motivo);
+      }
       if (data?.error) throw new Error(data.error);
       setBorrador("");
       qc.invalidateQueries({ queryKey: ["wa_mensajes"] });
