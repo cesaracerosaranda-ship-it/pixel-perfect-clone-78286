@@ -79,12 +79,62 @@ const CORS = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+/**
+ * Verifica que el POST venga realmente de Meta (firma HMAC-SHA256 del cuerpo
+ * con el App Secret, header X-Hub-Signature-256). Sin esto, cualquiera que
+ * conozca la URL podría inyectar conversaciones falsas en los hilos de clientes
+ * reales. Comparación en tiempo constante para no filtrar la firma.
+ *
+ * Si WHATSAPP_APP_SECRET aún no está configurado, se acepta el evento pero se
+ * deja constancia en logs — así el despliegue no rompe la operación en curso;
+ * en cuanto se configura el secreto, la validación pasa a ser obligatoria.
+ */
+async function firmaValida(rawBody: string, signatureHeader: string | null): Promise<boolean> {
+  const appSecret = Deno.env.get("WHATSAPP_APP_SECRET");
+  if (!appSecret) {
+    console.warn("[whatsapp-webhook] WHATSAPP_APP_SECRET sin configurar: se acepta sin verificar firma");
+    return true;
+  }
+  if (!signatureHeader?.startsWith("sha256=")) return false;
+
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(appSecret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"],
+  );
+  const mac = await crypto.subtle.sign("HMAC", key, new TextEncoder().encode(rawBody));
+  const esperado = Array.from(new Uint8Array(mac))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+  const recibido = signatureHeader.slice("sha256=".length);
+
+  // Comparación en tiempo constante
+  if (recibido.length !== esperado.length) return false;
+  let diff = 0;
+  for (let i = 0; i < esperado.length; i++) diff |= esperado.charCodeAt(i) ^ recibido.charCodeAt(i);
+  return diff === 0;
+}
+
 // Copia local de src/lib/vialux/telefono.ts (el edge function no comparte bundle
 // con la app). Reduce cualquier formato a los últimos 10 dígitos: el número
 // nacional mexicano, que es lo comparable entre el wa_id y clientes.telefono.
 function normalizarTelefono(valor: string | null | undefined): string | null {
   const digitos = (valor ?? "").replace(/\D/g, "");
   return digitos.length < 10 ? null : digitos.slice(-10);
+}
+
+/**
+ * El sobrante antes de los últimos 10 dígitos debe ser vacío o lada de México.
+ * Sin esto, un teléfono de EE.UU. (+1 818 123 4567) colisionaría con un wa_id
+ * mexicano (52 818 123 4567) y ligaría el chat al expediente de OTRO cliente.
+ */
+function prefijoMexicano(valor: string | null | undefined): boolean {
+  const digitos = (valor ?? "").replace(/\D/g, "");
+  if (digitos.length < 10) return false;
+  const prefijo = digitos.slice(0, -10);
+  return prefijo === "" || prefijo === "52" || prefijo === "521";
 }
 
 /**
@@ -95,14 +145,20 @@ function normalizarTelefono(valor: string | null | undefined): string | null {
 // deno-lint-ignore no-explicit-any
 async function buscarClientePorTelefono(supabase: any, waId: string): Promise<string | null> {
   const objetivo = normalizarTelefono(waId);
-  if (!objetivo) return null;
-  const { data } = await supabase
+  if (!objetivo || !prefijoMexicano(waId)) return null;
+  const { data, error } = await supabase
     .from("clientes")
     .select("id, telefono")
     .not("telefono", "is", null)
-    .neq("telefono", "");
+    .neq("telefono", "")
+    .limit(5000); // explícito: PostgREST corta en 1000 por defecto y ligaría de menos en silencio
+  if (error) {
+    console.error("[whatsapp-webhook] error consultando clientes:", error.message);
+    return null;
+  }
   const matches = (data ?? []).filter(
-    (c: { telefono: string | null }) => normalizarTelefono(c.telefono) === objetivo,
+    (c: { telefono: string | null }) =>
+      normalizarTelefono(c.telefono) === objetivo && prefijoMexicano(c.telefono),
   );
   // Solo se liga cuando el match es inequívoco.
   return matches.length === 1 ? (matches[0].id as string) : null;
@@ -130,7 +186,14 @@ Deno.serve(async (req) => {
   // Meta reintenta si no recibe 200 pronto: guardamos y respondemos 200 siempre
   // que el payload sea válido (los errores internos se registran, no se propagan).
   try {
-    const body = await req.json();
+    // El cuerpo se lee crudo para poder verificar la firma sobre los bytes exactos.
+    const rawBody = await req.text();
+    if (!(await firmaValida(rawBody, req.headers.get("x-hub-signature-256")))) {
+      console.error("[whatsapp-webhook] firma inválida — evento descartado");
+      return new Response("invalid signature", { status: 401, headers: CORS });
+    }
+
+    const body = JSON.parse(rawBody);
     const { incoming, statuses } = parseWebhook(body);
 
     if (incoming.length || statuses.length) {
@@ -153,7 +216,7 @@ Deno.serve(async (req) => {
           // cuyo teléfono coincida, para que el chat aparezca junto a sus
           // cotizaciones y expediente.
           const clienteId = await buscarClientePorTelefono(supabase, m.wa_id);
-          const { data: nueva } = await supabase
+          const { data: nueva, error: insErr } = await supabase
             .from("wa_conversaciones")
             .insert({
               wa_id: m.wa_id,
@@ -165,21 +228,42 @@ Deno.serve(async (req) => {
             })
             .select("id")
             .single();
-          conversacionId = nueva?.id;
+          if (insErr) {
+            // Carrera: otra entrega simultánea del mismo contacto ya la creó
+            // (choca con el UNIQUE de wa_id). Se recupera en vez de perder el mensaje.
+            const { data: existente } = await supabase
+              .from("wa_conversaciones")
+              .select("id")
+              .eq("wa_id", m.wa_id)
+              .maybeSingle();
+            conversacionId = existente?.id;
+            if (!conversacionId) {
+              console.error(
+                "[whatsapp-webhook] no se pudo crear ni recuperar la conversación:",
+                insErr.message,
+              );
+            }
+          } else {
+            conversacionId = nueva?.id;
+          }
         } else {
           // Si aún no tiene cliente ligado, se reintenta (pudo darse de alta después).
           const patch: Record<string, unknown> = {
-            nombre_contacto: m.nombre || undefined,
             ultimo_mensaje: m.texto,
             ultima_actividad: m.ts,
             no_leidos: (conv?.no_leidos ?? 0) + 1,
             archivada: false,
           };
+          if (m.nombre) patch.nombre_contacto = m.nombre;
           if (!conv?.cliente_id) {
             const clienteId = await buscarClientePorTelefono(supabase, m.wa_id);
             if (clienteId) patch.cliente_id = clienteId;
           }
-          await supabase.from("wa_conversaciones").update(patch).eq("id", conversacionId);
+          const { error: updErr } = await supabase
+            .from("wa_conversaciones")
+            .update(patch)
+            .eq("id", conversacionId);
+          if (updErr) console.error("[whatsapp-webhook] update conversación:", updErr.message);
         }
 
         if (conversacionId) {
@@ -197,15 +281,21 @@ Deno.serve(async (req) => {
                 estado: "read",
               },
               { onConflict: "wa_message_id", ignoreDuplicates: true },
-            );
+            )
+            .then(({ error }: { error: { message: string } | null }) => {
+              if (error) console.error("[whatsapp-webhook] insert mensaje:", error.message);
+            });
         }
       }
 
       for (const s of statuses) {
-        await supabase
+        // Los recibos aplican solo a mensajes que NOSOTROS enviamos.
+        const { error: stErr } = await supabase
           .from("wa_mensajes")
           .update({ estado: s.estado })
-          .eq("wa_message_id", s.wa_message_id);
+          .eq("wa_message_id", s.wa_message_id)
+          .eq("direccion", "out");
+        if (stErr) console.error("[whatsapp-webhook] update estado:", stErr.message);
       }
     }
 
@@ -213,8 +303,11 @@ Deno.serve(async (req) => {
       status: 200,
       headers: { ...CORS, "Content-Type": "application/json" },
     });
-  } catch (_e) {
-    // Aun con error respondemos 200 para que Meta no entre en bucle de reintentos.
+  } catch (e) {
+    // Se registra para poder diagnosticar; aun así respondemos 200 para que
+    // Meta no entre en bucle de reintentos por un payload que no vamos a poder
+    // procesar de todos modos.
+    console.error("[whatsapp-webhook] excepción procesando evento:", (e as Error).message);
     return new Response(JSON.stringify({ ok: false }), {
       status: 200,
       headers: { ...CORS, "Content-Type": "application/json" },

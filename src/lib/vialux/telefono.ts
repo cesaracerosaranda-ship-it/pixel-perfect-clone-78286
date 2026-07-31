@@ -14,14 +14,28 @@ export function normalizarTelefono(valor: string | null | undefined): string | n
   return digitos.slice(-10);
 }
 
-/** True si ambos teléfonos corresponden al mismo número nacional. */
+/**
+ * El sobrante antes de los últimos 10 dígitos debe ser vacío o lada de México.
+ * Sin esta comprobación, un teléfono de EE.UU. (+1 818 123 4567) colisionaría
+ * con un wa_id mexicano (52 818 123 4567) y ligaría el chat al expediente de
+ * OTRO cliente.
+ */
+function prefijoMexicano(valor: string | null | undefined): boolean {
+  const digitos = (valor ?? "").replace(/\D/g, "");
+  if (digitos.length < 10) return false;
+  const prefijo = digitos.slice(0, -10);
+  return prefijo === "" || prefijo === "52" || prefijo === "521";
+}
+
+/** True si ambos teléfonos corresponden al mismo número nacional mexicano. */
 export function mismoTelefono(
   a: string | null | undefined,
   b: string | null | undefined,
 ): boolean {
   const na = normalizarTelefono(a);
   const nb = normalizarTelefono(b);
-  return na !== null && na === nb;
+  if (na === null || na !== nb) return false;
+  return prefijoMexicano(a) && prefijoMexicano(b);
 }
 
 /** Formato legible para mostrar un wa_id: +52 1 81 1234 5678 → +5218112345678 */
