@@ -10,6 +10,7 @@ const tabs = [
   { to: "/", label: "Cotizador" },
   { to: "/historial", label: "Historial" },
   { to: "/clientes", label: "Clientes" },
+  { to: "/whatsapp", label: "WhatsApp" },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
