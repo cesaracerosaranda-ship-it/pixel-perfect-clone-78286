@@ -322,6 +322,100 @@ export type Database = {
         }
         Relationships: []
       }
+      wa_conversaciones: {
+        Row: {
+          archivada: boolean
+          cliente_id: string | null
+          created_at: string
+          id: string
+          no_leidos: number
+          nombre_contacto: string
+          pipeline: string
+          ultima_actividad: string
+          ultimo_mensaje: string
+          wa_id: string
+        }
+        Insert: {
+          archivada?: boolean
+          cliente_id?: string | null
+          created_at?: string
+          id?: string
+          no_leidos?: number
+          nombre_contacto?: string
+          pipeline?: string
+          ultima_actividad?: string
+          ultimo_mensaje?: string
+          wa_id: string
+        }
+        Update: {
+          archivada?: boolean
+          cliente_id?: string | null
+          created_at?: string
+          id?: string
+          no_leidos?: number
+          nombre_contacto?: string
+          pipeline?: string
+          ultima_actividad?: string
+          ultimo_mensaje?: string
+          wa_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wa_conversaciones_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      wa_mensajes: {
+        Row: {
+          conversacion_id: string
+          created_at: string
+          direccion: string
+          estado: string
+          id: string
+          media_url: string | null
+          texto: string
+          timestamp_wa: string
+          tipo: string
+          wa_message_id: string | null
+        }
+        Insert: {
+          conversacion_id: string
+          created_at?: string
+          direccion: string
+          estado?: string
+          id?: string
+          media_url?: string | null
+          texto?: string
+          timestamp_wa?: string
+          tipo?: string
+          wa_message_id?: string | null
+        }
+        Update: {
+          conversacion_id?: string
+          created_at?: string
+          direccion?: string
+          estado?: string
+          id?: string
+          media_url?: string | null
+          texto?: string
+          timestamp_wa?: string
+          tipo?: string
+          wa_message_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "wa_mensajes_conversacion_id_fkey"
+            columns: ["conversacion_id"]
+            isOneToOne: false
+            referencedRelation: "wa_conversaciones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
