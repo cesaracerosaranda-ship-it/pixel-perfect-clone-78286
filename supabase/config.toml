@@ -1,1 +1,5 @@
 project_id = "zolvicxzerlrkbitweov"
+
+# El webhook de WhatsApp lo llama Meta SIN sesión de Supabase → debe ser público.
+[functions.whatsapp-webhook]
+verify_jwt = false
