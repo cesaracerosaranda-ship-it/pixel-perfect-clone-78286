@@ -69,9 +69,10 @@ function AvisoPrivacidad() {
         <div className="border border-border bg-card">
           <Seccion num="00" titulo="Responsable de los datos">
             <p>
-              <strong>VIALUX</strong> (señalización vial), con domicilio en Nardo #705,
-              Col. Victoria, Monterrey, Nuevo León, México, es responsable del
-              tratamiento de los datos personales que usted nos proporciona.
+              <strong>VIALUX</strong> (señalización vial), con domicilio en Juan Zuazua
+              #2945, Col. Victoria, C.P. 64520, Monterrey, Nuevo León, México, es
+              responsable del tratamiento de los datos personales que usted nos
+              proporciona.
             </p>
             <p>
               Contacto:{" "}
