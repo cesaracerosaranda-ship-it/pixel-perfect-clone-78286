@@ -79,6 +79,35 @@ const CORS = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Copia local de src/lib/vialux/telefono.ts (el edge function no comparte bundle
+// con la app). Reduce cualquier formato a los últimos 10 dígitos: el número
+// nacional mexicano, que es lo comparable entre el wa_id y clientes.telefono.
+function normalizarTelefono(valor: string | null | undefined): string | null {
+  const digitos = (valor ?? "").replace(/\D/g, "");
+  return digitos.length < 10 ? null : digitos.slice(-10);
+}
+
+/**
+ * Busca en el directorio un cliente cuyo teléfono coincida con el wa_id.
+ * Se compara en código (no en SQL) porque el teléfono se captura a mano y
+ * llega en formatos libres. Devuelve null si no hay match o si hay ambigüedad.
+ */
+// deno-lint-ignore no-explicit-any
+async function buscarClientePorTelefono(supabase: any, waId: string): Promise<string | null> {
+  const objetivo = normalizarTelefono(waId);
+  if (!objetivo) return null;
+  const { data } = await supabase
+    .from("clientes")
+    .select("id, telefono")
+    .not("telefono", "is", null)
+    .neq("telefono", "");
+  const matches = (data ?? []).filter(
+    (c: { telefono: string | null }) => normalizarTelefono(c.telefono) === objetivo,
+  );
+  // Solo se liga cuando el match es inequívoco.
+  return matches.length === 1 ? (matches[0].id as string) : null;
+}
+
 Deno.serve(async (req) => {
   const url = new URL(req.url);
 
@@ -114,17 +143,22 @@ Deno.serve(async (req) => {
         // Conversación (crea o actualiza por wa_id)
         const { data: conv } = await supabase
           .from("wa_conversaciones")
-          .select("id, no_leidos")
+          .select("id, no_leidos, cliente_id")
           .eq("wa_id", m.wa_id)
           .maybeSingle();
 
         let conversacionId = conv?.id as string | undefined;
         if (!conversacionId) {
+          // Conversación nueva: se intenta ligar al cliente del directorio
+          // cuyo teléfono coincida, para que el chat aparezca junto a sus
+          // cotizaciones y expediente.
+          const clienteId = await buscarClientePorTelefono(supabase, m.wa_id);
           const { data: nueva } = await supabase
             .from("wa_conversaciones")
             .insert({
               wa_id: m.wa_id,
               nombre_contacto: m.nombre,
+              cliente_id: clienteId,
               ultimo_mensaje: m.texto,
               ultima_actividad: m.ts,
               no_leidos: 1,
@@ -133,16 +167,19 @@ Deno.serve(async (req) => {
             .single();
           conversacionId = nueva?.id;
         } else {
-          await supabase
-            .from("wa_conversaciones")
-            .update({
-              nombre_contacto: m.nombre || undefined,
-              ultimo_mensaje: m.texto,
-              ultima_actividad: m.ts,
-              no_leidos: (conv?.no_leidos ?? 0) + 1,
-              archivada: false,
-            })
-            .eq("id", conversacionId);
+          // Si aún no tiene cliente ligado, se reintenta (pudo darse de alta después).
+          const patch: Record<string, unknown> = {
+            nombre_contacto: m.nombre || undefined,
+            ultimo_mensaje: m.texto,
+            ultima_actividad: m.ts,
+            no_leidos: (conv?.no_leidos ?? 0) + 1,
+            archivada: false,
+          };
+          if (!conv?.cliente_id) {
+            const clienteId = await buscarClientePorTelefono(supabase, m.wa_id);
+            if (clienteId) patch.cliente_id = clienteId;
+          }
+          await supabase.from("wa_conversaciones").update(patch).eq("id", conversacionId);
         }
 
         if (conversacionId) {

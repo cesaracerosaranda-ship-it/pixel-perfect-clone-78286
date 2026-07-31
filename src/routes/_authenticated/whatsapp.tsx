@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -9,10 +9,22 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { PageTitle } from "@/components/RailSection";
-import { Search, MessageCircle, User } from "lucide-react";
+import { formatMoney } from "@/lib/vialux/constants";
+import { mismoTelefono } from "@/lib/vialux/telefono";
+import { Search, MessageCircle, User, Link2, Calculator, X } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/whatsapp")({
   component: WhatsAppPage,
@@ -66,6 +78,172 @@ function horaCorta(iso: string) {
   return mismoDia
     ? d.toLocaleTimeString("es-MX", { hour: "2-digit", minute: "2-digit" })
     : d.toLocaleDateString("es-MX", { day: "2-digit", month: "2-digit" });
+}
+
+type ClienteLite = { id: string; nombre: string; empresa: string; telefono: string };
+type CotizacionLite = {
+  id: string;
+  folio: string;
+  fecha: string;
+  total: number;
+  estado: string;
+  cantidad: number;
+};
+
+/** Panel del cliente ligado: sus cotizaciones + acceso directo a cotizar. */
+function ClientePanel({
+  conv,
+  onLigar,
+}: {
+  conv: Conversacion;
+  onLigar: (clienteId: string | null) => void;
+}) {
+  const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const [clientes, setClientes] = useState<ClienteLite[]>([]);
+
+  const cotsQuery = useQuery({
+    queryKey: ["wa_cliente_cots", conv.cliente_id],
+    enabled: !!conv.cliente_id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("cotizaciones")
+        .select("id, folio, fecha, total, estado, cantidad")
+        .eq("cliente_id", conv.cliente_id)
+        .order("fecha", { ascending: false })
+        .limit(4);
+      if (error) throw error;
+      return (data ?? []) as CotizacionLite[];
+    },
+  });
+
+  useEffect(() => {
+    if (!open) return;
+    supabase
+      .from("clientes")
+      .select("id, nombre, empresa, telefono")
+      .order("nombre")
+      .then(({ data }) => setClientes((data as ClienteLite[]) ?? []));
+  }, [open]);
+
+  // Sugerencia: cliente cuyo teléfono coincide con el wa_id de la conversación
+  const sugerido = useMemo(
+    () => clientes.find((c) => mismoTelefono(conv.wa_id, c.telefono)) ?? null,
+    [clientes, conv.wa_id],
+  );
+
+  if (!conv.cliente_id) {
+    return (
+      <div className="flex items-center justify-between gap-3 border-b border-border bg-[#FAF9F7] px-3 py-2">
+        <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#8A857C]">
+          Sin cliente ligado
+        </span>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 gap-1.5 font-mono text-[9px] uppercase tracking-[0.15em]"
+            >
+              <Link2 className="h-3 w-3" /> Ligar cliente
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-80 p-0" align="end">
+            <Command>
+              <CommandInput placeholder="Buscar cliente…" />
+              <CommandList>
+                <CommandEmpty>Sin resultados.</CommandEmpty>
+                {sugerido && (
+                  <CommandGroup heading="Coincide por teléfono">
+                    <CommandItem
+                      value={`sug ${sugerido.nombre}`}
+                      onSelect={() => { onLigar(sugerido.id); setOpen(false); }}
+                    >
+                      <div>
+                        <div className="text-xs font-bold uppercase">{sugerido.nombre}</div>
+                        <div className="font-mono text-[10px] text-[#C79100]">
+                          {sugerido.telefono}
+                        </div>
+                      </div>
+                    </CommandItem>
+                  </CommandGroup>
+                )}
+                <CommandGroup heading="Todos">
+                  {clientes.map((c) => (
+                    <CommandItem
+                      key={c.id}
+                      value={`${c.nombre} ${c.empresa}`}
+                      onSelect={() => { onLigar(c.id); setOpen(false); }}
+                    >
+                      <div>
+                        <div className="text-xs font-semibold uppercase">{c.nombre}</div>
+                        {c.empresa && (
+                          <div className="text-[10px] text-muted-foreground">{c.empresa}</div>
+                        )}
+                      </div>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
+      </div>
+    );
+  }
+
+  const cots = cotsQuery.data ?? [];
+  return (
+    <div className="border-b border-border bg-[#FAF9F7] px-3 py-2">
+      <div className="mb-1.5 flex items-center justify-between gap-2">
+        <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#C79100]">
+          Cliente · {conv.clientes?.nombre ?? "—"}
+        </span>
+        <div className="flex items-center gap-1">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-7 gap-1.5 font-mono text-[9px] uppercase tracking-[0.15em]"
+            onClick={() =>
+              navigate({
+                to: "/",
+                search: { clienteId: conv.cliente_id, duplicate: undefined } as never,
+              })
+            }
+          >
+            <Calculator className="h-3 w-3" /> Cotizar
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7"
+            title="Desligar cliente"
+            onClick={() => onLigar(null)}
+          >
+            <X className="h-3 w-3" />
+          </Button>
+        </div>
+      </div>
+      {cots.length === 0 ? (
+        <p className="font-mono text-[9px] text-muted-foreground">
+          SIN COTIZACIONES REGISTRADAS
+        </p>
+      ) : (
+        <div className="flex flex-wrap gap-1.5">
+          {cots.map((q) => (
+            <div
+              key={q.id}
+              className="border border-border bg-white px-2 py-1"
+              title={`${q.cantidad} pzas · ${q.estado}`}
+            >
+              <span className="font-mono text-[9px] font-bold text-[#C79100]">{q.folio}</span>
+              <span className="ml-1.5 font-mono text-[9px]">{formatMoney(Number(q.total))}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 function WhatsAppPage() {
@@ -156,6 +334,16 @@ function WhatsAppPage() {
       .update({ pipeline })
       .eq("id", id);
     if (error) return toast.error(error.message);
+    qc.invalidateQueries({ queryKey: ["wa_conversaciones"] });
+  };
+
+  const ligarCliente = async (id: string, clienteId: string | null) => {
+    const { error } = await supabase
+      .from("wa_conversaciones")
+      .update({ cliente_id: clienteId })
+      .eq("id", id);
+    if (error) return toast.error(error.message);
+    toast.success(clienteId ? "Conversación ligada al cliente" : "Cliente desligado");
     qc.invalidateQueries({ queryKey: ["wa_conversaciones"] });
   };
 
@@ -296,6 +484,12 @@ function WhatsAppPage() {
                   </SelectContent>
                 </Select>
               </div>
+
+              {/* Cliente ligado + sus cotizaciones */}
+              <ClientePanel
+                conv={sel}
+                onLigar={(clienteId) => ligarCliente(sel.id, clienteId)}
+              />
 
               {/* Mensajes */}
               <div className="flex-1 space-y-2 overflow-y-auto bg-[#FAF9F7] p-4">
