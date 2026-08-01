@@ -117,50 +117,84 @@ el token de 24 h como en el paso 2.
 
 ---
 
-## 2. Restaurar el inventario
+## 2. Cargar el inventario (lunes, al recibir)
 
-El contador quedó en **BOYAS 0 · CLAVOS 0**. La causa era un defecto en el modal
-de *Actualizar inventario*: al **borrar un campo para reescribirlo**, `Number("")`
-vale `0` en JavaScript, y ese cero pasaba la validación y se guardaba.
+El contador está en **BOYAS 0 · CLAVOS 0** y eso es correcto: no hay existencias.
+El lunes entran **clavos** del proveedor y **boyas** de pintura.
 
-Ya está corregido (un campo vacío ahora es inválido, no cero). Solo hay que
-recapturar los valores reales en **Historial → Actualizar inventario**. Los
-últimos conocidos eran **190 boyas** y **182 clavos** — confirma contra el conteo
-físico antes de guardar.
+Al recibirlas: **Historial → Actualizar inventario** → capturar las cantidades
+contadas físicamente.
+
+> **No capturar inventario por adelantado.** Al cerrar una venta el sistema
+> descuenta boyas automáticamente, y si el número está inflado deja pasar
+> compromisos que no se pueden surtir.
+
+*Nota técnica:* el modal tenía un defecto —al borrar un campo para reescribirlo,
+`Number("")` vale `0` en JavaScript y ese cero se guardaba— ya corregido: ahora
+un campo vacío es inválido y avisa en lugar de guardar cero.
 
 ---
 
 ## 3. Business Verification (Step 3)
 
-Sube el límite de **250 → 1,000+** conversaciones iniciadas por día y es
-requisito para operar en serio. Es el trámite más lento, así que conviene
-arrancarlo cuanto antes: la revisión de Meta tarda de horas a varios días.
+Sube el límite de **250 → 1,000+** conversaciones iniciadas por día. Es el
+trámite más lento (de horas a varios días de revisión), así que conviene
+arrancarlo cuanto antes: corre en paralelo con todo lo demás.
 
-### ⚠️ Revisar ANTES de enviar
+### La entidad que se verifica es Aceros Aranda, no VIALUX
 
-La cuenta de negocio en Meta está a nombre de **"Celosias"**. Meta rechaza la
-verificación si el nombre del negocio **no coincide exactamente** con el de los
-documentos. Antes de mandar nada, decidir con qué razón social se va a verificar
-y dejar el nombre del negocio idéntico al del acta/cédula fiscal. Esta es la
-causa #1 de rechazo.
+VIALUX es una **marca comercial** operada como célula de negocio dentro de Aceros
+Aranda; no tiene personalidad jurídica propia. Meta no verifica marcas: verifica
+**entidades legales**. Por lo tanto:
 
-### Documentos a tener a la mano
+- Se verifica con la entidad de la **CSF** (Constancia de Situación Fiscal).
+- **No hace falta acta constitutiva.** Meta acepta personas físicas con actividad
+  empresarial, y en ese caso el acta simplemente no existe. La CSF es el
+  documento estándar para México y acredita nombre legal, RFC y domicilio fiscal
+  en un solo papel.
+- **VIALUX sí puede ser el nombre visible** en WhatsApp. El *display name* del
+  número es una aprobación **aparte** de la verificación de negocio, y admite una
+  marca distinta de la razón social.
 
-Meta muestra la lista exacta dentro del flujo, pero típicamente pide **uno** que
-acredite el nombre legal y **uno** que acredite el domicilio:
+> Que el negocio tenga ~1 año y no estuviera dado de alta formalmente **no es un
+> impedimento**: lo que Meta evalúa es que la entidad exista y que los datos
+> coincidan, no su antigüedad.
 
-- Acta constitutiva
-- Cédula de identificación fiscal (RFC / SAT)
-- Comprobante de domicilio reciente (recibo de luz, agua o teléfono, con menos
-  de 90 días)
-- Estado de cuenta bancario a nombre del negocio
+### ⚠️ Lo primero: alinear el nombre en Meta
 
-Datos que pide el formulario, y que deben coincidir entre sí y con los documentos:
+La cuenta de negocio en Meta está hoy a nombre de **"Celosias"**. Meta rechaza la
+verificación cuando el nombre del negocio **no coincide exactamente** con el del
+documento — es la causa #1 de rechazo.
 
-- Nombre legal del negocio
-- Domicilio: **Juan Zuazua #2945, Col. Victoria, C.P. 64520, Monterrey, N.L.**
-- Teléfono del negocio
-- Sitio web: `vialuxmty.com`
+Antes de enviar nada: *Business Settings → Business Info* → dejar el nombre del
+negocio **idéntico, carácter por carácter**, al que aparece en la CSF (incluidos
+acentos, comas y la forma societaria si la hay).
+
+### Documentos y datos
+
+| Qué | Con qué se cubre |
+|---|---|
+| Nombre legal + RFC | **CSF** |
+| Domicilio fiscal | **CSF** (ya lo trae) |
+| Teléfono del negocio | El de la CSF — Meta puede validarlo por llamada o SMS |
+| Sitio web | `vialuxmty.com` |
+
+Si Meta pide un **segundo documento** de domicilio, sirve un recibo de luz, agua
+o teléfono con menos de 90 días, o un estado de cuenta bancario, **a nombre de la
+misma entidad de la CSF**. Meta muestra la lista exacta dentro del flujo.
+
+Todos los datos del formulario deben coincidir entre sí y con la CSF. El
+domicilio que traemos documentado es **Juan Zuazua #2945, Col. Victoria,
+C.P. 64520, Monterrey, N.L.** — verificar que sea el mismo de la CSF antes de
+capturarlo; si difiere, **manda el de la CSF**.
+
+### Recomendación: publicar la landing antes del display name
+
+Para que Meta apruebe **VIALUX** como nombre visible de un número verificado a
+nombre de otra entidad, ayuda mucho poder demostrar que la marca existe: que
+`vialuxmty.com` cargue una página real con el nombre VIALUX, el domicilio y el
+teléfono. Es la evidencia más simple de que la marca es legítima y no un intento
+de suplantar a alguien más.
 
 ---
 
