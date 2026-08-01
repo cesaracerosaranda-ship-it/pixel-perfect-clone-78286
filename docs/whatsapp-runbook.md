@@ -19,27 +19,75 @@ antiguo "API Setup" ahora se llama **Step 1. Try it out** (ya no hay entrada
 
 ---
 
-## 1. Renovar el token (hacer esto primero, ~5 min)
+## 1. Renovar el token — guía de ejecución (~5 min)
 
 El token de Step 1 **caduca cada 24 horas**. Cuando muera, la bandeja marca
 *"El token de WhatsApp expiró o es inválido"*.
 
-1. Meta → **Use cases → Connect on WhatsApp → Step 1. Try it out**
-2. En **Access token**, botón **Generate token**.
-   - **¿A qué se enlaza el token?** No a un número: a una **cuenta de WhatsApp
-     Business (WABA)**. Si pide elegir, selecciona la **WABA de prueba
-     `940017629110755`** (la que contiene el `+1 555 200-2984`). Hoy debería ser
-     la única opción; cuando se conecte el número real aparecerá una segunda.
-   - El número que **envía** no lo decide el token, lo decide el secreto
-     `WHATSAPP_PHONE_NUMBER_ID` (`1230528186813043`). El token solo autoriza.
-   - Copia el token: Meta lo muestra **una sola vez**. Después el campo vuelve a
-     decir *"Not generated yet"* aunque el token siga vivo — ese mensaje no
-     significa que se haya invalidado.
-3. En Lovable, actualiza el secreto `WHATSAPP_TOKEN` y pídele que redespliegue
-   la edge function `whatsapp-enviar`.
-4. **Vuelve a poner el Recipient.** Regenerar el token *vacía* la lista de
-   destinatarios autorizados. Desplegable **Recipient** → agrega
-   `+52 81 2063 9813` → verifica con el código que llega por WhatsApp.
+Son cuatro pasos y hay que hacerlos **en orden**. El paso C es el que se olvida.
+
+### A · Generar el token en Meta
+
+`developers.facebook.com` → app **VIALUX** → **Use cases** → **Connect on
+WhatsApp** → **Step 1. Try it out** → sección *Claim a WhatsApp test number* →
+botón **Generate token**.
+
+Si pregunta a qué cuenta enlazarlo, elige la **WABA de prueba
+`940017629110755`** (la que contiene el `+1 555 200-2984`). Hoy es la única
+opción; cuando se conecte el número real aparecerá una segunda.
+
+> **El token se enlaza a una cuenta (WABA), no a un número.** El número que
+> *envía* lo decide el secreto `WHATSAPP_PHONE_NUMBER_ID` (`1230528186813043`).
+> El token solo autoriza a usarlo.
+
+**Copia el token de una vez.** Meta lo muestra una sola vez; después el campo
+vuelve a decir *"Not generated yet"* aunque el token siga vivo. Ese mensaje **no**
+significa que caducó.
+
+### B · Cargarlo en Lovable
+
+Pega este mensaje en Lovable:
+
+```
+Actualiza el secreto WHATSAPP_TOKEN de Supabase con el nuevo valor que te voy a
+dar y vuelve a desplegar la edge function whatsapp-enviar para que tome el valor
+nuevo.
+
+No modifiques el código de la función ni ningún otro archivo: solo el secreto y
+el redespliegue. No toques whatsapp-webhook, esa función no usa ese secreto.
+```
+
+Lovable va a abrir un **campo seguro** para que pegues el token ahí — no lo
+escribas dentro del mensaje. Cuando termine debe confirmar el redespliegue de
+`whatsapp-enviar`.
+
+### C · Volver a autorizar tu número en Meta ⚠️
+
+**Regenerar el token vacía la lista de destinatarios.** Es el paso que se olvida
+y hace parecer que el token nuevo no sirve.
+
+En la misma pantalla de Step 1, sección *Send a message from your test number*:
+desplegable **Recipient** → **Manage phone number list** → agrega
+`+52 81 2063 9813` → llega un código por WhatsApp → captúralo.
+
+Al terminar, el campo **Recipient** debe mostrar el número, no
+*"Select a recipient number"*.
+
+> No presiones **Generate token** otra vez para habilitar el botón azul
+> *Send message* de esa pantalla: ese botón es la prueba interna de Meta y
+> generar un token nuevo invalidaría el que acabas de cargar en Lovable.
+
+### D · Probar en VIALUX
+
+1. Recarga con `Cmd + Shift + R`
+2. Pestaña **WhatsApp** → conversación de **César Aranda**
+3. Escribe cualquier cosa → **ENVIAR**
+
+**Funcionó** si el mensaje aparece en amarillo del lado derecho y llega a tu
+celular. Si marca error, busca el texto exacto en la tabla de *Diagnóstico
+rápido* al final de este documento.
+
+---
 
 > El token **permanente** (System User, sin expiración) no se puede crear
 > mientras usemos el número de prueba: los WABA de prueba no son activos de
@@ -161,13 +209,61 @@ Documentación:
 
 ---
 
+## Prompts para Lovable (copiar y pegar)
+
+Lovable es co-editor de este repo: también hace commits. Por eso conviene pedirle
+cosas acotadas y decirle explícitamente qué **no** tocar.
+
+**Actualizar el token de WhatsApp** (el de cada 24 h):
+
+```
+Actualiza el secreto WHATSAPP_TOKEN de Supabase con el nuevo valor que te voy a
+dar y vuelve a desplegar la edge function whatsapp-enviar para que tome el valor
+nuevo.
+
+No modifiques el código de la función ni ningún otro archivo: solo el secreto y
+el redespliegue. No toques whatsapp-webhook, esa función no usa ese secreto.
+```
+
+**Traer cambios que hice en el repo** (después de que yo suba algo a GitHub):
+
+```
+Sincroniza con la última versión de main en GitHub y vuelve a desplegar las edge
+functions que hayan cambiado. Dime cuáles redesplegaste. No modifiques código.
+```
+
+**Aplicar una migración nueva de base de datos:**
+
+```
+Ejecuta la migración SQL que está en supabase/migrations/NOMBRE_DEL_ARCHIVO.sql
+tal cual, sin modificarla. Confírmame qué tablas o políticas creó o cambió.
+```
+
+*(Lovable no aplica solo las migraciones que vienen del repo — siempre hay que
+pedírselo.)*
+
+**Reactivar la validación de firma del webhook** (si se cambia la clave secreta
+de la app en Meta):
+
+```
+Actualiza el secreto WHATSAPP_APP_SECRET de Supabase con el valor que te voy a
+dar y vuelve a desplegar la edge function whatsapp-webhook. No cambies código.
+```
+
+En todos los casos, cuando el mensaje mencione un secreto, Lovable abre un
+**campo seguro** aparte para pegar el valor. Nunca escribir el token dentro del
+mensaje.
+
+---
+
 ## Diagnóstico rápido
 
 | Síntoma | Causa probable |
 |---|---|
 | *"El token de WhatsApp expiró o es inválido"* | Token de 24 h vencido → paso 1 |
-| *"El destinatario no está en la lista autorizada"* | Recipient vacío en Step 1, o se perdió al regenerar el token |
+| *"El destinatario no está en la lista autorizada"* | Recipient vacío en Step 1, o se perdió al regenerar el token (paso 1·C) |
 | *"Pasaron más de 24 h desde el último mensaje"* | Fuera de ventana: hace falta plantilla aprobada |
+| Sigue fallando igual después de cargar el token | Lovable no redesplegó `whatsapp-enviar`: la función conserva el secreto viejo hasta que se redespliega |
 | No llegan mensajes entrantes | Revisar que el WABA siga suscrito a la app: `POST /940017629110755/subscribed_apps` |
 | Mensajes entrantes rechazados con 401 | Firma HMAC: `WHATSAPP_APP_SECRET` no coincide con la clave secreta de Meta |
 
