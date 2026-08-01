@@ -25,7 +25,16 @@ El token de Step 1 **caduca cada 24 horas**. Cuando muera, la bandeja marca
 *"El token de WhatsApp expiró o es inválido"*.
 
 1. Meta → **Use cases → Connect on WhatsApp → Step 1. Try it out**
-2. En **Access token**, botón **Generate token**. Copia el token.
+2. En **Access token**, botón **Generate token**.
+   - **¿A qué se enlaza el token?** No a un número: a una **cuenta de WhatsApp
+     Business (WABA)**. Si pide elegir, selecciona la **WABA de prueba
+     `940017629110755`** (la que contiene el `+1 555 200-2984`). Hoy debería ser
+     la única opción; cuando se conecte el número real aparecerá una segunda.
+   - El número que **envía** no lo decide el token, lo decide el secreto
+     `WHATSAPP_PHONE_NUMBER_ID` (`1230528186813043`). El token solo autoriza.
+   - Copia el token: Meta lo muestra **una sola vez**. Después el campo vuelve a
+     decir *"Not generated yet"* aunque el token siga vivo — ese mensaje no
+     significa que se haya invalidado.
 3. En Lovable, actualiza el secreto `WHATSAPP_TOKEN` y pídele que redespliegue
    la edge function `whatsapp-enviar`.
 4. **Vuelve a poner el Recipient.** Regenerar el token *vacía* la lista de
@@ -35,6 +44,28 @@ El token de Step 1 **caduca cada 24 horas**. Cuando muera, la bandeja marca
 > El token **permanente** (System User, sin expiración) no se puede crear
 > mientras usemos el número de prueba: los WABA de prueba no son activos de
 > negocio asignables. Se desbloquea al conectar el número real (paso 4).
+
+### Opcional: cambiar las 24 h por ~60 días
+
+El token de Step 1 es un *user token* de corta vida, y Meta permite canjearlo por
+uno de larga duración (~60 días). Vale la pena intentarlo para dejar de renovar a
+diario mientras dure la etapa de pruebas. Con el token recién generado:
+
+```bash
+curl -s "https://graph.facebook.com/v21.0/oauth/access_token?grant_type=fb_exchange_token&client_id=1462994488640283&client_secret=APP_SECRET&fb_exchange_token=TOKEN_DE_24H"
+```
+
+`APP_SECRET` es la clave secreta de la app (Meta → Configuración → Básica, la
+misma que está en el secreto `WHATSAPP_APP_SECRET`). Si responde con
+`access_token`, ese es el que va en `WHATSAPP_TOKEN`; verifica la vigencia real
+con:
+
+```bash
+curl -s "https://graph.facebook.com/v21.0/debug_token?input_token=TOKEN_NUEVO&access_token=TOKEN_NUEVO"
+```
+
+Busca `expires_at` en la respuesta. Si el canje falla, no pasa nada: se sigue con
+el token de 24 h como en el paso 2.
 
 ---
 
