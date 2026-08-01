@@ -515,6 +515,11 @@ function StepperInput({
   paso: number;
   autoFocus?: boolean;
 }) {
+  // Un campo vacío vale NaN, NO 0: Number("") es 0, así que emitir el valor
+  // crudo convertía el gesto más común —borrar para reescribir— en un cero
+  // que pasaba la validación y se guardaba en el inventario.
+  const base = Number.isFinite(value) ? Math.round(value) : 0;
+
   return (
     <div className="space-y-1.5">
       <Label className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#8A857C]">
@@ -525,7 +530,7 @@ function StepperInput({
           type="button"
           variant="outline"
           size="icon"
-          onClick={() => onChange(Math.max(0, Math.round(value) - paso))}
+          onClick={() => onChange(Math.max(0, base - paso))}
         >
           <Minus className="h-4 w-4" />
         </Button>
@@ -533,7 +538,10 @@ function StepperInput({
           type="number"
           min={0}
           value={Number.isFinite(value) ? value : ""}
-          onChange={(e) => onChange(Number(e.target.value))}
+          onChange={(e) => {
+            const texto = e.target.value.trim();
+            onChange(texto === "" ? NaN : Number(texto));
+          }}
           className="border-x-0 bg-muted text-center font-mono font-bold"
           autoFocus={autoFocus}
         />
@@ -541,7 +549,7 @@ function StepperInput({
           type="button"
           variant="outline"
           size="icon"
-          onClick={() => onChange(Math.max(0, Math.round(value) + paso))}
+          onClick={() => onChange(Math.max(0, base + paso))}
         >
           <Plus className="h-4 w-4" />
         </Button>
@@ -568,14 +576,21 @@ function ActualizarInventarioModal({
   const [boyas, setBoyas] = useState(boyasActual);
   const [clavos, setClavos] = useState(clavosActual);
   const [saving, setSaving] = useState(false);
+  const [tocado, setTocado] = useState(false);
 
-  // Al abrir, arranca de los valores vigentes
+  // Mientras el usuario no escriba, el modal sigue reflejando los valores
+  // vigentes (la consulta puede resolver después de abrirlo). En cuanto toca un
+  // campo deja de re-sincronizarse: la suscripción en tiempo real refresca esta
+  // tabla y, si no, borraría lo que está capturando.
   useEffect(() => {
-    if (open) {
-      setBoyas(boyasActual);
-      setClavos(clavosActual);
+    if (!open) {
+      setTocado(false);
+      return;
     }
-  }, [open, boyasActual, clavosActual]);
+    if (tocado) return;
+    setBoyas(boyasActual);
+    setClavos(clavosActual);
+  }, [open, boyasActual, clavosActual, tocado]);
 
   const save = async () => {
     const b = Math.round(boyas);
@@ -620,7 +635,7 @@ function ActualizarInventarioModal({
             <StepperInput
               label="Boyas disponibles"
               value={boyas}
-              onChange={setBoyas}
+              onChange={(v) => { setTocado(true); setBoyas(v); }}
               paso={50}
               autoFocus
             />
@@ -628,7 +643,7 @@ function ActualizarInventarioModal({
               <StepperInput
                 label="Clavos disponibles"
                 value={clavos}
-                onChange={setClavos}
+                onChange={(v) => { setTocado(true); setClavos(v); }}
                 paso={200}
               />
             )}

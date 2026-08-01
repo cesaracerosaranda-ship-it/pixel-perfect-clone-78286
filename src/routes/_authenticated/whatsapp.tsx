@@ -106,10 +106,14 @@ function ClientePanel({
     queryKey: ["wa_cliente_cots", conv.cliente_id],
     enabled: !!conv.cliente_id,
     queryFn: async () => {
+      // El `enabled` de arriba ya lo garantiza, pero hay que estrecharlo aquí
+      // para no colar un filtro por null (traería la tabla entera).
+      const clienteId = conv.cliente_id;
+      if (!clienteId) return [];
       const { data, error } = await supabase
         .from("cotizaciones")
         .select("id, folio, fecha, total, estado, cantidad")
-        .eq("cliente_id", conv.cliente_id)
+        .eq("cliente_id", clienteId)
         .order("fecha", { ascending: false })
         .limit(4);
       if (error) throw error;
@@ -271,10 +275,12 @@ function WhatsAppPage() {
     queryKey: ["wa_mensajes", selId],
     enabled: !!selId,
     queryFn: async () => {
+      const convId = selId;
+      if (!convId) return [];
       const { data, error } = await supabase
         .from("wa_mensajes")
         .select("*")
-        .eq("conversacion_id", selId)
+        .eq("conversacion_id", convId)
         .order("timestamp_wa", { ascending: true });
       if (error) throw error;
       return (data ?? []) as Mensaje[];
