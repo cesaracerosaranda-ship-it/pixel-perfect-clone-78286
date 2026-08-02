@@ -95,6 +95,11 @@ Estructura mínima que corrige el error de fragmentación:
 - **3-4 anuncios del concepto "3 precios"** con visual renovado (identidad de la
   ficha técnica: amarillo tráfico, riel numerado, JetBrains Mono). El texto casi
   no cambia: precios visibles, CTA a WhatsApp.
+- **Conservar la prueba social:** al montar la campaña nueva, el anuncio de
+  "AD Boyas 3 precios 2" NO se recrea desde cero — se agrega con **"Usar
+  publicación existente"** (mismo post ID). Así conserva sus 211 reacciones,
+  14 comentarios y 12 shares; duplicarlo normal crea un post en ceros y regala
+  esa credibilidad.
 - Cadencia semanal (15 min): gasto, conversaciones, $/conv. Regla: anuncio con
   $/conv > $40 sostenido 2 semanas → se reemplaza la imagen.
 - Refresh creativo cada ~3 meses aunque "siga funcionando".
@@ -200,10 +205,59 @@ prospecto llega al chat ya sabiendo qué cuesta qué; la conversación empieza e
 - La estructura NO se toca; lo que se renueva es la ejecución visual (identidad
   ficha técnica: amarillo tráfico #F2B90D sobre grafito, riel numerado,
   JetBrains Mono para los precios, foto real del producto).
-- PENDIENTE de capturar: texto primario COMPLETO (está cortado por "see more")
-  y el creativo de **"AD Boyas 3 precios 2"** (dic 2025) — el que sigue activo y
-  sano. Ruta: Campaigns → seleccionar solo "…Boyas 3 precios || Ubis || 1.12.25"
-  → Ads for 1 Campaign → preview.
+- ~~PENDIENTE de capturar~~ **COMPLETO (2/ago):** los dos creativos ganadores y
+  el texto primario íntegro quedaron documentados abajo. El checklist de
+  creativos está CERRADO.
+
+### Creativo #2 documentado: "AD Boyas 3 precios 2" (dic 2025 — el vigente)
+
+Mismo concepto que el original con layout distinto: precios apilados a la
+izquierda, foto grande de la boya a la derecha, fondo negro.
+
+> **BOYA METÁLICA**
+> Resistente | Visible | Doble reflejante | Lista para instalar
+> **$44 MXN** +IVA — Sin Clavos
+> **$48 MXN** +IVA — Incluye Clavos
+> **$53 MXN** +IVA — Incluye Clavos y Dos Cintas Reflejantes
+> [¡Contáctanos ahora!] · CTA WhatsApp "¡Cotiza Hoy Mismo!"
+
+Diferencia clave vs el original: los precios llevan **"+IVA" explícito** (y el
+texto primario remata "*Precio más IVA. Aplican restricciones.*"). Mantener esa
+precisión en los visuales nuevos.
+
+**Prueba social acumulada: 211 reacciones · 14 comentarios · 12 shares.** Ver la
+nota de "publicación existente" en §4 — NO se debe perder al migrar.
+
+### Texto primario completo (reutilizable)
+
+> Boyas metálicas de alta resistencia desde $44 MXN 💪⚠️
+> Dale seguridad y orden a tus vialidades con boyas más duraderas y competitivas
+> en precio.
+> 🔶 Acero al carbón calibre 1/8 para máxima resistencia
+> 🔶 Pintura electrostática amarillo tráfico de alta visibilidad
+> 🔶 Doble reflejante para mayor seguridad nocturna
+> 🔶 Incluye clavos de instalación
+> 🔶 Entrega inmediata + envío gratis en pedidos desde 200 pz*
+> 📲 ¡Cotiza hoy mismo y asegura el mejor precio del mercado ‼️
+> *Precio más IVA. Aplican restricciones.
+
+**Dos precisiones antes de reutilizarlo:**
+1. "Incluye clavos de instalación" es impreciso — los clavos entran desde la
+   configuración de $48; a $44 la boya va sola. Reescribir como "disponible con
+   clavos de instalación".
+2. ⚠️ **"Entrega inmediata + envío gratis en pedidos desde 200 pz"** NO coincide
+   con la política real del cotizador (entrega inmediata: ≥500 pzs en área
+   metropolitana MTY; el flete se cobra como partida). VERIFICAR con César si esa
+   promesa sigue vigente: si no, se elimina del texto nuevo; si sí, hay que
+   reflejarla en las reglas del cotizador para que lo prometido y lo cotizado
+   coincidan.
+
+### Teléfono — resuelto (2/ago)
+
+El único número de VIALUX es **+52 81 3073 0586**. El "Cel. 818 180 6663" impreso
+en los creativos de la campaña "Nuevas img AI" NO es de VIALUX — no reutilizar
+esa placa. Los visuales nuevos imprimen el número real (o ninguno: el botón de
+WhatsApp ya lleva al correcto) y el correo del dominio.
 
 ### Segundo creativo documentado: "AD nuevo 1 - Copia" (Nuevas img AI, mar 2026)
 
