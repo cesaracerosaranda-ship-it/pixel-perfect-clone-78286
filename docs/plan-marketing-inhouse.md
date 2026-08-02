@@ -65,11 +65,15 @@ reclamar — los números recientes fueron los mejores.
 
 - [ ] Avisar la salida con un mes de cortesía (último mes de honorario = mes de
       transición acompañada).
-- [ ] Documentar los 2 anuncios ganadores ANTES del corte: imagen final, texto
-      primario, título, descripción, CTA. (Se ven en Ads Manager → preview del
-      anuncio, o en la Ad Library pública de la página.)
-- [ ] **Verificar el método de pago** de Vialux ADS (Billing): si la tarjeta
-      cargada es de S4, cambiarla a una propia antes del corte.
+- [x] ~~Verificar el método de pago~~ **HECHO (2/ago):** la Visa ····4262 de
+      Billing es de César. Sin riesgo de interrupción. (Límite diario actual
+      impuesto por Meta: MX$595/día — alcanza para el presupuesto del plan y
+      sube solo con historial de pagos.)
+- [ ] Documentar los 2 anuncios ganadores ANTES del corte — **la imagen del #1 ya
+      quedó (ver Apéndice); faltan:** el texto primario de ese anuncio (el párrafo
+      que va arriba de la imagen en el preview) y la imagen + textos del **#2
+      ("AD Boyas 3 precios 2")**, que es el que sigue vivo y el MÁS importante
+      de conservar.
 - [ ] Convertir los accesos individuales de S4 (Carlos, Diego, Pato — hoy con
       full access) en relación de Partner, o retirarlos al corte. Identificar a
       "Alan Hernández" (acceso parcial).
@@ -165,3 +169,36 @@ falta de inventario, y proyección a N meses bajo escenarios de producción.
 Pendientes de estructura (sin fecha, antes de la Business Verification):
 renombrar el portafolio "Celosias" a la razón social de la CSF · sacar Lattice
 Works a su propio portafolio · quitar y despublicar CRG Safety.
+
+---
+
+## Apéndice · Creativo ganador documentado (2/ago/2026)
+
+**"AD Boyas 3 precios"** (el original, sep 2025). Imagen cuadrada, fondo negro,
+fotos del producto en amarillo:
+
+> **BOYA METÁLICA**
+> Resistente | Visible | Doble reflejante | Lista para instalar
+>
+> **$44 MXN** — Sin Clavos
+> **$48 MXN** — Incluye Clavos
+> **$53 MXN** — Incluye Clavos y Dos Cintas Reflejantes
+>
+> [¡Contáctanos ahora!] → botón *Chat on WhatsApp*
+>
+> Página: vialux_monterrey · Ubicaciones: FB + IG
+
+**Por qué funciona (conservar esta estructura en todo visual nuevo):** es una
+ficha de decisión completa — producto + atributos + los 3 precios + CTA. El
+prospecto llega al chat ya sabiendo qué cuesta qué; la conversación empieza en
+"lo quiero", no en "¿precio?".
+
+**Notas para la siguiente generación de visuales:**
+- Los precios mostrados son la lista CON factura ($44/48/53) — mantener ese
+  criterio para no abrir discusiones de precio en el chat. Actualizar el visual
+  si la lista cambia.
+- La estructura NO se toca; lo que se renueva es la ejecución visual (identidad
+  ficha técnica: amarillo tráfico #F2B90D sobre grafito, riel numerado,
+  JetBrains Mono para los precios, foto real del producto).
+- PENDIENTE de capturar: texto primario del anuncio y el creativo completo de
+  **"AD Boyas 3 precios 2"** (dic 2025) — el que sigue activo y sano.
