@@ -200,5 +200,29 @@ prospecto llega al chat ya sabiendo qué cuesta qué; la conversación empieza e
 - La estructura NO se toca; lo que se renueva es la ejecución visual (identidad
   ficha técnica: amarillo tráfico #F2B90D sobre grafito, riel numerado,
   JetBrains Mono para los precios, foto real del producto).
-- PENDIENTE de capturar: texto primario del anuncio y el creativo completo de
-  **"AD Boyas 3 precios 2"** (dic 2025) — el que sigue activo y sano.
+- PENDIENTE de capturar: texto primario COMPLETO (está cortado por "see more")
+  y el creativo de **"AD Boyas 3 precios 2"** (dic 2025) — el que sigue activo y
+  sano. Ruta: Campaigns → seleccionar solo "…Boyas 3 precios || Ubis || 1.12.25"
+  → Ads for 1 Campaign → preview.
+
+### Segundo creativo documentado: "AD nuevo 1 - Copia" (Nuevas img AI, mar 2026)
+
+> Imagen (generada con IA): boya amarilla sobre asfalto, carretera de fondo
+> **SEGURIDAD VIAL GARANTIZADA** · desde **$44 MXN**
+> [SOLICITA COTIZACIÓN] · logo VIALUX · Cel. 818 180 6663 ·
+> cotizaciones.vialuxmty@gmail.com
+> Texto primario: "Boyas metálicas de alta resistencia desde $44 MXN 💪⚠️ Dale
+> seguridad y orden a tus …" (pendiente el párrafo completo)
+> CTA: WhatsApp "¡Cotiza Hoy Mismo!"
+
+**Lectura:** es el concepto alternativo — beneficio emocional + precio ancla
+único, con mejor foto — y convierte PEOR: $35.46/conv en los últimos 30 días vs
+~$20 del formato 3 precios. Confirma que la ventaja está en la ESTRUCTURA de
+decisión (3 precios), no en la calidad de la imagen.
+
+**Correcciones obligadas en los visuales nuevos:**
+- Correo: usar el del dominio (`cotizaciones@vialuxmty.com`), no el Gmail que
+  trae este creativo.
+- Teléfono: el creativo imprime Cel. 818 180 6663; el WhatsApp de ventas mapeado
+  es +52 81 3073 0586. Confirmar cuál debe aparecer ANTES de producir — sobre
+  todo porque ese número será el que se conecte a la Cloud API.
