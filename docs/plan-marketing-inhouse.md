@@ -63,6 +63,11 @@ Aceros Aranda.
 Mensaje central: "la etapa se cumplió, lo hacemos interno; gracias". Nada que
 reclamar — los números recientes fueron los mejores.
 
+**⏱ Línea de tiempo:** la mensualidad de S4 se paga los días **15**. Pista al
+2/ago: ~13 días naturales. Días 1-4 Design + port de la dirección ganadora;
+día 5 montar la campaña consolidada; días 6-12 aprendizaje en paralelo con la
+actual; **decisión de corte ANTES del 15/ago** para no generar otro pago.
+
 - [ ] Avisar la salida con un mes de cortesía (último mes de honorario = mes de
       transición acompañada).
 - [x] ~~Verificar el método de pago~~ **HECHO (2/ago):** la Visa ····4262 de
@@ -132,6 +137,43 @@ sustento del incremento de producción.
   por conversación (estado de pipeline, objeciones, tiempos de respuesta, motivo
   de pérdida) y el dashboard cruza: conversación → cotización → venta →
   inventario. De ahí salen las proyecciones.
+
+### Fase D ampliada — el uso real de WhatsApp en Control (estrategia, 2/ago)
+
+La bandeja es lo de menos; el valor es que la conversación es el eslabón perdido
+del embudo (anuncio → conversación → cotización → venta → inventario). Usos, por
+valor:
+
+1. **Atribución anuncio→dinero:** los mensajes que llegan desde un anuncio
+   clic-a-WhatsApp traen un objeto `referral` en el webhook (ID del anuncio,
+   `ctwa_clid`). Capturarlo y etiquetar la conversación por campaña → cruzar con
+   cotizaciones/cierres = **CAC por venta cerrada, por anuncio**. ⚠️ Cambio de
+   código pequeño en `whatsapp-webhook`: hacerlo ANTES de lanzar campañas
+   propias (el número de prueba no recibe tráfico real; la tubería debe estar
+   lista para el día de la coexistencia).
+2. **Auditoría de ventas:** cruzar chats vs cotizaciones registradas — ventas
+   cerradas por teléfono que nunca entraron a Control, precios fuera de lista,
+   folios sin conversación de respaldo.
+3. **Expediente vivo:** la conversación completa en el perfil del cliente +
+   análisis Claude por conversación (etapa, objeción, siguiente acción, motivo
+   de pérdida — patrón heredado del Analyzer).
+4. **Pipeline operativo:** colas automáticas — cotizado sin respuesta en 3 días,
+   vigencia (7 días) por vencer, recurrentes en ciclo de recompra; métrica de
+   tiempo de primera respuesta.
+5. **Demanda no surtida:** conversaciones con intención de compra mientras el
+   inventario está en cero = venta perdida por producción, con nombres y montos.
+   Es LA cifra del pitch a Aceros Aranda.
+6. **Cotización al hilo:** desde la conversación, un clic genera el PDF foliado
+   y lo envía DE VUELTA al mismo chat vía API (+ archivo en expediente + estado).
+7. **Reactivación quirúrgica** con plantillas aprobadas (vigencias, ciclos de
+   recompra). Nunca difusión masiva a los ~121 (quality rating).
+
+End-state: **Conversions API** con `ctwa_clid` → Meta optimiza hacia
+"cotización generada" en lugar de "conversación iniciada" (la respuesta de fondo
+al hueco 1,252 reportadas vs ~121 reales).
+
+Orden de activación: A (backfill) → B (import) → C (coexistencia; enciende la
+atribución) → D. Solo el punto 1 se programa antes, junto con las campañas.
 
 ---
 
