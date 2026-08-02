@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>VIALUX AD · V4a Foto héroe</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --vx-yellow:#EDBA1A; --vx-graphite:#2D3036; --vx-graphite-dark:#1C1E22;
+    --vx-steel-light:#6B8899; --vx-white:#FFFFFF; --vx-light:#F0EFEB; --vx-muted:#7A8090;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{width:1080px;height:1080px;overflow:hidden;position:relative;
+       font-family:'Manrope',sans-serif;color:var(--vx-white);
+       background:#1C1E22 url("fotos/boya-1352.jpg") center/cover no-repeat}
+
+  /* scrims para legibilidad — la foto no se toca */
+  .scrim-top{position:absolute;inset:0 0 auto 0;height:190px;
+    background:linear-gradient(to bottom, rgba(28,30,34,.88), rgba(28,30,34,0))}
+  .scrim-bottom{position:absolute;inset:auto 0 0 0;height:560px;
+    background:linear-gradient(to top, rgba(28,30,34,.97) 38%, rgba(28,30,34,.75) 62%, rgba(28,30,34,0))}
+
+  header{position:absolute;top:0;left:0;right:0;display:flex;
+         justify-content:space-between;align-items:baseline;padding:42px 60px}
+  .wordmark{font-weight:800;font-size:36px;letter-spacing:-0.03em;color:var(--vx-yellow)}
+  .kicker{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:0.2em;color:var(--vx-light)}
+
+  .stack{position:absolute;left:60px;right:60px;bottom:118px}
+  .titulo{display:flex;align-items:baseline;gap:18px}
+  .titulo .l1{font-weight:300;font-size:58px;letter-spacing:-0.02em;color:var(--vx-yellow)}
+  .titulo .l2{font-weight:800;font-size:58px;letter-spacing:-0.02em;color:var(--vx-white)}
+  .tag{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:0.18em;
+       color:var(--vx-steel-light);margin-top:10px}
+
+  .chips{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:26px}
+  .chip{background:rgba(28,30,34,.92);border-left:4px solid var(--vx-yellow);padding:18px 20px}
+  .chip .p{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:42px;
+           color:var(--vx-yellow);line-height:1}
+  .chip .p small{font-size:13px;font-weight:500;color:var(--vx-muted);margin-left:6px}
+  .chip .c{font-weight:600;font-size:15.5px;color:var(--vx-light);margin-top:8px;line-height:1.25}
+
+  .contacto{margin-top:20px;font-family:'JetBrains Mono',monospace;font-size:14px;
+            letter-spacing:0.08em;color:var(--vx-light);text-align:center}
+  .contacto small{display:block;font-size:11px;letter-spacing:0.16em;color:var(--vx-muted);margin-top:6px}
+
+  .cta{position:absolute;left:0;right:0;bottom:0;background:var(--vx-yellow);
+       color:var(--vx-graphite-dark);text-align:center;padding:24px;
+       font-weight:800;font-size:27px;letter-spacing:0.02em}
+</style>
+</head>
+<body>
+  <div class="scrim-top"></div>
+  <div class="scrim-bottom"></div>
+
+  <header>
+    <div class="wordmark">VIALUX</div>
+    <div class="kicker">HECHA EN MONTERREY</div>
+  </header>
+
+  <div class="stack">
+    <div class="titulo"><span class="l1">BOYA</span><span class="l2">METÁLICA</span></div>
+    <div class="tag">ACERO C 1/8 · PINTURA ELECTROSTÁTICA · DOBLE REFLEJANTE</div>
+
+    <div class="chips">
+      <div class="chip">
+        <div class="p">$44<small>+IVA</small></div>
+        <div class="c">Sin clavos</div>
+      </div>
+      <div class="chip">
+        <div class="p">$48<small>+IVA</small></div>
+        <div class="c">Incluye 4 clavos</div>
+      </div>
+      <div class="chip">
+        <div class="p">$53<small>+IVA</small></div>
+        <div class="c">Clavos + 2 reflejantes</div>
+      </div>
+    </div>
+
+    <div class="contacto">
+      +52 81 3073 0586 · COTIZACIONES@VIALUXMTY.COM
+      <small>PRECIOS EN MXN MÁS IVA · ENVÍOS A TODO MÉXICO</small>
+    </div>
+  </div>
+
+  <div class="cta">COTIZA POR WHATSAPP</div>
+</body>
+</html>

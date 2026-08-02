@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>VIALUX AD · V4b Foto columna</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --vx-yellow:#EDBA1A; --vx-graphite:#2D3036; --vx-graphite-dark:#1C1E22;
+    --vx-steel-light:#6B8899; --vx-white:#FFFFFF; --vx-light:#F0EFEB; --vx-muted:#7A8090;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{width:1080px;height:1080px;overflow:hidden;position:relative;
+       font-family:'Manrope',sans-serif;color:var(--vx-white);
+       background:#1C1E22 url("fotos/boya-1350.jpg") center right -80px/cover no-repeat}
+
+  /* columna de legibilidad a la izquierda; la boya respira a la derecha */
+  .scrim-left{position:absolute;inset:0 auto 0 0;width:640px;
+    background:linear-gradient(to right, rgba(28,30,34,.94) 42%, rgba(28,30,34,.72) 66%, rgba(28,30,34,0))}
+  .scrim-bottom{position:absolute;inset:auto 0 0 0;height:170px;
+    background:linear-gradient(to top, rgba(28,30,34,.92), rgba(28,30,34,0))}
+
+  .col{position:absolute;top:0;bottom:84px;left:0;width:560px;
+       display:flex;flex-direction:column;padding:46px 0 30px 60px}
+  .wordmark{font-weight:800;font-size:36px;letter-spacing:-0.03em;color:var(--vx-yellow)}
+  .kicker{font-family:'JetBrains Mono',monospace;font-size:12.5px;letter-spacing:0.2em;
+          color:var(--vx-light);margin-top:8px}
+
+  .titulo{margin-top:52px}
+  .titulo .l1{font-weight:300;font-size:74px;line-height:0.98;letter-spacing:-0.03em;color:var(--vx-yellow)}
+  .titulo .l2{font-weight:800;font-size:74px;letter-spacing:-0.03em;color:var(--vx-white);margin-top:8px}
+  .tag{font-family:'JetBrains Mono',monospace;font-size:12.5px;letter-spacing:0.14em;
+       color:var(--vx-steel-light);margin-top:16px;line-height:1.8}
+
+  .precios{margin-top:34px;flex:1}
+  .row{display:flex;align-items:baseline;gap:18px;padding:17px 0;
+       border-bottom:1px solid rgba(240,239,235,.14)}
+  .row:last-child{border-bottom:none}
+  .num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:46px;
+       color:var(--vx-yellow);line-height:1;min-width:132px}
+  .num small{font-size:13px;font-weight:500;color:var(--vx-muted);margin-left:4px}
+  .lbl{font-weight:600;font-size:17px;color:var(--vx-light)}
+
+  .contacto{font-family:'JetBrains Mono',monospace;font-size:13px;
+            letter-spacing:0.06em;color:var(--vx-light)}
+  .contacto small{display:block;font-size:10.5px;letter-spacing:0.14em;color:var(--vx-muted);margin-top:5px}
+
+  .cta{position:absolute;left:0;right:0;bottom:0;background:var(--vx-yellow);
+       color:var(--vx-graphite-dark);text-align:center;padding:23px;
+       font-weight:800;font-size:26px;letter-spacing:0.02em}
+</style>
+</head>
+<body>
+  <div class="scrim-left"></div>
+  <div class="scrim-bottom"></div>
+
+  <div class="col">
+    <div>
+      <div class="wordmark">VIALUX</div>
+      <div class="kicker">HECHA EN MONTERREY</div>
+    </div>
+
+    <div class="titulo">
+      <div class="l1">BOYA</div>
+      <div class="l2">METÁLICA</div>
+    </div>
+    <div class="tag">ACERO C 1/8 · PINTURA ELECTROSTÁTICA<br>DOBLE REFLEJANTE · LISTA PARA INSTALAR</div>
+
+    <div class="precios">
+      <div class="row">
+        <div class="num">$44<small>+IVA</small></div>
+        <div class="lbl">Sin clavos</div>
+      </div>
+      <div class="row">
+        <div class="num">$48<small>+IVA</small></div>
+        <div class="lbl">Incluye 4 clavos</div>
+      </div>
+      <div class="row">
+        <div class="num">$53<small>+IVA</small></div>
+        <div class="lbl">Clavos + 2 reflejantes</div>
+      </div>
+    </div>
+
+    <div class="contacto">
+      +52 81 3073 0586
+      <small>PRECIOS EN MXN MÁS IVA · ENVÍOS A TODO MÉXICO</small>
+    </div>
+  </div>
+
+  <div class="cta">COTIZA POR WHATSAPP</div>
+</body>
+</html>
