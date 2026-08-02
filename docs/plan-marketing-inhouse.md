@@ -160,6 +160,10 @@ falta de inventario, y proyección a N meses bajo escenarios de producción.
 
 **Semana 2**
 - Producir 3-4 visuales nuevos del concepto "3 precios" (identidad VIALUX)
+  → **EN CURSO (2/ago):** 3 variantes en `marketing/creativos/` (v1 grafito
+  directo, v2 ficha técnica clara, v3 con foto real — pendiente de fotos).
+  Fuentes HTML editables + PNG 2160×2160 listos para Meta. Falta: fotos reales
+  del producto (César) y elegir las 2 finalistas.
 - Montar la campaña única consolidada; correr en paralelo con la actual
 
 **Semana 3**
@@ -245,12 +249,29 @@ nota de "publicación existente" en §4 — NO se debe perder al migrar.
 1. "Incluye clavos de instalación" es impreciso — los clavos entran desde la
    configuración de $48; a $44 la boya va sola. Reescribir como "disponible con
    clavos de instalación".
-2. ⚠️ **"Entrega inmediata + envío gratis en pedidos desde 200 pz"** NO coincide
-   con la política real del cotizador (entrega inmediata: ≥500 pzs en área
-   metropolitana MTY; el flete se cobra como partida). VERIFICAR con César si esa
-   promesa sigue vigente: si no, se elimina del texto nuevo; si sí, hay que
-   reflejarla en las reglas del cotizador para que lo prometido y lo cotizado
-   coincidan.
+2. ~~"Entrega inmediata + envío gratis en pedidos desde 200 pz"~~ **RESUELTO
+   (2/ago, César):** fue una estrategia puntual para captar recurrencia local y
+   ya NO va — el aprendizaje fue que conviene más el volumen foráneo que el
+   goteo local. Política real: CP foráneo SIEMPRE cobra flete; local se decide
+   caso por caso (se aprovechan las camionetas de Aceros Aranda dentro de la
+   agenda diaria). La promesa se ELIMINA del texto nuevo; el claim de envío
+   que sí es verdadero y diferenciador: **"Envíos a todo México"**.
+
+### Texto primario v2 (propuesto, voz de marca)
+
+Directo, precio primero, sin urgencia artificial, emojis solo funcionales:
+
+> Boya metálica de acero al carbón C 1/8 — $44, $48 y $53 MXN +IVA según
+> configuración.
+> ✅ Pintura electrostática amarillo tráfico
+> ✅ Doble reflejante para visibilidad nocturna
+> ✅ Disponible sola, con 4 clavos, o con clavos y 2 cintas reflejantes
+> ✅ Envíos a todo México
+> 📋 Cotiza por WhatsApp: recibes tu cotización formal en PDF con folio, al
+> momento.
+
+*(La última línea es diferenciador real — el cotizador de VIALUX Control genera
+el PDF foliado en segundos; ningún competidor de Marketplace responde así.)*
 
 ### Teléfono — resuelto (2/ago)
 

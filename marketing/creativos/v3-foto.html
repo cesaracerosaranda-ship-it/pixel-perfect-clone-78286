@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>VIALUX AD · V3 Foto (borrador)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --vx-yellow:#EDBA1A; --vx-yellow-dark:#C99B0E;
+    --vx-graphite:#2D3036; --vx-graphite-light:#3D4148; --vx-graphite-dark:#1C1E22;
+    --vx-steel:#4A6274; --vx-steel-light:#6B8899;
+    --vx-white:#FFFFFF; --vx-light:#F0EFEB; --vx-muted:#7A8090;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{width:1080px;height:1080px;overflow:hidden;background:var(--vx-graphite);
+       font-family:'Manrope',sans-serif;color:var(--vx-white);display:flex;flex-direction:column}
+  .road{height:10px;background:var(--vx-yellow);flex:0 0 auto}
+
+  .marco{flex:1;display:flex}
+  .col{width:54%;display:flex;flex-direction:column;padding:44px 48px 40px 64px}
+  .wordmark{font-weight:800;font-size:34px;letter-spacing:-0.03em;color:var(--vx-yellow)}
+  .kicker{font-family:'JetBrains Mono',monospace;font-size:12.5px;letter-spacing:0.2em;
+          color:var(--vx-steel-light);margin-top:8px}
+
+  .titulo{margin-top:44px}
+  .titulo .l1{font-weight:300;font-size:72px;line-height:0.95;letter-spacing:-0.03em;color:var(--vx-yellow)}
+  .titulo .l2{font-weight:800;font-size:72px;letter-spacing:-0.03em;color:var(--vx-white)}
+
+  .precios{margin-top:40px;flex:1}
+  .row{display:flex;align-items:baseline;gap:20px;padding:19px 0;
+       border-bottom:1px solid var(--vx-graphite-light)}
+  .row:last-child{border-bottom:none}
+  .num{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:52px;
+       color:var(--vx-yellow);line-height:1;min-width:150px}
+  .lbl{font-weight:600;font-size:18px;color:var(--vx-light)}
+  .lbl small{display:block;font-family:'JetBrains Mono',monospace;font-weight:400;
+             font-size:12px;letter-spacing:0.1em;color:var(--vx-muted);margin-top:4px}
+
+  .cta{background:var(--vx-yellow);color:var(--vx-graphite-dark);text-align:center;
+       padding:22px;font-weight:800;font-size:25px}
+  .contacto{margin-top:16px;font-family:'JetBrains Mono',monospace;font-size:14.5px;
+            letter-spacing:0.05em;color:var(--vx-light);text-align:center}
+  .nota{margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:11.5px;
+        letter-spacing:0.14em;color:var(--vx-muted);text-align:center}
+
+  .foto{width:46%;position:relative;border-left:4px solid var(--vx-yellow)}
+  .slot{position:absolute;inset:28px;border:2px dashed var(--vx-steel);
+        display:flex;flex-direction:column;align-items:center;justify-content:center;
+        gap:18px;text-align:center}
+  .slot .icono{width:74px;height:60px;border:3px solid var(--vx-steel-light);border-radius:6px;position:relative}
+  .slot .icono::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+        width:22px;height:22px;border:3px solid var(--vx-steel-light);border-radius:50%}
+  .slot p{font-family:'JetBrains Mono',monospace;font-size:14px;letter-spacing:0.12em;
+          color:var(--vx-steel-light);line-height:2}
+  .borrador{position:absolute;top:44px;right:-34px;transform:rotate(90deg);
+            font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.5em;color:var(--vx-muted)}
+</style>
+</head>
+<body>
+  <div class="road"></div>
+  <div class="marco">
+    <div class="col">
+      <div>
+        <div class="wordmark">VIALUX</div>
+        <div class="kicker">SEÑALIZACIÓN VIAL · MONTERREY</div>
+      </div>
+
+      <div class="titulo">
+        <div class="l1">BOYA</div>
+        <div class="l2">METÁLICA</div>
+      </div>
+
+      <div class="precios">
+        <div class="row">
+          <div class="num">$44</div>
+          <div class="lbl">Sin clavos<small>MXN +IVA</small></div>
+        </div>
+        <div class="row">
+          <div class="num">$48</div>
+          <div class="lbl">Incluye 4 clavos<small>MXN +IVA</small></div>
+        </div>
+        <div class="row">
+          <div class="num">$53</div>
+          <div class="lbl">Clavos + 2 reflejantes<small>MXN +IVA</small></div>
+        </div>
+      </div>
+
+      <div class="cta">COTIZA POR WHATSAPP</div>
+      <div class="contacto">+52 81 3073 0586 · COTIZACIONES@VIALUXMTY.COM</div>
+      <div class="nota">*PRECIOS MÁS IVA · ENVÍOS A TODO MÉXICO</div>
+    </div>
+
+    <div class="foto">
+      <div class="borrador">BORRADOR</div>
+      <div class="slot">
+        <div class="icono"></div>
+        <p>FOTO REAL DEL PRODUCTO<br>BOYA INSTALADA EN VIALIDAD<br>— PENDIENTE —</p>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

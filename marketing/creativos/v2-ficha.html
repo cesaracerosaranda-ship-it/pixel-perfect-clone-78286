@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>VIALUX AD · V2 Ficha técnica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --vx-yellow:#EDBA1A; --vx-yellow-dark:#C99B0E;
+    --vx-graphite:#2D3036; --vx-graphite-light:#3D4148; --vx-graphite-dark:#1C1E22;
+    --vx-steel:#4A6274; --vx-steel-light:#6B8899;
+    --vx-white:#FFFFFF; --vx-light:#F0EFEB; --vx-muted:#7A8090; --vx-border:#D8D7D3;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{width:1080px;height:1080px;overflow:hidden;background:var(--vx-white);
+       font-family:'Manrope',sans-serif;color:var(--vx-graphite);display:flex;flex-direction:column}
+  .mono{font-family:'JetBrains Mono',monospace}
+
+  header{background:var(--vx-graphite);display:flex;justify-content:space-between;
+         align-items:center;padding:24px 56px}
+  .wordmark{font-weight:800;font-size:32px;letter-spacing:-0.03em;color:var(--vx-yellow)}
+  .kicker{font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.24em;color:var(--vx-steel-light)}
+  .road{height:5px;background:var(--vx-yellow)}
+
+  .grid{flex:1;display:flex;flex-direction:column;min-height:0}
+  section{display:grid;grid-template-columns:84px 1fr;border-bottom:1px solid var(--vx-border);flex:none}
+  section:nth-of-type(1){height:480px}
+  section:nth-of-type(2){height:285px}
+  section:nth-of-type(3){height:174px}
+  section:last-of-type{border-bottom:none}
+  .rail{border-right:1px solid var(--vx-border);display:flex;flex-direction:column;
+        align-items:center;padding-top:26px;gap:16px}
+  .rail .n{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:15px;color:var(--vx-yellow-dark)}
+  .rail .v{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.32em;
+           color:var(--vx-muted);writing-mode:vertical-rl;transform:rotate(180deg)}
+  .cuerpo{padding:24px 48px;display:flex;flex-direction:column;justify-content:center}
+
+  /* 00 PRODUCTO */
+  .s00{flex-direction:row;align-items:center;justify-content:space-between;gap:30px}
+  .s00 h1{font-weight:800;font-size:52px;letter-spacing:-0.03em;line-height:1.22}
+  .s00 h1 .sub{display:inline-block;border-bottom:7px solid var(--vx-yellow);padding-bottom:4px}
+  .specs{margin-top:22px;display:grid;grid-template-columns:1fr 1fr;gap:12px 28px}
+  .spec{display:flex;align-items:center;gap:12px;font-family:'JetBrains Mono',monospace;
+        font-size:13.5px;letter-spacing:0.04em;color:var(--vx-steel)}
+  .spec::before{content:"";width:9px;height:9px;background:var(--vx-yellow);flex:0 0 auto}
+
+  /* 01 PRECIOS */
+  .celdas{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--vx-border)}
+  .celda{padding:20px 22px;border-right:1px solid var(--vx-border)}
+  .celda:last-child{border-right:none}
+  .celda .tag{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.2em;color:var(--vx-muted)}
+  .celda .p{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:48px;
+            color:var(--vx-yellow-dark);margin-top:10px;line-height:1}
+  .celda .iva{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--vx-muted);margin-top:6px}
+  .celda .c{font-weight:600;font-size:16px;margin-top:10px;line-height:1.3}
+
+  /* 02 CONTACTO */
+  .s02{flex-direction:row;align-items:center;gap:40px}
+  .cta{background:var(--vx-yellow);color:var(--vx-graphite-dark);font-weight:800;
+       font-size:24px;letter-spacing:0.01em;padding:20px 40px;white-space:nowrap}
+  .datos{font-family:'JetBrains Mono',monospace;font-size:15px;line-height:1.9;color:var(--vx-graphite)}
+  .datos .fino{font-size:11.5px;letter-spacing:0.12em;color:var(--vx-muted)}
+
+  footer{background:var(--vx-graphite);text-align:center;padding:16px;
+         font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:0.28em;color:var(--vx-light)}
+</style>
+</head>
+<body>
+  <header>
+    <div class="wordmark">VIALUX</div>
+    <div class="kicker">FICHA COMERCIAL · MONTERREY · 2026</div>
+  </header>
+  <div class="road"></div>
+
+  <div class="grid">
+    <section>
+      <div class="rail"><div class="n">00</div><div class="v">PRODUCTO</div></div>
+      <div class="cuerpo s00">
+        <div>
+          <h1>BOYA<br><span class="sub">METÁLICA</span></h1>
+          <div class="specs">
+            <div class="spec">ACERO AL CARBÓN C 1/8</div>
+            <div class="spec">PINTURA ELECTROSTÁTICA</div>
+            <div class="spec">AMARILLO TRÁFICO</div>
+            <div class="spec">DOBLE REFLEJANTE</div>
+          </div>
+        </div>
+        <svg width="240" height="196" viewBox="0 0 300 240" fill="none" style="flex:0 0 auto">
+          <path d="M 44 196 Q 44 74 150 74 Q 256 74 256 196 Z" fill="#EDBA1A" stroke="#1C1E22" stroke-width="3.5"/>
+          <rect x="72" y="140" width="156" height="20" rx="4" fill="#F0EFEB" stroke="#1C1E22" stroke-width="2.5"/>
+          <rect x="20" y="196" width="260" height="22" rx="5" fill="#3D4148" stroke="#6B8899" stroke-width="2"/>
+          <circle cx="42" cy="207" r="5" fill="#1C1E22" stroke="#6B8899" stroke-width="1.5"/>
+          <circle cx="258" cy="207" r="5" fill="#1C1E22" stroke="#6B8899" stroke-width="1.5"/>
+          <polygon points="84,218 95,218 89.5,238" fill="#6B8899"/>
+          <polygon points="205,218 216,218 210.5,238" fill="#6B8899"/>
+        </svg>
+      </div>
+    </section>
+
+    <section>
+      <div class="rail"><div class="n">01</div><div class="v">PRECIOS</div></div>
+      <div class="cuerpo">
+        <div class="celdas">
+          <div class="celda">
+            <div class="tag">VLX-22-A</div>
+            <div class="p">$44</div>
+            <div class="iva">MXN +IVA</div>
+            <div class="c">Boya sola,<br>sin clavos</div>
+          </div>
+          <div class="celda">
+            <div class="tag">VLX-22-B</div>
+            <div class="p">$48</div>
+            <div class="iva">MXN +IVA</div>
+            <div class="c">Incluye 4 clavos<br>de fijación</div>
+          </div>
+          <div class="celda">
+            <div class="tag">VLX-22-C</div>
+            <div class="p">$53</div>
+            <div class="iva">MXN +IVA</div>
+            <div class="c">Incluye clavos +<br>2 reflejantes</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="rail"><div class="n">02</div><div class="v">CONTACTO</div></div>
+      <div class="cuerpo s02">
+        <div class="cta">COTIZA POR WHATSAPP</div>
+        <div class="datos">
+          +52 81 3073 0586<br>
+          COTIZACIONES@VIALUXMTY.COM<br>
+          <span class="fino">*PRECIOS MÁS IVA · ENVÍOS A TODO MÉXICO</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <footer>SEÑALIZACIÓN VIAL DE PRECISIÓN · MONTERREY, N.L.</footer>
+</body>
+</html>
