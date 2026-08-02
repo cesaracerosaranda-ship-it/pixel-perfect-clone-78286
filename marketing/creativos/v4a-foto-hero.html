@@ -13,46 +13,73 @@
   }
   *{margin:0;padding:0;box-sizing:border-box}
   body{width:1080px;height:1080px;overflow:hidden;position:relative;
-       font-family:'Manrope',sans-serif;color:var(--vx-white);
-       background:#1C1E22 url("fotos/boya-1352.jpg") center/cover no-repeat}
+       font-family:'Manrope',sans-serif;color:var(--vx-white);background:#141518}
 
-  /* scrims para legibilidad — la foto no se toca */
-  .scrim-top{position:absolute;inset:0 0 auto 0;height:190px;
-    background:linear-gradient(to bottom, rgba(28,30,34,.88), rgba(28,30,34,0))}
-  .scrim-bottom{position:absolute;inset:auto 0 0 0;height:560px;
-    background:linear-gradient(to top, rgba(28,30,34,.97) 38%, rgba(28,30,34,.75) 62%, rgba(28,30,34,0))}
+  /* ── revelado de la foto: contraste + saturación + tono cálido sutil ── */
+  .foto{position:absolute;inset:0;
+    background:
+      linear-gradient(180deg, rgba(255,186,40,.06), rgba(16,18,22,.14)),
+      url("fotos/boya-1352.jpg") center/cover no-repeat;
+    background-blend-mode:overlay, normal;
+    filter:contrast(1.08) saturate(1.15) brightness(.99)}
+  .vignette{position:absolute;inset:0;
+    background:radial-gradient(120% 92% at 50% 36%, transparent 52%, rgba(8,9,11,.52) 100%)}
+  .grain{position:absolute;inset:0;opacity:.05;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
 
-  header{position:absolute;top:0;left:0;right:0;display:flex;
+  .scrim-top{position:absolute;inset:0 0 auto 0;height:200px;
+    background:linear-gradient(to bottom, rgba(20,22,26,.9), rgba(20,22,26,0))}
+  .scrim-bottom{position:absolute;inset:auto 0 0 0;height:580px;
+    background:linear-gradient(to top, rgba(20,22,26,.98) 40%, rgba(20,22,26,.78) 62%, rgba(20,22,26,0))}
+
+  .road{position:absolute;top:0;left:0;right:0;height:8px;background:var(--vx-yellow);z-index:9}
+
+  header{position:absolute;top:8px;left:0;right:0;display:flex;z-index:8;
          justify-content:space-between;align-items:baseline;padding:42px 60px}
-  .wordmark{font-weight:800;font-size:36px;letter-spacing:-0.03em;color:var(--vx-yellow)}
-  .kicker{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:0.2em;color:var(--vx-light)}
+  .wordmark{font-weight:800;font-size:36px;letter-spacing:-0.03em;color:var(--vx-yellow);
+            text-shadow:0 2px 14px rgba(0,0,0,.55)}
+  .kicker{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:0.2em;
+          color:var(--vx-light);text-shadow:0 1px 10px rgba(0,0,0,.6)}
 
-  .stack{position:absolute;left:60px;right:60px;bottom:118px}
-  .titulo{display:flex;align-items:baseline;gap:18px}
-  .titulo .l1{font-weight:300;font-size:58px;letter-spacing:-0.02em;color:var(--vx-yellow)}
-  .titulo .l2{font-weight:800;font-size:58px;letter-spacing:-0.02em;color:var(--vx-white)}
+  .stack{position:absolute;left:60px;right:60px;bottom:120px;z-index:8}
+  .overline{width:56px;height:5px;background:var(--vx-yellow);margin-bottom:20px}
+  .titulo{display:flex;align-items:baseline;gap:18px;
+          text-shadow:0 3px 22px rgba(0,0,0,.5)}
+  .titulo .l1{font-weight:300;font-size:64px;letter-spacing:-0.02em;color:var(--vx-yellow)}
+  .titulo .l2{font-weight:800;font-size:64px;letter-spacing:-0.02em;color:var(--vx-white)}
   .tag{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:0.18em;
-       color:var(--vx-steel-light);margin-top:10px}
+       color:#9FB3BF;margin-top:12px;text-shadow:0 1px 8px rgba(0,0,0,.6)}
 
-  .chips{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-top:26px}
-  .chip{background:rgba(28,30,34,.92);border-left:4px solid var(--vx-yellow);padding:18px 20px}
-  .chip .p{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:42px;
-           color:var(--vx-yellow);line-height:1}
+  .chips{display:grid;grid-template-columns:1fr 1fr 1fr;gap:18px;margin-top:28px}
+  .chip{background:rgba(24,26,30,.96);border-left:4px solid var(--vx-yellow);
+        padding:18px 20px 16px;
+        box-shadow:0 24px 48px rgba(0,0,0,.5), 0 4px 14px rgba(0,0,0,.35),
+                   inset 0 1px 0 rgba(255,255,255,.06)}
+  .chip .sku{font-family:'JetBrains Mono',monospace;font-size:10px;
+             letter-spacing:0.22em;color:var(--vx-muted)}
+  .chip .p{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:46px;
+           color:var(--vx-yellow);line-height:1;margin-top:10px}
   .chip .p small{font-size:13px;font-weight:500;color:var(--vx-muted);margin-left:6px}
-  .chip .c{font-weight:600;font-size:15.5px;color:var(--vx-light);margin-top:8px;line-height:1.25}
+  .chip .c{font-weight:600;font-size:15.5px;color:var(--vx-light);margin-top:9px;line-height:1.25}
 
-  .contacto{margin-top:20px;font-family:'JetBrains Mono',monospace;font-size:14px;
-            letter-spacing:0.08em;color:var(--vx-light);text-align:center}
-  .contacto small{display:block;font-size:11px;letter-spacing:0.16em;color:var(--vx-muted);margin-top:6px}
+  .contacto{margin-top:22px;font-family:'JetBrains Mono',monospace;font-size:14px;
+            letter-spacing:0.1em;color:var(--vx-light);text-align:center;
+            text-shadow:0 1px 8px rgba(0,0,0,.6)}
+  .contacto small{display:block;font-size:11px;letter-spacing:0.18em;color:var(--vx-muted);margin-top:7px}
 
-  .cta{position:absolute;left:0;right:0;bottom:0;background:var(--vx-yellow);
-       color:var(--vx-graphite-dark);text-align:center;padding:24px;
-       font-weight:800;font-size:27px;letter-spacing:0.02em}
+  .cta{position:absolute;left:0;right:0;bottom:0;background:var(--vx-yellow);z-index:9;
+       color:var(--vx-graphite-dark);text-align:center;padding:25px;
+       font-weight:800;font-size:28px;letter-spacing:0.02em;
+       box-shadow:0 -14px 34px rgba(0,0,0,.4)}
 </style>
 </head>
 <body>
+  <div class="foto"></div>
+  <div class="vignette"></div>
   <div class="scrim-top"></div>
   <div class="scrim-bottom"></div>
+  <div class="grain"></div>
+  <div class="road"></div>
 
   <header>
     <div class="wordmark">VIALUX</div>
@@ -60,19 +87,23 @@
   </header>
 
   <div class="stack">
+    <div class="overline"></div>
     <div class="titulo"><span class="l1">BOYA</span><span class="l2">METÁLICA</span></div>
     <div class="tag">ACERO C 1/8 · PINTURA ELECTROSTÁTICA · DOBLE REFLEJANTE</div>
 
     <div class="chips">
       <div class="chip">
+        <div class="sku">VLX-22-A</div>
         <div class="p">$44<small>+IVA</small></div>
         <div class="c">Sin clavos</div>
       </div>
       <div class="chip">
+        <div class="sku">VLX-22-B</div>
         <div class="p">$48<small>+IVA</small></div>
         <div class="c">Incluye 4 clavos</div>
       </div>
       <div class="chip">
+        <div class="sku">VLX-22-C</div>
         <div class="p">$53<small>+IVA</small></div>
         <div class="c">Clavos + 2 reflejantes</div>
       </div>
