@@ -280,6 +280,72 @@ en los creativos de la campaña "Nuevas img AI" NO es de VIALUX — no reutiliza
 esa placa. Los visuales nuevos imprimen el número real (o ninguno: el botón de
 WhatsApp ya lleva al correcto) y el correo del dominio.
 
+---
+
+## Apéndice B · Benchmark competitivo en Meta (2/ago/2026)
+
+Fuente: Biblioteca de Anuncios de Meta (anuncios ACTIVOS, México) + landing de
+Semex. Mercado Libre quedó pendiente (pide login para listar).
+
+| Quién | Qué vende | Su ángulo | ¿Precios públicos? |
+|---|---|---|---|
+| **Semex** (líder MTY, "+30 años") | Boya metálica A36 cal 10, horneada 210 °C, 22×22×7.5 cm, 4 clavos incluidos | Landing dedicada `boyas.semex.com.mx`, "fabricante directo", specs + confianza | **NO** — todo "Cotizar" |
+| **Icity México** | Vialetas reflejantes | Dolor de obra: "¿Ya viene la inspección…?", "las necesitas para ayer", stock listo, mayoreo a constructoras y municipios | NO |
+| **Tráfico Soluciones Viales** | Boyas **plásticas** + instalación | Casos de obra reales con cliente y ubicación (CALIDRA, Torreón), servicio integral B2B industrial | NO |
+| **Daniel Racks MTY** | Boyas metálicas | Video; **copia el headline de VIALUX** ("Seguridad vial garantizada") | NO |
+
+### Lecturas estratégicas
+
+1. **VIALUX es el ÚNICO anunciante de la categoría que publica precios.** Todos
+   los demás esconden el precio detrás de "cotizar". El formato 3 precios no es
+   solo el ganador histórico: es un diferenciador de categoría. No abandonarlo.
+2. **El espacio pagado de "boyas metálicas" está casi vacío** (VIALUX + un
+   imitador pequeño). Semex empezó a pautar "boyas viales" apenas en julio 2026:
+   el líder ACABA de entrar al canal. Hay una ventana para consolidar posición
+   con constancia de pauta antes de que escale.
+3. Que un competidor copie el headline de VIALUX confirma liderazgo — y recuerda
+   por qué renovar el creativo: al imitado le urge no verse genérico.
+4. **Qué adoptar de cada uno:**
+   - *Icity* → urgencia de obra + stock: al cargar inventario, badge
+     "EN STOCK · ENTREGA INMEDIATA" (solo cuando sea verdad) y nombrar segmentos
+     (constructoras y municipios).
+   - *Tráfico* → serie orgánica "obra entregada": foto real de instalación con
+     ubicación. Es exactamente lo que habilitan las fotos de César.
+   - *Semex* → landing dedicada: refuerza `vialuxmty.com` (ya en plan §3).
+5. **Spec-intel (interno, NO publicitar):** Semex declara calibre 10 (~3.4 mm)
+   vs VIALUX C 1/8 (~3.2 mm). No entrar en guerra de calibres — la cancha de
+   VIALUX es precio transparente + velocidad (PDF foliado al momento) + trato
+   directo.
+
+---
+
+## Apéndice C · Sistema de mockups: foto real + capa gráfica
+
+Decisión de César (2/ago): el fondo es SIEMPRE foto real (nada generado con IA);
+la capa gráfica —marca, precios, CTA— va encima, generada por nosotros.
+
+**Spec de la capa (sobre los tokens del brand system):**
+- Scrim de legibilidad: gradiente grafito `#1C1E22 → transparente` desde abajo
+  (o franja lateral), nunca texto directo sobre zonas ocupadas de la foto.
+- Elementos: wordmark VIALUX + barra amarilla superior · chips de precio en
+  JetBrains Mono ($44/$48/$53 +IVA) · CTA "COTIZA POR WHATSAPP" · badge opcional
+  "EN STOCK · MTY" cuando el inventario lo respalde.
+- El amarillo #EDBA1A solo en chips/CTA/barra (acento ≤20% de superficie).
+- Formatos: 1080×1080 feed; después 1080×1920 stories con la misma capa.
+- Plantillas editables en `marketing/creativos/` (mismo flujo HTML → PNG).
+
+**Shot list para César (celular está bien, luz de día, varias tomas de c/u):**
+1. **La héroe:** boya instalada en vialidad, toma baja a ras de piso, ángulo 3/4,
+   con línea amarilla de carril visible.
+2. Hilera de boyas en curva o isleta (da profundidad).
+3. Primer plano del reflejante — atardecer/noche con flash o faros encima
+   (demuestra el "doble reflejante" mejor que cualquier texto).
+4. Boya en mano o junto a una bota (escala real).
+5. Lote/pallet listo para embarque o camioneta cargada (stock + envíos).
+6. Si se puede: proceso de pintura/horneado en planta (fabricación real).
+
+Cada foto en horizontal Y vertical; limpiar la boya antes de la toma.
+
 ### Segundo creativo documentado: "AD nuevo 1 - Copia" (Nuevas img AI, mar 2026)
 
 > Imagen (generada con IA): boya amarilla sobre asfalto, carretera de fondo
