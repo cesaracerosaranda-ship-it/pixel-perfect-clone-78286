@@ -1,6 +1,6 @@
 # ARRANQUE — Punto exacto para retomar
 
-Última sesión: 2/ago/2026. Este documento es el único que hay que leer para
+Última actualización: 3/ago/2026. Este documento es el único que hay que leer para
 continuar. Los detalles viven en `plan-marketing-inhouse.md`,
 `adopcion-corteclaro.md` y `whatsapp-runbook.md`.
 
@@ -9,8 +9,7 @@ continuar. Los detalles viven en `plan-marketing-inhouse.md`,
 ## A · Lo que César hace SIN Claude (no requiere sesión)
 
 **Domingo 3/ago**
-- [ ] Historial → Actualizar inventario → capturar **~500 boyas** (conteo real).
-      Clavos se quedan en 0 hasta que lleguen (mar-mié).
+- [x] ~~Capturar inventario~~ — HECHO: 500 boyas · 2,000 clavos.
 
 **Lunes 4/ago — montar la campaña (~1 h)**
 - [ ] Seguir la guía de `plan-marketing-inhouse.md` §7 "Semana 2". Resumen:
@@ -44,7 +43,7 @@ sin modificarla. Confírmame que quedó aplicada.
 
 ---
 
-## C · Construido el 3/ago (falta aplicar migraciones)
+## C · Construido el 3/ago
 
 - ✅ **Motivo de pérdida obligatorio** — modal con 6 motivos canónicos + detalle.
 - ✅ **Tasa de cierre + panel "por qué se pierde"** en el resumen de Historial
@@ -90,10 +89,11 @@ detalle completo." Aplica al modal de copiar y al botón de WhatsApp directo.
 
 ---
 
-## E · Estado del repo (2/ago)
+## E · Estado del repo (3/ago)
 
 Todo está commiteado y pusheado a `main`. Últimos trabajos:
-- Trigger de clavos + fix del modal de inventario (falta aplicar la migración)
+- Motivo de pérdida + tasa de cierre + panel "por qué se pierde" + módulo Pipeline
+- Trigger de clavos + fix del modal de inventario (migraciones ya aplicadas)
 - Plan de marketing in-house completo, con benchmark competitivo y guía de
   montaje de campaña
 - Creativos: `marketing/creativos/` (v1 técnico, v2 ficha, v4a/v4b con foto real
