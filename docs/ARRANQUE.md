@@ -1,0 +1,110 @@
+# ARRANQUE — Punto exacto para retomar
+
+Última sesión: 2/ago/2026. Este documento es el único que hay que leer para
+continuar. Los detalles viven en `plan-marketing-inhouse.md`,
+`adopcion-corteclaro.md` y `whatsapp-runbook.md`.
+
+---
+
+## A · Lo que César hace SIN Claude (no requiere sesión)
+
+**Domingo 3/ago**
+- [ ] Historial → Actualizar inventario → capturar **~500 boyas** (conteo real).
+      Clavos se quedan en 0 hasta que lleguen (mar-mié).
+
+**Lunes 4/ago — montar la campaña (~1 h)**
+- [ ] Seguir la guía de `plan-marketing-inhouse.md` §7 "Semana 2". Resumen:
+      duplicar `Ventas-Mensajes || Boyas 3 precios || Ubis || 1.12.25` →
+      renombrar `VIALUX || Consolidada || 08.26` → $200/día → borrar el anuncio
+      duplicado y crear uno con **"Usar publicación existente"** (la de
+      AD Boyas 3 precios 2, con sus 211 reacciones) → publicar.
+- [ ] Al publicar: **apagar** las dos campañas débiles (IG 10.12.25 y
+      Nuevas img AI). Dejar viva solo la ganadora 3-5 días como seguro.
+- [ ] Días siguientes: 5 min/día (gasto, conversaciones, $/conv).
+
+**Martes-miércoles 5-6/ago**
+- [ ] Al recibir clavos: capturar el conteo real en el mismo modal.
+
+**Antes del 15/ago**
+- [ ] Comparar consolidada vs viejas → decisión S4 → avisar la salida.
+
+---
+
+## B · Pegar en Lovable (cuando haya tokens, o incluso sin sesión)
+
+Los dos son independientes. Se pueden mandar juntos o por separado.
+
+**1. Migración de clavos (YA está en el repo, solo falta aplicarla):**
+
+```
+Ejecuta la migración SQL que está en
+supabase/migrations/20260802130000_inventario_clavos_trigger.sql tal cual, sin
+modificarla. Solo reemplaza la función ajustar_inventario_cotizacion; no toques
+tablas ni otras funciones. Confírmame que quedó aplicada.
+```
+
+**2. Sincronizar el repo** (por si Lovable no ha jalado los últimos commits):
+
+```
+Sincroniza con la última versión de main en GitHub. No modifiques código, solo
+dime qué archivos entraron.
+```
+
+---
+
+## C · Lo primero que construye Claude al retomar
+
+### Tarea #1 — Motivo de pérdida (spec lista, ~30 min de trabajo)
+
+**Migración nueva** `supabase/migrations/AAAAMMDD_motivo_perdida.sql`:
+```sql
+alter table public.cotizaciones
+  add column if not exists motivo_perdida text;
+```
+
+**UI** en `src/routes/_authenticated/historial.tsx`: al cambiar estado a
+`perdido`, abrir modal (patrón del `ActualizarInventarioModal` ya existente) con:
+- Botones de motivo rápido: `precio` · `tiempo de entrega` · `sin inventario` ·
+  `eligió competencia` · `no responde` · `otro`
+- Campo de texto libre opcional (se concatena o se guarda solo si es "otro")
+- No permitir guardar sin motivo seleccionado
+- Mostrar el motivo en la fila/tarjeta de las cotizaciones perdidas
+
+**Por qué primero:** es la pieza de datos más barata con mayor retorno — alimenta
+el análisis de objeciones con Claude (fase D de WhatsApp) y el win-rate por
+fuente cuando llegue la atribución de anuncios.
+
+### Después, en orden (detalle en `adopcion-corteclaro.md`)
+2. Pipeline kanban (½ día) — semana del 11
+3. Cobranza / estado de pago (1 día) — semana del 11
+4. Rastreo público por token (1-2 días) — después del corte S4
+5. Normalización de captura (1 h)
+
+---
+
+## D · Lo que sigue pendiente de decisión o insumo
+
+- **Fotos de obra instalada** (César) — para la serie orgánica del feed. El shot
+  list está en `plan-marketing-inhouse.md` Apéndice C.
+- **Claude Design** — el brief está listo en
+  `marketing/creativos/BRIEF-claude-design.md`; se difirió a los refreshes
+  post-corte. Retomar cuando haya holgura.
+- **Estructura de portafolios en Meta** — renombrar "Celosias" a la razón social
+  de la CSF, sacar Lattice Works a su propio portafolio, quitar/despublicar CRG
+  Safety. Requisito previo a la Business Verification.
+- **WhatsApp fase pesada** (coexistencia del número real + captura de `referral`
+  + backfill del historial): **después del 15/ago**, en sesión dedicada, con
+  `whatsapp-runbook.md` a la mano. El token de prueba caduca cada 24 h — dar por
+  hecho que habrá que renovarlo antes de probar cualquier cosa.
+
+---
+
+## E · Estado del repo (2/ago)
+
+Todo está commiteado y pusheado a `main`. Últimos trabajos:
+- Trigger de clavos + fix del modal de inventario (falta aplicar la migración)
+- Plan de marketing in-house completo, con benchmark competitivo y guía de
+  montaje de campaña
+- Creativos: `marketing/creativos/` (v1 técnico, v2 ficha, v4a/v4b con foto real
+  + las fotos originales en `fotos/`)
+- Mapa de adopción de CorteClaro
