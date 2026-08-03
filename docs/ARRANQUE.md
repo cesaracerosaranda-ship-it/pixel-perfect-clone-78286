@@ -89,6 +89,15 @@ fuente cuando llegue la atribución de anuncios.
 - **Claude Design** — el brief está listo en
   `marketing/creativos/BRIEF-claude-design.md`; se difirió a los refreshes
   post-corte. Retomar cuando haya holgura.
+- **Conector MCP de Meta Ads** (`mcp.facebook.com/ads`) — hallazgo del artículo
+  practicaly.ai (2/ago). Si la cuenta lo tiene habilitado, sustituiría la
+  integración con la Marketing API del plan: Claude consultaría métricas y Ad
+  Library directo, sin exports manuales. Añadir como conector personalizado por
+  URL y probar. **Sin verificar** (no aparece en el registro; ~40% de cuentas no
+  tienen el permiso). No bloquea nada: es mejora de flujo, no requisito.
+  Del mismo artículo se DESCARTA la generación de creativo con IA (contradice
+  el dato propio: $35 vs $20) y la cadencia de muchas variantes (con ~90
+  conversaciones/mes fragmentar impide salir del aprendizaje).
 - **Estructura de portafolios en Meta** — renombrar "Celosias" a la razón social
   de la CSF, sacar Lattice Works a su propio portafolio, quitar/despublicar CRG
   Safety. Requisito previo a la Business Verification.
