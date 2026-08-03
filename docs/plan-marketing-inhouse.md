@@ -220,12 +220,17 @@ falta de inventario, y proyección a N meses bajo escenarios de producción.
      **AD Boyas 3 precios 2** (la de 211 reacciones / 14 comentarios).
   5. Opcional: segundo anuncio con `v4a-foto-hero.png` (publicación nueva —
      va acumulando su propia prueba social).
-  6. Publicar. **NO apagar las campañas viejas todavía** — corren en paralelo.
-  7. Días siguientes: revisar 5 min/día (gasto, conversaciones, $/conv). La
-     campaña sale de aprendizaje en ~7 días o ~50 conversaciones.
-  8. Cuando la consolidada esté estable en ≤$25/conv → apagar las 3 viejas
-     activas (Nuevas img AI, IG 10.12.25, Ubis 1.12.25) → decisión S4 antes
-     del 15.
+  6. **Al publicar, apagar de inmediato las DOS campañas débiles** (IG 10.12.25
+     a $50/conv y Nuevas img AI a $42/conv en julio) — pagan resultados peores,
+     no son red de seguridad. Dejar viva SOLO la ganadora (Ubis 1.12.25).
+  7. **Paralelo corto, no indefinido:** dos campañas idénticas no se encarecen
+     entre sí en subasta (Meta solo mete un anuncio tuyo por subasta), pero SÍ
+     se reparten las conversaciones y ambas aprenden más lento. La ganadora se
+     queda 3-5 días solo como seguro contra un error de configuración de la
+     nueva; con $200 vs $40 diarios, la consolidada domina la entrega.
+  8. En cuanto la consolidada entregue estable (5-8 conversaciones a ≤$25/conv)
+     → apagar también la ganadora (cutover completo, toda la señal concentrada)
+     → decisión S4 antes del 15.
 
 **Semana 3**
 - Corte S4: apagar campañas viejas cuando la nueva salga de aprendizaje
