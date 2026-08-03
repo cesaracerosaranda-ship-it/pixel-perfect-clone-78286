@@ -30,24 +30,16 @@ continuar. Los detalles viven en `plan-marketing-inhouse.md`,
 
 ---
 
-## B · Pegar en Lovable (cuando haya tokens, o incluso sin sesión)
+## B · Migraciones — APLICADAS ✅ (Lovable, 3/ago)
 
-Los dos son independientes. Se pueden mandar juntos o por separado.
+Ya corren en producción: el trigger de clavos (20260802130000) y el motivo de
+pérdida (20260802190000). Nada pendiente aquí.
 
-**1. Migración de clavos (YA está en el repo, solo falta aplicarla):**
-
-```
-Ejecuta la migración SQL que está en
-supabase/migrations/20260802130000_inventario_clavos_trigger.sql tal cual, sin
-modificarla. Solo reemplaza la función ajustar_inventario_cotizacion; no toques
-tablas ni otras funciones. Confírmame que quedó aplicada.
-```
-
-**2. Sincronizar el repo** (por si Lovable no ha jalado los últimos commits):
+Si en el futuro se agrega otra migración, el prompt para Lovable es:
 
 ```
-Sincroniza con la última versión de main en GitHub. No modifiques código, solo
-dime qué archivos entraron.
+Ejecuta la migración SQL que está en supabase/migrations/NOMBRE.sql tal cual,
+sin modificarla. Confírmame que quedó aplicada.
 ```
 
 ---
@@ -61,16 +53,11 @@ dime qué archivos entraron.
   columna, drag & drop, marca de vencida a los 7 días, mismos candados que
   Historial.
 
-**Pendiente para que funcione:** pegar en Lovable →
+✅ **Migraciones aplicadas** — todo lo anterior ya funciona en producción.
 
-```
-Ejecuta tal cual, sin modificarlas, estas dos migraciones de
-supabase/migrations/: 20260802130000_inventario_clavos_trigger.sql y
-20260802190000_motivo_perdida.sql. Confírmame que quedaron aplicadas.
-```
-
-Mientras no se apliquen: el descuento de clavos no ocurre y el motivo de pérdida
-no se guarda (la UI está escrita a prueba de eso — no truena, solo no persiste).
+✅ **Texto de WhatsApp ajustado** (3/ago) — tuteo y sin cortesías de relleno:
+arranca en "Te comparto la cotización…" y cierra en "Adjunto el PDF con el
+detalle completo." Aplica al modal de copiar y al botón de WhatsApp directo.
 
 ### Siguiente en construir (orden de `adopcion-corteclaro.md`)
 3. Cobranza / estado de pago (1 día)

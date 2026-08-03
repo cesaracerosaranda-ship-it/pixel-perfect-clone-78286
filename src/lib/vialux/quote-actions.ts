@@ -26,14 +26,15 @@ export function buildWhatsAppResumen(
   ]
     .filter(Boolean)
     .join("\n");
+  // Tuteo y sin cortesías de relleno: la voz de marca es de asesor técnico
+  // directo, y el mensaje se pega en un chat donde ya hay conversación abierta.
   return [
-    `Hola, le comparto la cotización ${folio} de VIALUX.`,
+    `Te comparto la cotización ${folio} de VIALUX.`,
     "",
     "📋 Resumen:",
     resumen,
     "",
-    "Adjunto el PDF con el detalle completo. Quedo atento a cualquier duda.",
-    "— Augusto Robles · VIALUX",
+    "Adjunto el PDF con el detalle completo.",
   ].join("\n");
 }
 
@@ -87,10 +88,10 @@ export function buildWhatsAppUrl(
   pdfUrl?: string | null,
 ) {
   const tel = (state.telefono || "").replace(/\D/g, "");
-  const liga = pdfUrl ? `\n\nDescargue su cotización en PDF aquí:\n${pdfUrl}` : "";
-  const msg = `Hola ${state.cliente}, le comparto la cotización ${folio} de VIALUX por un total de ${formatMoney(
+  const liga = pdfUrl ? `\n\nDescarga tu cotización en PDF aquí:\n${pdfUrl}` : "";
+  const msg = `Hola ${state.cliente}, te comparto la cotización ${folio} de VIALUX por un total de ${formatMoney(
     total,
-  )} MXN. Vigencia: ${VIGENCIA_DIAS} días.${liga}\n\n— Augusto Robles · VIALUX`;
+  )} MXN. Vigencia: ${VIGENCIA_DIAS} días.${liga}`;
   return `https://wa.me/${tel}?text=${encodeURIComponent(msg)}`;
 }
 
