@@ -79,14 +79,9 @@ detalle completo." Aplica al modal de copiar y al botón de WhatsApp directo.
   Del mismo artículo se DESCARTA la generación de creativo con IA (contradice
   el dato propio: $35 vs $20) y la cadencia de muchas variantes (con ~90
   conversaciones/mes fragmentar impide salir del aprendizaje).
-- **Dominio propio para la app** — hoy vive en
-  `pixel-perfect-clone-78286.lovable.app`. Plan: `control.vialuxmty.com`
-  (subdominio, NO la raíz — esa queda para la landing pública). Lovable →
-  Settings → Domains → Connect domain; el registro se crea en **Cloudflare**
-  (ahí está el DNS de vialuxmty.com). ⚠️ El registro debe quedar en **DNS only
-  (nube GRIS)**: con el proxy naranja la verificación y el SSL fallan. No afecta
-  al webhook (vive en Supabase) ni tira la URL vieja. Después: actualizar en Meta
-  la URL del aviso de privacidad a `control.vialuxmty.com/privacidad`.
+- **Actualizar en Meta la URL del aviso de privacidad** a
+  `https://control.vialuxmty.com/privacidad` (hoy apunta al dominio de Lovable,
+  que sigue vivo — no urge, pero se ve mejor en la revisión de verificación).
 - **Estructura de portafolios en Meta** — renombrar "Celosias" a la razón social
   de la CSF, sacar Lattice Works a su propio portafolio, quitar/despublicar CRG
   Safety. Requisito previo a la Business Verification.
@@ -97,7 +92,18 @@ detalle completo." Aplica al modal de copiar y al botón de WhatsApp directo.
 
 ---
 
-## E · Estado del repo (3/ago)
+## E · Dominio propio ✅ (3/ago)
+
+La app vive en **https://control.vialuxmty.com** (registro A a 185.158.133.1,
+creado automáticamente por la integración de Lovable con Cloudflare; no hubo que
+capturar nada a mano). Verificado: SSL válido, `/`, `/auth` y `/privacidad`
+responden 200. La URL vieja `pixel-perfect-clone-78286.lovable.app` sigue activa,
+así que nada de lo registrado en Meta se cayó. La raíz `vialuxmty.com` queda
+libre para la landing pública.
+
+---
+
+## F · Estado del repo (3/ago)
 
 Todo está commiteado y pusheado a `main`. Últimos trabajos:
 - Motivo de pérdida + tasa de cierre + panel "por qué se pierde" + módulo Pipeline
