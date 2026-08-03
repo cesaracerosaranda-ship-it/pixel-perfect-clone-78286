@@ -201,12 +201,31 @@ falta de inventario, y proyección a N meses bajo escenarios de producción.
 - Lunes: cargar inventario real al recibir clavos y boyas (runbook §2)
 
 **Semana 2**
-- Producir 3-4 visuales nuevos del concepto "3 precios" (identidad VIALUX)
-  → **EN CURSO (2/ago):** 3 variantes en `marketing/creativos/` (v1 grafito
-  directo, v2 ficha técnica clara, v3 con foto real — pendiente de fotos).
-  Fuentes HTML editables + PNG 2160×2160 listos para Meta. Falta: fotos reales
-  del producto (César) y elegir las 2 finalistas.
-- Montar la campaña única consolidada; correr en paralelo con la actual
+- ~~Producir visuales nuevos~~ → **DECISIÓN (2/ago, César): el lanzamiento
+  reutiliza el contenido que ya corre.** La exploración en Claude Design se
+  difiere a los refreshes post-corte (el brief ya está entregado). Los v4 con
+  foto real quedan disponibles como anuncios adicionales opcionales.
+- Montar la campaña única consolidada; correr en paralelo con la actual:
+
+  **Guía de montaje (lunes 4/ago, ~1 hora, DESPUÉS de cargar inventario):**
+  1. Ads Manager → seleccionar la campaña
+     **"Ventas-Mensajes || Boyas 3 precios || Ubis || 1.12.25"** (la ganadora)
+     → **Duplicar**. Hereda objetivo Ventas→WhatsApp, público abierto y
+     ubicaciones ya probados.
+  2. Renombrar la copia: `VIALUX || Consolidada || 08.26`.
+  3. Presupuesto del conjunto: **$200/día** (rango del plan $150-250).
+  4. Dentro de la copia, **eliminar el anuncio duplicado** (un duplicado
+     normal crea una publicación NUEVA en ceros) y crear anuncio →
+     **"Usar publicación existente"** → elegir la publicación de
+     **AD Boyas 3 precios 2** (la de 211 reacciones / 14 comentarios).
+  5. Opcional: segundo anuncio con `v4a-foto-hero.png` (publicación nueva —
+     va acumulando su propia prueba social).
+  6. Publicar. **NO apagar las campañas viejas todavía** — corren en paralelo.
+  7. Días siguientes: revisar 5 min/día (gasto, conversaciones, $/conv). La
+     campaña sale de aprendizaje en ~7 días o ~50 conversaciones.
+  8. Cuando la consolidada esté estable en ≤$25/conv → apagar las 3 viejas
+     activas (Nuevas img AI, IG 10.12.25, Ubis 1.12.25) → decisión S4 antes
+     del 15.
 
 **Semana 3**
 - Corte S4: apagar campañas viejas cuando la nueva salga de aprendizaje

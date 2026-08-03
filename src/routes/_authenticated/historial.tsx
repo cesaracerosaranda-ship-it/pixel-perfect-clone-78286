@@ -649,8 +649,10 @@ function ActualizarInventarioModal({
             )}
           </div>
           <p className="font-mono text-[10px] leading-relaxed text-[#7C766A]">
-            AL CERRAR UNA VENTA EL SISTEMA DESCUENTA LAS BOYAS SOLO. USA ESTO PARA
-            REGISTRAR REABASTECIMIENTOS O CORRECCIONES DE CONTEO.
+            AL CERRAR UNA VENTA SE DESCUENTAN LAS BOYAS Y, SI LA CONFIGURACIÓN
+            LLEVA CLAVOS, UN JUEGO DE CLAVOS POR BOYA. LOS CLAVOS PUEDEN QUEDAR
+            EN NEGATIVO (JUEGOS COMPROMETIDOS POR LLEGAR). USA ESTO PARA
+            REABASTECIMIENTOS O CORRECCIONES DE CONTEO.
           </p>
         </div>
 
