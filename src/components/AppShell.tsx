@@ -8,6 +8,7 @@ import { LogOut } from "lucide-react";
 
 const tabs = [
   { to: "/", label: "Cotizador" },
+  { to: "/pipeline", label: "Pipeline" },
   { to: "/historial", label: "Historial" },
   { to: "/clientes", label: "Clientes" },
   { to: "/whatsapp", label: "WhatsApp" },

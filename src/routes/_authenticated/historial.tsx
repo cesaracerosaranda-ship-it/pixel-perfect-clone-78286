@@ -46,6 +46,10 @@ import { generateFolio } from "@/lib/vialux/quote-actions";
 import type { Tables } from "@/integrations/supabase/types";
 import { RailSection, PageTitle } from "@/components/RailSection";
 import { upsertCliente } from "@/lib/vialux/clientes";
+import {
+  MotivoPerdidaModal,
+  motivoPerdidaDe as motivoDe,
+} from "@/components/MotivoPerdidaModal";
 
 export const Route = createFileRoute("/_authenticated/historial")({
   component: HistorialPage,
@@ -679,6 +683,7 @@ function HistorialPage() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | Estado>("all");
   const [fleteRow, setFleteRow] = useState<CotizacionRow | null>(null);
+  const [perdidaRow, setPerdidaRow] = useState<CotizacionRow | null>(null);
   const [showHistorica, setShowHistorica] = useState(false);
   const [showInventario, setShowInventario] = useState(false);
 
@@ -759,6 +764,22 @@ function HistorialPage() {
       (r) => r.estado === "cotizado" || r.estado === "enviado",
     );
     const perdidas = all.filter((r) => r.estado === "perdido");
+
+    // Motivos agregados: se agrupa por la parte canónica (antes del guión largo),
+    // ordenados por DINERO perdido, no por número de casos — un motivo que
+    // tumba una venta grande importa más que tres chicas.
+    const porMotivo = new Map<string, { n: number; monto: number }>();
+    for (const r of perdidas) {
+      const m = motivoDe(r);
+      if (!m) continue;
+      const clave = m.split("—")[0].trim();
+      const acc = porMotivo.get(clave) ?? { n: 0, monto: 0 };
+      acc.n += 1;
+      acc.monto += Number(r.total);
+      porMotivo.set(clave, acc);
+    }
+
+    const decididas = cerradas.length + perdidas.length;
     return {
       total: all.length,
       valorCerrado: cerradas.reduce((s, r) => s + Number(r.total), 0),
@@ -766,24 +787,30 @@ function HistorialPage() {
       enProcesoMonto: enProceso.reduce((s, r) => s + Number(r.total), 0),
       enProceso: enProceso.length,
       perdidas: perdidas.length,
+      montoPerdido: perdidas.reduce((s, r) => s + Number(r.total), 0),
+      // Tasa de cierre sobre lo YA decidido; las que siguen en proceso no
+      // deben castigar el número.
+      winRate: decididas ? Math.round((cerradas.length / decididas) * 100) : null,
+      motivos: [...porMotivo.entries()]
+        .map(([motivo, v]) => ({ motivo, ...v }))
+        .sort((a, b) => b.monto - a.monto),
+      sinMotivo: perdidas.filter((r) => !motivoDe(r)).length,
     };
   }, [cotizacionesQuery.data]);
 
-  const changeStatus = async (id: string, estado: Estado) => {
-    if (estado === "cerrado") {
-      const row = cotizacionesQuery.data?.find((r) => r.id === id);
-      const inv = inventarioQuery.data?.boyas_disponibles ?? 0;
-      if (row && row.estado !== "cerrado" && !row.es_historica && inv < row.cantidad) {
-        toast.error(
-          `Sin stock suficiente — ${inv} boyas disponibles, se requieren ${row.cantidad}`,
-        );
-        return;
-      }
-    }
+  const aplicarEstado = async (
+    id: string,
+    estado: Estado,
+    motivoPerdida?: string | null,
+  ) => {
+    // Al salir de "perdido" se limpia el motivo: dejarlo pegado confundiría.
+    const patch: { estado: Estado; motivo_perdida?: string | null } = { estado };
+    if (estado === "perdido") patch.motivo_perdida = motivoPerdida ?? null;
+    else patch.motivo_perdida = null;
 
     const { error } = await supabase
       .from("cotizaciones")
-      .update({ estado })
+      .update(patch as never)
       .eq("id", id);
 
     if (error) {
@@ -793,9 +820,32 @@ function HistorialPage() {
       } else {
         toast.error(error.message);
       }
-    } else {
-      toast.success(`Estado: ${ESTADO_LABEL[estado]}`);
+      return false;
     }
+    toast.success(`Estado: ${ESTADO_LABEL[estado]}`);
+    return true;
+  };
+
+  const changeStatus = async (id: string, estado: Estado) => {
+    const row = cotizacionesQuery.data?.find((r) => r.id === id);
+
+    if (estado === "cerrado") {
+      const inv = inventarioQuery.data?.boyas_disponibles ?? 0;
+      if (row && row.estado !== "cerrado" && !row.es_historica && inv < row.cantidad) {
+        toast.error(
+          `Sin stock suficiente — ${inv} boyas disponibles, se requieren ${row.cantidad}`,
+        );
+        return;
+      }
+    }
+
+    // PERDIDO pasa por el modal: no se puede perder una venta sin decir por qué.
+    if (estado === "perdido" && row && row.estado !== "perdido") {
+      setPerdidaRow(row);
+      return;
+    }
+
+    await aplicarEstado(id, estado);
   };
 
   const removeRow = async (id: string) => {
@@ -877,15 +927,75 @@ function HistorialPage() {
               </div>
             </div>
             <div className="p-4 md:px-5">
-              <div className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">Registros totales</div>
-              <div className="font-mono text-[22px] font-extrabold leading-none tabular-nums">
-                {kpis.total}
+              <div className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">Tasa de cierre</div>
+              <div
+                className={`font-mono text-[22px] font-extrabold leading-none tabular-nums ${
+                  kpis.winRate === null
+                    ? "text-[#8A857C]"
+                    : kpis.winRate >= 50
+                      ? "text-[#16A34A]"
+                      : kpis.winRate >= 30
+                        ? "text-[#C79100]"
+                        : "text-[#DC2626]"
+                }`}
+              >
+                {kpis.winRate === null ? "—" : `${kpis.winRate}%`}
               </div>
               <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">
-                {kpis.perdidas} {kpis.perdidas === 1 ? "PERDIDA" : "PERDIDAS"}
+                {kpis.total} REGISTROS · {kpis.perdidas} {kpis.perdidas === 1 ? "PERDIDA" : "PERDIDAS"}
               </div>
             </div>
           </div>
+
+          {/* Por qué se pierde — el dato que antes se evaporaba */}
+          {kpis.perdidas > 0 && (
+            <div className="border-t border-border px-4 py-3.5 md:px-5">
+              <div className="mb-2.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">
+                  Por qué se pierde
+                </span>
+                <span className="font-mono text-[9px] tracking-[0.08em] text-[#DC2626]">
+                  {formatMoney(kpis.montoPerdido)} NO CERRADOS
+                </span>
+                {kpis.sinMotivo > 0 && (
+                  <span className="font-mono text-[9px] tracking-[0.08em] text-[#8A857C]">
+                    · {kpis.sinMotivo} SIN MOTIVO REGISTRADO
+                  </span>
+                )}
+              </div>
+
+              {kpis.motivos.length === 0 ? (
+                <p className="font-mono text-[10px] leading-relaxed text-[#7C766A]">
+                  AÚN NO HAY MOTIVOS CAPTURADOS. AL MARCAR UNA COTIZACIÓN COMO
+                  PERDIDA SE PEDIRÁ EL MOTIVO Y APARECERÁ AQUÍ.
+                </p>
+              ) : (
+                <div className="space-y-1.5">
+                  {kpis.motivos.map((m) => {
+                    const pct = kpis.montoPerdido
+                      ? Math.round((m.monto / kpis.montoPerdido) * 100)
+                      : 0;
+                    return (
+                      <div key={m.motivo} className="flex items-center gap-3">
+                        <div className="w-36 shrink-0 truncate text-[11px] font-semibold">
+                          {m.motivo}
+                        </div>
+                        <div className="h-2.5 flex-1 bg-[#F1EFEA]">
+                          <div
+                            className="h-full bg-[#DC2626]/70"
+                            style={{ width: `${Math.max(pct, 2)}%` }}
+                          />
+                        </div>
+                        <div className="w-32 shrink-0 text-right font-mono text-[10px] tabular-nums text-[#7C766A]">
+                          {formatMoney(m.monto)} · {m.n}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </RailSection>
 
         {/* 01 REGISTRO */}
@@ -966,6 +1076,14 @@ function HistorialPage() {
                         </td>
                         <td className="px-4 py-3 text-xs font-bold uppercase">
                           {r.cliente_nombre}
+                          {estado === "perdido" && motivoDe(r) && (
+                            <div
+                              className="mt-0.5 font-mono text-[9px] font-normal normal-case tracking-wide text-[#DC2626]"
+                              title={motivoDe(r) ?? ""}
+                            >
+                              {motivoDe(r)}
+                            </div>
+                          )}
                         </td>
                         <td className="px-4 py-3 text-xs text-muted-foreground">
                           {r.cliente_empresa || "—"}
@@ -1059,6 +1177,16 @@ function HistorialPage() {
           onDone={invalidate}
         />
       )}
+
+      <MotivoPerdidaModal
+        row={perdidaRow}
+        onOpenChange={(v) => { if (!v) setPerdidaRow(null); }}
+        onConfirm={async (motivo) => {
+          if (!perdidaRow) return;
+          const ok = await aplicarEstado(perdidaRow.id, "perdido", motivo);
+          if (ok) setPerdidaRow(null);
+        }}
+      />
 
       <RegistrarHistoricaModal
         open={showHistorica}
