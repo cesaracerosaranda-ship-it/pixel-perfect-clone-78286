@@ -142,6 +142,7 @@ export type Database = {
           incluye_flete: boolean
           iva: number | null
           margen_porcentaje: number | null
+          motivo_perdida: string | null
           municipio: string | null
           notas_internas: string | null
           precio_especial: boolean
@@ -176,6 +177,7 @@ export type Database = {
           incluye_flete?: boolean
           iva?: number | null
           margen_porcentaje?: number | null
+          motivo_perdida?: string | null
           municipio?: string | null
           notas_internas?: string | null
           precio_especial?: boolean
@@ -210,6 +212,7 @@ export type Database = {
           incluye_flete?: boolean
           iva?: number | null
           margen_porcentaje?: number | null
+          motivo_perdida?: string | null
           municipio?: string | null
           notas_internas?: string | null
           precio_especial?: boolean
