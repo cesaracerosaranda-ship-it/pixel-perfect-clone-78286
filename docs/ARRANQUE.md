@@ -52,35 +52,30 @@ dime qué archivos entraron.
 
 ---
 
-## C · Lo primero que construye Claude al retomar
+## C · Construido el 3/ago (falta aplicar migraciones)
 
-### Tarea #1 — Motivo de pérdida (spec lista, ~30 min de trabajo)
+- ✅ **Motivo de pérdida obligatorio** — modal con 6 motivos canónicos + detalle.
+- ✅ **Tasa de cierre + panel "por qué se pierde"** en el resumen de Historial
+  (motivos ordenados por DINERO perdido).
+- ✅ **Módulo Pipeline** (`/pipeline`, nueva pestaña) — kanban con $ y conteo por
+  columna, drag & drop, marca de vencida a los 7 días, mismos candados que
+  Historial.
 
-**Migración nueva** `supabase/migrations/AAAAMMDD_motivo_perdida.sql`:
-```sql
-alter table public.cotizaciones
-  add column if not exists motivo_perdida text;
+**Pendiente para que funcione:** pegar en Lovable →
+
+```
+Ejecuta tal cual, sin modificarlas, estas dos migraciones de
+supabase/migrations/: 20260802130000_inventario_clavos_trigger.sql y
+20260802190000_motivo_perdida.sql. Confírmame que quedaron aplicadas.
 ```
 
-**UI** en `src/routes/_authenticated/historial.tsx`: al cambiar estado a
-`perdido`, abrir modal (patrón del `ActualizarInventarioModal` ya existente) con:
-- Botones de motivo rápido: `precio` · `tiempo de entrega` · `sin inventario` ·
-  `eligió competencia` · `no responde` · `otro`
-- Campo de texto libre opcional (se concatena o se guarda solo si es "otro")
-- No permitir guardar sin motivo seleccionado
-- Mostrar el motivo en la fila/tarjeta de las cotizaciones perdidas
+Mientras no se apliquen: el descuento de clavos no ocurre y el motivo de pérdida
+no se guarda (la UI está escrita a prueba de eso — no truena, solo no persiste).
 
-**Por qué primero:** es la pieza de datos más barata con mayor retorno — alimenta
-el análisis de objeciones con Claude (fase D de WhatsApp) y el win-rate por
-fuente cuando llegue la atribución de anuncios.
-
-### Después, en orden (detalle en `adopcion-corteclaro.md`)
-2. Pipeline kanban (½ día) — semana del 11
-3. Cobranza / estado de pago (1 día) — semana del 11
+### Siguiente en construir (orden de `adopcion-corteclaro.md`)
+3. Cobranza / estado de pago (1 día)
 4. Rastreo público por token (1-2 días) — después del corte S4
 5. Normalización de captura (1 h)
-
----
 
 ## D · Lo que sigue pendiente de decisión o insumo
 
