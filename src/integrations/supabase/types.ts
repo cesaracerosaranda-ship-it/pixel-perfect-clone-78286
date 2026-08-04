@@ -119,6 +119,60 @@ export type Database = {
         }
         Relationships: []
       }
+      contactos: {
+        Row: {
+          cliente_id: string
+          cotizacion_id: string | null
+          created_at: string
+          cumplida: boolean
+          fecha: string
+          id: string
+          nota: string
+          proxima_accion: string | null
+          proxima_fecha: string | null
+          tipo: string
+        }
+        Insert: {
+          cliente_id: string
+          cotizacion_id?: string | null
+          created_at?: string
+          cumplida?: boolean
+          fecha?: string
+          id?: string
+          nota: string
+          proxima_accion?: string | null
+          proxima_fecha?: string | null
+          tipo?: string
+        }
+        Update: {
+          cliente_id?: string
+          cotizacion_id?: string | null
+          created_at?: string
+          cumplida?: boolean
+          fecha?: string
+          id?: string
+          nota?: string
+          proxima_accion?: string | null
+          proxima_fecha?: string | null
+          tipo?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "contactos_cliente_id_fkey"
+            columns: ["cliente_id"]
+            isOneToOne: false
+            referencedRelation: "clientes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "contactos_cotizacion_id_fkey"
+            columns: ["cotizacion_id"]
+            isOneToOne: false
+            referencedRelation: "cotizaciones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cotizaciones: {
         Row: {
           cantidad: number
