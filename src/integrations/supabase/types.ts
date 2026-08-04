@@ -132,6 +132,7 @@ export type Database = {
           es_historica: boolean
           estado: string
           estado_destino: string | null
+          estado_pago: string
           fecha: string
           flete_costo: number | null
           flete_modalidad: string | null
@@ -167,6 +168,7 @@ export type Database = {
           es_historica?: boolean
           estado?: string
           estado_destino?: string | null
+          estado_pago?: string
           fecha?: string
           flete_costo?: number | null
           flete_modalidad?: string | null
@@ -202,6 +204,7 @@ export type Database = {
           es_historica?: boolean
           estado?: string
           estado_destino?: string | null
+          estado_pago?: string
           fecha?: string
           flete_costo?: number | null
           flete_modalidad?: string | null
@@ -324,6 +327,44 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      pagos: {
+        Row: {
+          cotizacion_id: string
+          created_at: string
+          fecha: string
+          id: string
+          metodo: string
+          monto: number
+          nota: string | null
+        }
+        Insert: {
+          cotizacion_id: string
+          created_at?: string
+          fecha?: string
+          id?: string
+          metodo?: string
+          monto: number
+          nota?: string | null
+        }
+        Update: {
+          cotizacion_id?: string
+          created_at?: string
+          fecha?: string
+          id?: string
+          metodo?: string
+          monto?: number
+          nota?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pagos_cotizacion_id_fkey"
+            columns: ["cotizacion_id"]
+            isOneToOne: false
+            referencedRelation: "cotizaciones"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       wa_conversaciones: {
         Row: {
