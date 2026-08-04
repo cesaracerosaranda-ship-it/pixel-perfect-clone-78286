@@ -115,18 +115,18 @@ function Cola({
   vacio: string;
 }) {
   return (
-    <RailSection num={num} label={label} padded={false}>
-      <div className="border-b border-border px-5 py-3">
-        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <h2 className="font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[#8A6508]">
-            {titulo}
-          </h2>
-          <span className="font-mono text-[11px] tracking-[0.08em] text-[#57524A]">
-            {filas.length} {filas.length === 1 ? "PENDIENTE" : "PENDIENTES"}
-          </span>
-        </div>
-        <p className="mt-1 text-[12px] text-muted-foreground">{descripcion}</p>
-      </div>
+    <RailSection
+      num={num}
+      label={label}
+      titulo={titulo}
+      descripcion={descripcion}
+      padded={false}
+      meta={
+        <span className="font-mono text-[11px] tracking-[0.08em] text-[#57524A]">
+          {filas.length} {filas.length === 1 ? "PENDIENTE" : "PENDIENTES"}
+        </span>
+      }
+    >
       {filas.length === 0 ? (
         <p className="px-5 py-8 text-center font-mono text-[11px] uppercase tracking-[0.14em] text-[#767066]">
           {vacio}
