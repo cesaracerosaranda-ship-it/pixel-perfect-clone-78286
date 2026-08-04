@@ -90,20 +90,33 @@ grids bordeados, esquinas rectas (--radius: 0; solo toggles/radios circulares).
 ### Tokens (app)
 - Papel (fondo): #FAF9F7 · Paneles: #FFFFFF · Texto: #2E2B27
 - Bordes: #E5E2DC (fuerte) / #EFEDE8 (filas de tabla) · Thead: #F5F3EF
-- Labels/secundario: #8A857C · Terciario: #7C766A
-- Amarillo superficie: #EDBA1A (tab activa, botón PDF, badges, avatares, pill COTIZADO)
-- Dorado texto sobre blanco: #C79100 / #C99B0E — NUNCA #EDBA1A como texto sobre blanco
-- Verde: #16A34A (texto) / #10B981 (pill CERRADO) · Rojo: #DC2626
+- **Rampa de texto ACCESIBLE (ago 2026 — todos ≥4.5:1 sobre #FAF9F7):**
+  Principal #2E2B27 (13.4) · Secundario #57524A (7.4) · Terciario #6B665C (5.4) ·
+  Mínimo/placeholder #767066 (4.7). NO usar los viejos #8A857C/#7C766A/#B5B0A6:
+  reprobaban WCAG AA.
+- Amarillo superficie: #EDBA1A (tab activa, botón PDF, badges, pill COTIZADO)
+- **Dorado TEXTO: #8A6508** (5.1:1) — reemplaza #C79100/#C99B0E, que daban 2.8 y 2.6.
+  NUNCA #EDBA1A ni #C79100 como texto sobre fondo claro.
+- Verde texto: **#12843C** (4.5) — reemplaza #16A34A (3.3) · Pill CERRADO #10B981 ·
+  Rojo #DC2626 (4.6)
+- **Sobre el header/footer GRAFITO #343331 la rampa se INVIERTE** (aclarar, no
+  oscurecer): nav/footer #A8A29A (5.0) · label inventario #D9AE3A (6.1) ·
+  cifras #EDBA1A (7.0). Aplicar la rampa clara aquí deja 2.2:1 — ya pasó una vez.
+- Iconos decorativos de estado vacío: #948D80 (3.1:1, umbral de gráfico)
 - Panel TOTAL del resumen: fondo #1B1A17 con monto #EDBA1A mono 28px
-- Pills cuadradas mono 8px: COTIZADO #EDBA1A/#1B1A17, CERRADO #10B981/blanco,
+- Pills cuadradas mono 10px: COTIZADO #EDBA1A/#1B1A17, CERRADO #10B981/blanco,
   ENVIADO #E5E2DC/#1B1A17, PERDIDO #DC2626/blanco
-- Semáforo margen sobre blanco: ≥27% #16A34A · 20-26% #C79100 · <20% #DC2626
+- Semáforo margen sobre blanco: ≥27% #12843C · 20-26% #8A6508 · <20% #DC2626
 - Logo: src/assets/vialux-logo-t.png (transparente) — shell 40px, PDF 58px
 - Componentes clave: RailSection/PageTitle en src/components/RailSection.tsx
 
 ### Tipografía
 - Manrope (UI general) — JetBrains Mono (números, folios, labels, datos técnicos,
   y TODO el PDF)
+- **Escala de la APP (ago 2026, subida +2px):** 10px labels mono con tracking ·
+  11px metadatos · 12px cuerpo/labels · 13-14px texto de lectura · 22-28px KPIs.
+  NO bajar de 10px: había 185 usos entre 8 y 10px y el cuerpo más grande era 13px.
+  (El PDF conserva su propia escala — ver arriba, no se tocó.)
 
 ## Lógica de envío por CP
 
