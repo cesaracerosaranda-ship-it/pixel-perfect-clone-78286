@@ -33,6 +33,12 @@ import { useCpLookup } from "@/hooks/useCpLookup";
 import { CarriersPanel } from "./CarriersPanel";
 import { CpDistanceTool } from "./CpDistanceTool";
 import { RailSection } from "@/components/RailSection";
+import {
+  normTitulo,
+  normEmpresa,
+  normCorreo,
+  normTelefono,
+} from "@/lib/vialux/normaliza";
 
 type Props = {
   state: QuoteState;
@@ -164,6 +170,7 @@ export function QuoteForm({ state, update, errors = {} }: Props) {
               <Input
                 value={state.cliente}
                 onChange={(e) => update("cliente", e.target.value)}
+                onBlur={(e) => update("cliente", normTitulo(e.target.value))}
                 placeholder="EJ. JUAN PÉREZ"
                 className={`bg-background font-semibold${errors.cliente ? " border-[#DC2626]" : ""}`}
               />
@@ -172,6 +179,7 @@ export function QuoteForm({ state, update, errors = {} }: Props) {
               <Input
                 value={state.empresa}
                 onChange={(e) => update("empresa", e.target.value)}
+                onBlur={(e) => update("empresa", normEmpresa(e.target.value))}
                 placeholder="—"
                 className="bg-background"
               />
@@ -180,6 +188,7 @@ export function QuoteForm({ state, update, errors = {} }: Props) {
               <Input
                 value={state.telefono}
                 onChange={(e) => update("telefono", e.target.value)}
+                onBlur={(e) => update("telefono", normTelefono(e.target.value))}
                 placeholder="8112345678"
                 className="bg-background font-mono"
               />
@@ -189,6 +198,7 @@ export function QuoteForm({ state, update, errors = {} }: Props) {
                 type="email"
                 value={state.email}
                 onChange={(e) => update("email", e.target.value)}
+                onBlur={(e) => update("email", normCorreo(e.target.value))}
                 placeholder="correo@ejemplo.com"
                 className="bg-background font-mono"
               />
