@@ -6,7 +6,15 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatMoney } from "@/lib/vialux/constants";
 import type { Tables } from "@/integrations/supabase/types";
 import { RailSection, PageTitle } from "@/components/RailSection";
+import { BandaCargando, BandaError, textoError } from "@/components/EstadoConsulta";
 import { MotivoPerdidaModal } from "@/components/MotivoPerdidaModal";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown } from "lucide-react";
 
 export const Route = createFileRoute("/_authenticated/pipeline")({
   component: PipelinePage,
@@ -128,14 +136,13 @@ function PipelinePage() {
     return true;
   };
 
-  const soltar = async (destino: Estado) => {
-    const id = arrastrando;
-    setArrastrando(null);
-    setSobre(null);
-    if (!id) return;
-
-    const row = cotsQuery.data?.find((r) => r.id === id);
-    if (!row || row.estado === destino) return;
+  /**
+   * Único camino para cambiar de etapa: lo usan por igual el arrastre y el menú
+   * de la tarjeta, para que los candados no dependan de cómo se disparó la
+   * acción.
+   */
+  const mover = async (row: Cot, destino: Estado) => {
+    if (row.estado === destino) return;
 
     // Mismo candado que Historial: no se cierra lo que no se puede surtir.
     if (destino === "cerrado") {
@@ -150,7 +157,16 @@ function PipelinePage() {
       setPerdidaRow(row);
       return;
     }
-    await aplicarEstado(id, destino);
+    await aplicarEstado(row.id, destino);
+  };
+
+  const soltar = async (destino: Estado) => {
+    const id = arrastrando;
+    setArrastrando(null);
+    setSobre(null);
+    if (!id) return;
+    const row = cotsQuery.data?.find((r) => r.id === id);
+    if (row) await mover(row, destino);
   };
 
   return (
@@ -179,6 +195,14 @@ function PipelinePage() {
           </div>
         }
       />
+
+      {cotsQuery.isLoading && <BandaCargando mensaje="Cargando el embudo…" />}
+      {cotsQuery.isError && (
+        <BandaError
+          mensaje={textoError(cotsQuery.error)}
+          onReintentar={() => void cotsQuery.refetch()}
+        />
+      )}
 
       <div className="mt-6 border border-border bg-card">
         <RailSection num="00" label="EMBUDO" padded={false} last>
@@ -227,11 +251,7 @@ function PipelinePage() {
                             draggable
                             onDragStart={() => setArrastrando(r.id)}
                             onDragEnd={() => { setArrastrando(null); setSobre(null); }}
-                            onClick={() =>
-                              navigate({ to: "/", search: { duplicate: r.id, clienteId: undefined } })
-                            }
-                            title="Arrastra para cambiar estado · clic para duplicar en el cotizador"
-                            className={`cursor-grab border bg-card p-3 transition-shadow hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)] active:cursor-grabbing ${
+                            className={`group cursor-grab border bg-card p-3 transition-shadow hover:shadow-[0_2px_10px_rgba(0,0,0,0.08)] active:cursor-grabbing ${
                               arrastrando === r.id ? "opacity-40" : ""
                             } ${vencida ? "border-[#DC2626]/40" : "border-border"}`}
                           >
@@ -263,6 +283,45 @@ function PipelinePage() {
                                 {motivoDe(r)}
                               </div>
                             )}
+
+                            {/* Acciones explícitas: arrastrar es un atajo, no el único
+                                camino. Antes, cambiar de estado era imposible con
+                                teclado y el clic en la tarjeta duplicaba sin avisar. */}
+                            <div className="mt-2.5 flex items-center gap-1.5 border-t border-[#EFEDE8] pt-2">
+                              <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                  <button
+                                    type="button"
+                                    aria-label={`Mover ${r.folio} a otra etapa`}
+                                    className="flex items-center gap-1 px-1.5 py-1 font-mono text-[11px] uppercase tracking-[0.12em] text-[#57524A] transition-colors hover:bg-[#F1EFEA] hover:text-[#2E2B27] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#8A6508]"
+                                  >
+                                    Mover <ChevronDown className="h-3 w-3" aria-hidden="true" />
+                                  </button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent align="start">
+                                  {COLUMNAS.filter((c) => c.key !== col.key).map((c) => (
+                                    <DropdownMenuItem
+                                      key={c.key}
+                                      onClick={() => void mover(r, c.key)}
+                                      className="font-mono text-[12px] uppercase tracking-[0.1em]"
+                                    >
+                                      {c.label}
+                                    </DropdownMenuItem>
+                                  ))}
+                                </DropdownMenuContent>
+                              </DropdownMenu>
+
+                              <button
+                                type="button"
+                                aria-label={`Duplicar ${r.folio} en el cotizador`}
+                                onClick={() =>
+                                  navigate({ to: "/", search: { duplicate: r.id, clienteId: undefined } })
+                                }
+                                className="ml-auto px-1.5 py-1 font-mono text-[11px] uppercase tracking-[0.12em] text-[#57524A] transition-colors hover:bg-[#F1EFEA] hover:text-[#2E2B27] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-[#8A6508]"
+                              >
+                                Cotizar
+                              </button>
+                            </div>
                           </div>
                         );
                       })

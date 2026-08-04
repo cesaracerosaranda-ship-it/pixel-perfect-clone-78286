@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatMoney } from "@/lib/vialux/constants";
 import type { Tables } from "@/integrations/supabase/types";
 import { RailSection, PageTitle } from "@/components/RailSection";
+import { BandaCargando, BandaError, textoError } from "@/components/EstadoConsulta";
 
 export const Route = createFileRoute("/_authenticated/cobranza")({
   component: CobranzaPage,
@@ -323,6 +324,14 @@ function CobranzaPage() {
           </div>
         }
       />
+
+      {ventasQuery.isLoading && <BandaCargando mensaje="Cargando saldos por cobrar…" />}
+      {ventasQuery.isError && (
+        <BandaError
+          mensaje={textoError(ventasQuery.error)}
+          onReintentar={() => void ventasQuery.refetch()}
+        />
+      )}
 
       <div className="border border-border bg-card">
         {/* 00 RESUMEN */}

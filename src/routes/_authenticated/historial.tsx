@@ -45,6 +45,7 @@ import type { ProductoKey } from "@/lib/vialux/constants";
 import { generateFolio } from "@/lib/vialux/quote-actions";
 import type { Tables } from "@/integrations/supabase/types";
 import { RailSection, PageTitle } from "@/components/RailSection";
+import { BandaCargando, BandaError, textoError } from "@/components/EstadoConsulta";
 import { upsertCliente } from "@/lib/vialux/clientes";
 import {
   MotivoPerdidaModal,
@@ -877,6 +878,14 @@ function HistorialPage() {
           </Button>
         }
       />
+
+      {cotizacionesQuery.isLoading && <BandaCargando mensaje="Cargando el registro de cotizaciones…" />}
+      {cotizacionesQuery.isError && (
+        <BandaError
+          mensaje={textoError(cotizacionesQuery.error)}
+          onReintentar={() => void cotizacionesQuery.refetch()}
+        />
+      )}
 
       <div className="border border-border bg-card">
         {/* 00 INDICADORES */}
