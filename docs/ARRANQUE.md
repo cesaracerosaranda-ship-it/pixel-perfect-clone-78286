@@ -58,10 +58,30 @@ sin modificarla. Confírmame que quedó aplicada.
 arranca en "Te comparto la cotización…" y cierra en "Adjunto el PDF con el
 detalle completo." Aplica al modal de copiar y al botón de WhatsApp directo.
 
+## C2 · Construido el 3/ago (tarde) — falta migración
+
+- ✅ **Módulo Cobranza** (`/cobranza`, pestaña nueva) — ventas cerradas con
+  saldo, ordenadas de la más antigua; avance de cobro, antigüedad en semáforo
+  (0-7 / 8-30 / +30 d), desglose de pagos, registro y borrado de pagos. KPIs:
+  por cobrar, vencido +30 d, cobrado en el mes. El estado de pago lo DERIVA un
+  trigger desde los pagos (no se captura a mano).
+- ✅ **Normalización de captura** — nombre/empresa/correo/teléfono se ordenan al
+  salir del campo en el cotizador (`src/lib/vialux/normaliza.ts`, 11/11 casos).
+
+**Pendiente:** pegar en Lovable →
+
+```
+Ejecuta tal cual, sin modificarla, la migración
+supabase/migrations/20260803140000_cobranza.sql. Después regenera los tipos de
+TypeScript para que incluya la tabla `pagos`. Confírmame ambas cosas.
+```
+
+Sin la migración, Cobranza carga y muestra todo como pendiente, pero no permite
+registrar pagos.
+
 ### Siguiente en construir (orden de `adopcion-corteclaro.md`)
-3. Cobranza / estado de pago (1 día)
-4. Rastreo público por token (1-2 días) — después del corte S4
-5. Normalización de captura (1 h)
+4. **Rastreo público por token** (1-2 días) — después del corte S4. Es lo único
+   grande que queda de la lista de CorteClaro.
 
 ## D · Lo que sigue pendiente de decisión o insumo
 
