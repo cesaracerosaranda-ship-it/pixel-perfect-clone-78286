@@ -101,7 +101,7 @@ function AuthPage() {
         <div className="mb-6 flex justify-center">
           <img src={logoT} alt="VIALUX" className="h-10 w-auto" style={{ filter: "invert(1)" }} />
         </div>
-        <h1 className="mb-1 text-center font-mono text-[11px] uppercase tracking-[0.3em] text-[#8A857C]">
+        <h1 className="mb-1 text-center font-mono text-[13px] uppercase tracking-[0.3em] text-[#57524A]">
           VIALUX Control
         </h1>
         <p className="mb-6 text-center text-lg font-semibold text-[#2E2B27]">
@@ -118,7 +118,7 @@ function AuthPage() {
           Continuar con Google
         </Button>
 
-        <div className="mb-4 flex items-center gap-2 text-[10px] uppercase tracking-[0.2em] text-[#8A857C]">
+        <div className="mb-4 flex items-center gap-2 text-[12px] uppercase tracking-[0.2em] text-[#57524A]">
           <div className="h-px flex-1 bg-[#E5E2DC]" />
           <span>o correo</span>
           <div className="h-px flex-1 bg-[#E5E2DC]" />
@@ -151,7 +151,7 @@ function AuthPage() {
           <Button
             type="submit"
             disabled={busy}
-            className="w-full bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#C99B0E]"
+            className="w-full bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#8A6508]"
           >
             {mode === "signin" ? "Entrar" : "Registrarme"}
           </Button>
@@ -160,7 +160,7 @@ function AuthPage() {
         <button
           type="button"
           onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          className="mt-4 w-full text-center text-xs text-[#8A857C] hover:text-[#2E2B27]"
+          className="mt-4 w-full text-center text-xs text-[#57524A] hover:text-[#2E2B27]"
         >
           {mode === "signin" ? "¿No tienes cuenta? Crear una" : "¿Ya tienes cuenta? Iniciar sesión"}
         </button>
@@ -170,7 +170,7 @@ function AuthPage() {
             type="button"
             onClick={handleForgotPassword}
             disabled={resetting}
-            className="mt-2 w-full text-center text-xs text-[#8A857C] hover:text-[#2E2B27] disabled:opacity-50"
+            className="mt-2 w-full text-center text-xs text-[#57524A] hover:text-[#2E2B27] disabled:opacity-50"
           >
             {resetting ? "Enviando…" : "¿Olvidaste tu contraseña?"}
           </button>

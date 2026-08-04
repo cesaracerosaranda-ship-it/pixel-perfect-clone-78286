@@ -17,9 +17,9 @@ type Cot = Tables<"cotizaciones">;
 
 // El orden ES el embudo: de izquierda a derecha se avanza.
 const COLUMNAS: { key: Estado; label: string; acento: string; barra: string }[] = [
-  { key: "cotizado", label: "COTIZADO", acento: "text-[#C99B0E]", barra: "bg-[#EDBA1A]" },
-  { key: "enviado", label: "ENVIADO", acento: "text-[#4A6274]", barra: "bg-[#8A857C]" },
-  { key: "cerrado", label: "CERRADO", acento: "text-[#16A34A]", barra: "bg-[#10B981]" },
+  { key: "cotizado", label: "COTIZADO", acento: "text-[#8A6508]", barra: "bg-[#EDBA1A]" },
+  { key: "enviado", label: "ENVIADO", acento: "text-[#4A6274]", barra: "bg-[#57524A]" },
+  { key: "cerrado", label: "CERRADO", acento: "text-[#12843C]", barra: "bg-[#10B981]" },
   { key: "perdido", label: "PERDIDO", acento: "text-[#DC2626]", barra: "bg-[#DC2626]" },
 ];
 
@@ -160,17 +160,17 @@ function PipelinePage() {
         title="PIPELINE"
         right={
           <div className="flex items-baseline gap-2">
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#8A857C]">
+            <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#57524A]">
               Tasa de cierre
             </span>
             <span
               className={`font-mono text-lg font-extrabold tabular-nums ${
                 winRate === null
-                  ? "text-[#8A857C]"
+                  ? "text-[#57524A]"
                   : winRate >= 50
-                    ? "text-[#16A34A]"
+                    ? "text-[#12843C]"
                     : winRate >= 30
-                      ? "text-[#C79100]"
+                      ? "text-[#8A6508]"
                       : "text-[#DC2626]"
               }`}
             >
@@ -198,13 +198,13 @@ function PipelinePage() {
                 >
                   <div className={`h-1 ${col.barra}`} />
                   <div className="border-b border-border px-4 py-3">
-                    <div className={`font-mono text-[9px] font-bold uppercase tracking-[0.2em] ${col.acento}`}>
+                    <div className={`font-mono text-[11px] font-bold uppercase tracking-[0.2em] ${col.acento}`}>
                       {col.label}
                     </div>
                     <div className="mt-1 font-mono text-base font-extrabold tabular-nums">
                       {formatMoney(totales[col.key].monto)}
                     </div>
-                    <div className="font-mono text-[9px] tracking-[0.08em] text-[#7C766A]">
+                    <div className="font-mono text-[11px] tracking-[0.08em] text-[#6B665C]">
                       {totales[col.key].n}{" "}
                       {totales[col.key].n === 1 ? "COTIZACIÓN" : "COTIZACIONES"}
                     </div>
@@ -212,7 +212,7 @@ function PipelinePage() {
 
                   <div className="space-y-2 p-3">
                     {filas.length === 0 ? (
-                      <p className="px-1 py-6 text-center font-mono text-[9px] uppercase tracking-[0.14em] text-[#B5B0A6]">
+                      <p className="px-1 py-6 text-center font-mono text-[11px] uppercase tracking-[0.14em] text-[#767066]">
                         Vacío
                       </p>
                     ) : (
@@ -236,22 +236,22 @@ function PipelinePage() {
                             } ${vencida ? "border-[#DC2626]/40" : "border-border"}`}
                           >
                             <div className="flex items-baseline justify-between gap-2">
-                              <span className="font-mono text-[10px] font-bold text-[#C79100]">
+                              <span className="font-mono text-[12px] font-bold text-[#8A6508]">
                                 {r.folio}
                               </span>
                               <span className="font-mono text-xs font-bold tabular-nums">
                                 {formatMoney(Number(r.total))}
                               </span>
                             </div>
-                            <div className="mt-1 truncate text-[11px] font-bold uppercase">
+                            <div className="mt-1 truncate text-[13px] font-bold uppercase">
                               {r.cliente_nombre}
                             </div>
                             {r.cliente_empresa && (
-                              <div className="truncate text-[10px] text-muted-foreground">
+                              <div className="truncate text-[12px] text-muted-foreground">
                                 {r.cliente_empresa}
                               </div>
                             )}
-                            <div className="mt-1.5 flex items-center justify-between font-mono text-[9px] text-[#8A857C]">
+                            <div className="mt-1.5 flex items-center justify-between font-mono text-[11px] text-[#57524A]">
                               <span>{r.cantidad} PZS</span>
                               <span className={vencida ? "font-bold text-[#DC2626]" : ""}>
                                 {dias === 0 ? "HOY" : `${dias}D`}
@@ -259,7 +259,7 @@ function PipelinePage() {
                               </span>
                             </div>
                             {col.key === "perdido" && motivoDe(r) && (
-                              <div className="mt-1.5 border-t border-[#EFEDE8] pt-1.5 font-mono text-[9px] leading-snug text-[#DC2626]">
+                              <div className="mt-1.5 border-t border-[#EFEDE8] pt-1.5 font-mono text-[11px] leading-snug text-[#DC2626]">
                                 {motivoDe(r)}
                               </div>
                             )}
@@ -268,7 +268,7 @@ function PipelinePage() {
                       })
                     )}
                     {filas.length > 40 && (
-                      <p className="pt-1 text-center font-mono text-[9px] uppercase tracking-[0.12em] text-[#8A857C]">
+                      <p className="pt-1 text-center font-mono text-[11px] uppercase tracking-[0.12em] text-[#57524A]">
                         +{filas.length - 40} más — ver en Historial
                       </p>
                     )}
@@ -280,7 +280,7 @@ function PipelinePage() {
         </RailSection>
       </div>
 
-      <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.14em] text-[#8A857C]">
+      <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-[#57524A]">
         Arrastra una tarjeta entre columnas para cambiar su estado · Clic para
         duplicarla en el cotizador · Las de más de 7 días en proceso se marcan
         vencidas

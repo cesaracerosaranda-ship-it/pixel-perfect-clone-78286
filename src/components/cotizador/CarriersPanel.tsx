@@ -75,8 +75,8 @@ export function CarriersPanel({ cp, clientLat, clientLng }: Props) {
     return (
       <section className="border border-border bg-card p-5">
         <div className="flex items-center gap-2">
-          <Loader2 className="h-3.5 w-3.5 animate-spin text-[#C79100]" />
-          <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#C79100]">
+          <Loader2 className="h-3.5 w-3.5 animate-spin text-[#8A6508]" />
+          <span className="font-mono text-[12px] uppercase tracking-[0.16em] text-[#8A6508]">
             Cargando paqueterías…
           </span>
         </div>
@@ -91,8 +91,8 @@ export function CarriersPanel({ cp, clientLat, clientLng }: Props) {
     return (
       <section className="border border-border bg-card p-5">
         <div className="mb-3 flex items-center gap-2">
-          <Truck className="h-3.5 w-3.5 text-[#C79100]" />
-          <h3 className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#C79100]">
+          <Truck className="h-3.5 w-3.5 text-[#8A6508]" />
+          <h3 className="font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[#8A6508]">
             Paqueterías disponibles — {stateName.toUpperCase()}
           </h3>
         </div>
@@ -104,19 +104,19 @@ export function CarriersPanel({ cp, clientLat, clientLng }: Props) {
             >
               <span className="flex-1 text-sm font-medium">{c.name}</span>
               {c.nota && (
-                <span className="text-[10px] text-muted-foreground">{c.nota}</span>
+                <span className="text-[12px] text-muted-foreground">{c.nota}</span>
               )}
               {c.webUrl ? (
                 <a
                   href={c.webUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 bg-[#16A34A]/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#16A34A] transition-colors hover:bg-[#16A34A]/20"
+                  className="flex items-center gap-1 bg-[#12843C]/10 px-2.5 py-0.5 text-[12px] font-bold uppercase tracking-wider text-[#12843C] transition-colors hover:bg-[#12843C]/20"
                 >
                   WEB <ExternalLink className="h-2.5 w-2.5" />
                 </a>
               ) : (
-                <span className="bg-[#F1EFEA] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#8A857C]">
+                <span className="bg-[#F1EFEA] px-2.5 py-0.5 text-[12px] font-bold uppercase tracking-wider text-[#57524A]">
                   CONTACTAR
                 </span>
               )}
@@ -170,8 +170,8 @@ export function CarriersPanel({ cp, clientLat, clientLng }: Props) {
   return (
     <section className="border border-border bg-card p-5">
       <div className="mb-3 flex items-center gap-2">
-        <Truck className="h-3.5 w-3.5 text-[#C79100]" />
-        <h3 className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#C79100]">
+        <Truck className="h-3.5 w-3.5 text-[#8A6508]" />
+        <h3 className="font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[#8A6508]">
           Paqueterías disponibles — {stateName.toUpperCase()}
         </h3>
       </div>
@@ -194,10 +194,10 @@ function CarrierRow({ entry }: { entry: CarrierEntry }) {
       <div className="flex flex-col items-end gap-0.5">
         {hasDistance && (
           <span
-            className={`px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+            className={`px-2.5 py-0.5 text-[12px] font-bold uppercase tracking-wider ${
               isClose
-                ? "bg-[#16A34A]/10 text-[#16A34A]"
-                : "bg-[#C79100]/10 text-[#C79100]"
+                ? "bg-[#12843C]/10 text-[#12843C]"
+                : "bg-[#8A6508]/10 text-[#8A6508]"
             }`}
           >
             {isClose
@@ -210,12 +210,12 @@ function CarrierRow({ entry }: { entry: CarrierEntry }) {
             href={entry.webUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1 bg-[#16A34A]/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#16A34A] transition-colors hover:bg-[#16A34A]/20"
+            className="flex items-center gap-1 bg-[#12843C]/10 px-2.5 py-0.5 text-[12px] font-bold uppercase tracking-wider text-[#12843C] transition-colors hover:bg-[#12843C]/20"
           >
             WEB <ExternalLink className="h-2.5 w-2.5" />
           </a>
         ) : (
-          <span className="bg-[#F1EFEA] px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-[#8A857C]">
+          <span className="bg-[#F1EFEA] px-2.5 py-0.5 text-[12px] font-bold uppercase tracking-wider text-[#57524A]">
             CONTACTAR
           </span>
         )}

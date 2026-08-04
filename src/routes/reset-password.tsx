@@ -61,7 +61,7 @@ function ResetPasswordPage() {
         <div className="mb-6 flex justify-center">
           <img src={logoT} alt="VIALUX" className="h-10 w-auto" style={{ filter: "invert(1)" }} />
         </div>
-        <h1 className="mb-1 text-center font-mono text-[11px] uppercase tracking-[0.3em] text-[#8A857C]">
+        <h1 className="mb-1 text-center font-mono text-[13px] uppercase tracking-[0.3em] text-[#57524A]">
           VIALUX Control
         </h1>
         <p className="mb-6 text-center text-lg font-semibold text-[#2E2B27]">
@@ -69,7 +69,7 @@ function ResetPasswordPage() {
         </p>
 
         {!ready ? (
-          <p className="text-center text-sm text-[#8A857C]">
+          <p className="text-center text-sm text-[#57524A]">
             Abre este enlace desde el correo de recuperación para continuar.
           </p>
         ) : (
@@ -101,7 +101,7 @@ function ResetPasswordPage() {
             <Button
               type="submit"
               disabled={busy}
-              className="w-full bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#C99B0E]"
+              className="w-full bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#8A6508]"
             >
               {busy ? "Actualizando…" : "Guardar contraseña"}
             </Button>

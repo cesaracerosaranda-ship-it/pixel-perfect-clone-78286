@@ -174,7 +174,7 @@ function AgregarFleteModal({
 
         <div className="space-y-4 py-2">
           <div className="space-y-1.5">
-            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
+            <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">
               Paquetería
             </Label>
             <Input
@@ -185,7 +185,7 @@ function AgregarFleteModal({
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
+              <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">
                 Modalidad
               </Label>
               <Select value={form.modalidad} onValueChange={(v) => f("modalidad", v as typeof form.modalidad)}>
@@ -197,7 +197,7 @@ function AgregarFleteModal({
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
+              <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">
                 Costo del flete (MXN)
               </Label>
               <Input
@@ -228,7 +228,7 @@ function AgregarFleteModal({
               )}
               <div className="flex justify-between border-t border-border pt-1.5">
                 <span className="text-xs font-bold uppercase tracking-wide">Nuevo total</span>
-                <span className="font-mono font-bold text-[#C79100]">{formatMoney(totalNuevo)}</span>
+                <span className="font-mono font-bold text-[#8A6508]">{formatMoney(totalNuevo)}</span>
               </div>
             </div>
           )}
@@ -355,7 +355,7 @@ function RegistrarHistoricaModal({
         <div className="space-y-4 py-2">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
+              <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">
                 Fecha de la venta *
               </Label>
               <Input
@@ -366,7 +366,7 @@ function RegistrarHistoricaModal({
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
+              <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">
                 ¿Incluye factura?
               </Label>
               <div className="flex h-10 items-center gap-3 rounded-md border border-input bg-background px-3">
@@ -383,7 +383,7 @@ function RegistrarHistoricaModal({
 
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
+              <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">
                 Cliente *
               </Label>
               <Input
@@ -393,7 +393,7 @@ function RegistrarHistoricaModal({
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
+              <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">
                 Empresa
               </Label>
               <Input
@@ -405,7 +405,7 @@ function RegistrarHistoricaModal({
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
+            <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">
               Producto *
             </Label>
             <Select value={form.producto} onValueChange={(v) => f("producto", v as ProductoKey)}>
@@ -420,7 +420,7 @@ function RegistrarHistoricaModal({
 
           <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
+              <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">
                 Cantidad *
               </Label>
               <Input
@@ -432,7 +432,7 @@ function RegistrarHistoricaModal({
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
+              <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">
                 Precio unitario *
               </Label>
               <Input
@@ -444,7 +444,7 @@ function RegistrarHistoricaModal({
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
+              <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">
                 CP destino
               </Label>
               <Input
@@ -458,7 +458,7 @@ function RegistrarHistoricaModal({
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">
+            <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">
               Notas internas
             </Label>
             <Textarea
@@ -483,7 +483,7 @@ function RegistrarHistoricaModal({
               )}
               <div className="flex justify-between border-t border-border pt-1.5">
                 <span className="text-xs font-bold uppercase tracking-wide">Total</span>
-                <span className="font-mono font-bold text-[#C79100]">{formatMoney(total)}</span>
+                <span className="font-mono font-bold text-[#8A6508]">{formatMoney(total)}</span>
               </div>
             </div>
           )}
@@ -526,7 +526,7 @@ function StepperInput({
 
   return (
     <div className="space-y-1.5">
-      <Label className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#8A857C]">
+      <Label className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#57524A]">
         {label}
       </Label>
       <div className="flex items-stretch">
@@ -652,7 +652,7 @@ function ActualizarInventarioModal({
               />
             )}
           </div>
-          <p className="font-mono text-[10px] leading-relaxed text-[#7C766A]">
+          <p className="font-mono text-[12px] leading-relaxed text-[#6B665C]">
             AL CERRAR UNA VENTA SE DESCUENTAN LAS BOYAS Y, SI LA CONFIGURACIÓN
             LLEVA CLAVOS, UN JUEGO DE CLAVOS POR BOYA. LOS CLAVOS PUEDEN QUEDAR
             EN NEGATIVO (JUEGOS COMPROMETIDOS POR LLEGAR). USA ESTO PARA
@@ -870,7 +870,7 @@ function HistorialPage() {
           <Button
             onClick={() => setShowHistorica(true)}
             variant="outline"
-            className="gap-2 font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#8A857C]"
+            className="gap-2 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-[#57524A]"
           >
             <History className="h-3.5 w-3.5" />
             + Registrar venta histórica
@@ -884,64 +884,64 @@ function HistorialPage() {
           <div className="grid grid-cols-2 md:grid-cols-4">
             <div className="group border-r border-border p-4 md:px-5">
               <div className="mb-1.5 flex items-center justify-between gap-2">
-                <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">Inventario</span>
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">Inventario</span>
                 <button
                   onClick={() => setShowInventario(true)}
                   title="Actualizar inventario"
-                  className="text-[#8A857C] opacity-40 transition-opacity hover:text-[#C79100] group-hover:opacity-100"
+                  className="text-[#57524A] opacity-40 transition-opacity hover:text-[#8A6508] group-hover:opacity-100"
                 >
                   <Pencil className="h-3 w-3" />
                 </button>
               </div>
               <div className="flex items-end gap-4">
                 <div>
-                  <div className="font-mono text-[22px] font-extrabold leading-none text-[#C79100] tabular-nums">
+                  <div className="font-mono text-[22px] font-extrabold leading-none text-[#8A6508] tabular-nums">
                     {inventarioQuery.data?.boyas_disponibles ?? "—"}
                   </div>
-                  <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">BOYAS</div>
+                  <div className="mt-0.5 font-mono text-[10px] tracking-[0.08em] text-[#6B665C]">BOYAS</div>
                 </div>
                 <div className="border-l border-border pl-4">
-                  <div className="font-mono text-[22px] font-extrabold leading-none text-[#C79100] tabular-nums">
+                  <div className="font-mono text-[22px] font-extrabold leading-none text-[#8A6508] tabular-nums">
                     {clavosSupported ? clavosDisponibles.toLocaleString("es-MX") : "—"}
                   </div>
-                  <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">CLAVOS</div>
+                  <div className="mt-0.5 font-mono text-[10px] tracking-[0.08em] text-[#6B665C]">CLAVOS</div>
                 </div>
               </div>
             </div>
             <div className="border-r border-border p-4 md:px-5">
-              <div className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">Ventas cerradas</div>
-              <div className="font-mono text-[22px] font-extrabold leading-none text-[#16A34A] tabular-nums">
+              <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">Ventas cerradas</div>
+              <div className="font-mono text-[22px] font-extrabold leading-none text-[#12843C] tabular-nums">
                 {formatMoney(kpis.valorCerrado)}
               </div>
-              <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">
+              <div className="mt-0.5 font-mono text-[10px] tracking-[0.08em] text-[#6B665C]">
                 {kpis.cierres} {kpis.cierres === 1 ? "CIERRE" : "CIERRES"}
               </div>
             </div>
             <div className="border-r border-border p-4 md:px-5">
-              <div className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">En proceso</div>
+              <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">En proceso</div>
               <div className="font-mono text-[22px] font-extrabold leading-none tabular-nums">
                 {formatMoney(kpis.enProcesoMonto)}
               </div>
-              <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">
+              <div className="mt-0.5 font-mono text-[10px] tracking-[0.08em] text-[#6B665C]">
                 {kpis.enProceso} {kpis.enProceso === 1 ? "COTIZACIÓN" : "COTIZACIONES"}
               </div>
             </div>
             <div className="p-4 md:px-5">
-              <div className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">Tasa de cierre</div>
+              <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">Tasa de cierre</div>
               <div
                 className={`font-mono text-[22px] font-extrabold leading-none tabular-nums ${
                   kpis.winRate === null
-                    ? "text-[#8A857C]"
+                    ? "text-[#57524A]"
                     : kpis.winRate >= 50
-                      ? "text-[#16A34A]"
+                      ? "text-[#12843C]"
                       : kpis.winRate >= 30
-                        ? "text-[#C79100]"
+                        ? "text-[#8A6508]"
                         : "text-[#DC2626]"
                 }`}
               >
                 {kpis.winRate === null ? "—" : `${kpis.winRate}%`}
               </div>
-              <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">
+              <div className="mt-0.5 font-mono text-[10px] tracking-[0.08em] text-[#6B665C]">
                 {kpis.total} REGISTROS · {kpis.perdidas} {kpis.perdidas === 1 ? "PERDIDA" : "PERDIDAS"}
               </div>
             </div>
@@ -951,21 +951,21 @@ function HistorialPage() {
           {kpis.perdidas > 0 && (
             <div className="border-t border-border px-4 py-3.5 md:px-5">
               <div className="mb-2.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">
+                <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">
                   Por qué se pierde
                 </span>
-                <span className="font-mono text-[9px] tracking-[0.08em] text-[#DC2626]">
+                <span className="font-mono text-[11px] tracking-[0.08em] text-[#DC2626]">
                   {formatMoney(kpis.montoPerdido)} NO CERRADOS
                 </span>
                 {kpis.sinMotivo > 0 && (
-                  <span className="font-mono text-[9px] tracking-[0.08em] text-[#8A857C]">
+                  <span className="font-mono text-[11px] tracking-[0.08em] text-[#57524A]">
                     · {kpis.sinMotivo} SIN MOTIVO REGISTRADO
                   </span>
                 )}
               </div>
 
               {kpis.motivos.length === 0 ? (
-                <p className="font-mono text-[10px] leading-relaxed text-[#7C766A]">
+                <p className="font-mono text-[12px] leading-relaxed text-[#6B665C]">
                   AÚN NO HAY MOTIVOS CAPTURADOS. AL MARCAR UNA COTIZACIÓN COMO
                   PERDIDA SE PEDIRÁ EL MOTIVO Y APARECERÁ AQUÍ.
                 </p>
@@ -977,7 +977,7 @@ function HistorialPage() {
                       : 0;
                     return (
                       <div key={m.motivo} className="flex items-center gap-3">
-                        <div className="w-36 shrink-0 truncate text-[11px] font-semibold">
+                        <div className="w-36 shrink-0 truncate text-[13px] font-semibold">
                           {m.motivo}
                         </div>
                         <div className="h-2.5 flex-1 bg-[#F1EFEA]">
@@ -986,7 +986,7 @@ function HistorialPage() {
                             style={{ width: `${Math.max(pct, 2)}%` }}
                           />
                         </div>
-                        <div className="w-32 shrink-0 text-right font-mono text-[10px] tabular-nums text-[#7C766A]">
+                        <div className="w-32 shrink-0 text-right font-mono text-[12px] tabular-nums text-[#6B665C]">
                           {formatMoney(m.monto)} · {m.n}
                         </div>
                       </div>
@@ -1025,7 +1025,7 @@ function HistorialPage() {
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="border-b border-border bg-[#F5F3EF] font-mono text-[8px] uppercase tracking-[0.2em] text-[#8A857C]">
+              <thead className="border-b border-border bg-[#F5F3EF] font-mono text-[10px] uppercase tracking-[0.2em] text-[#57524A]">
                 <tr>
                   <th className="px-4 py-3 text-left font-bold">Folio</th>
                   <th className="px-4 py-3 text-left font-bold">Fecha</th>
@@ -1061,11 +1061,11 @@ function HistorialPage() {
                         {/* Folio + badges */}
                         <td className="px-4 py-3">
                           <div className="flex flex-wrap items-center gap-1.5">
-                            <span className="font-mono text-xs font-bold text-[#C79100]">
+                            <span className="font-mono text-xs font-bold text-[#8A6508]">
                               {r.folio}
                             </span>
                             {r.es_historica && (
-                              <span className="bg-[#F1EFEA] px-1.5 py-0.5 font-mono text-[8px] font-bold uppercase tracking-wider text-[#8A857C]">
+                              <span className="bg-[#F1EFEA] px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-[#57524A]">
                                 HISTÓRICA
                               </span>
                             )}
@@ -1078,7 +1078,7 @@ function HistorialPage() {
                           {r.cliente_nombre}
                           {estado === "perdido" && motivoDe(r) && (
                             <div
-                              className="mt-0.5 font-mono text-[9px] font-normal normal-case tracking-wide text-[#DC2626]"
+                              className="mt-0.5 font-mono text-[11px] font-normal normal-case tracking-wide text-[#DC2626]"
                               title={motivoDe(r) ?? ""}
                             >
                               {motivoDe(r)}
@@ -1096,7 +1096,7 @@ function HistorialPage() {
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <button
-                                className={`px-2 py-1 font-mono text-[8px] font-bold uppercase tracking-[0.12em] ${ESTADO_CLASS[estado]}`}
+                                className={`px-2 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.12em] ${ESTADO_CLASS[estado]}`}
                               >
                                 {ESTADO_LABEL[estado]}
                               </button>
@@ -1122,7 +1122,7 @@ function HistorialPage() {
                                 onClick={() => setFleteRow(r)}
                                 title="Agregar flete (crear revisión)"
                               >
-                                <Truck className="h-4 w-4 text-[#8A857C]" />
+                                <Truck className="h-4 w-4 text-[#57524A]" />
                               </Button>
                             )}
                             <Button

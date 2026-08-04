@@ -64,8 +64,8 @@ function bucketDe(dias: number): "corriente" | "medio" | "vencido" {
 }
 
 const BUCKET_COLOR = {
-  corriente: "text-[#16A34A]",
-  medio: "text-[#C79100]",
+  corriente: "text-[#12843C]",
+  medio: "text-[#8A6508]",
   vencido: "text-[#DC2626]",
 } as const;
 
@@ -132,18 +132,18 @@ function RegistrarPagoModal({
         {venta && (
           <div className="space-y-4 py-1">
             <div className="border border-border bg-[#FAF9F7] px-3 py-2">
-              <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#8A857C]">
+              <div className="font-mono text-[12px] uppercase tracking-[0.16em] text-[#57524A]">
                 {venta.folio} · TOTAL {formatMoney(Number(venta.total))}
               </div>
               <div className="mt-0.5 text-xs font-bold uppercase">{venta.cliente_nombre}</div>
-              <div className="mt-1 font-mono text-[11px] font-bold text-[#DC2626]">
+              <div className="mt-1 font-mono text-[13px] font-bold text-[#DC2626]">
                 SALDO {formatMoney(saldo)}
               </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#8A857C]">
+                <Label className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#57524A]">
                   Monto
                 </Label>
                 <Input
@@ -157,13 +157,13 @@ function RegistrarPagoModal({
                 <button
                   type="button"
                   onClick={() => setMonto(String(saldo.toFixed(2)))}
-                  className="font-mono text-[9px] uppercase tracking-[0.14em] text-[#C79100] hover:underline"
+                  className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A6508] hover:underline"
                 >
                   Liquidar — {formatMoney(saldo)}
                 </button>
               </div>
               <div className="space-y-1.5">
-                <Label className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#8A857C]">
+                <Label className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#57524A]">
                   Fecha
                 </Label>
                 <Input type="date" value={fecha} onChange={(e) => setFecha(e.target.value)} className="font-mono" />
@@ -171,7 +171,7 @@ function RegistrarPagoModal({
             </div>
 
             <div className="space-y-1.5">
-              <Label className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#8A857C]">
+              <Label className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#57524A]">
                 Método
               </Label>
               <Select value={metodo} onValueChange={setMetodo}>
@@ -183,7 +183,7 @@ function RegistrarPagoModal({
             </div>
 
             <div className="space-y-1.5">
-              <Label className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#8A857C]">
+              <Label className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#57524A]">
                 Nota (opcional)
               </Label>
               <Textarea
@@ -199,7 +199,7 @@ function RegistrarPagoModal({
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Cancelar</Button>
-          <Button onClick={guardar} disabled={saving} className="bg-[#16A34A] text-white hover:bg-[#16A34A]/90">
+          <Button onClick={guardar} disabled={saving} className="bg-[#12843C] text-white hover:bg-[#12843C]/90">
             {saving ? "Guardando…" : "Registrar"}
           </Button>
         </DialogFooter>
@@ -314,7 +314,7 @@ function CobranzaPage() {
         title="POR COBRAR"
         right={
           <div className="text-right">
-            <div className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#8A857C]">
+            <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#57524A]">
               Saldo total
             </div>
             <div className="font-mono text-xl font-extrabold tabular-nums text-[#DC2626]">
@@ -329,46 +329,46 @@ function CobranzaPage() {
         <RailSection num="00" label="RESUMEN" padded={false}>
           <div className="grid grid-cols-2 md:grid-cols-4">
             <div className="border-r border-border p-4 md:px-5">
-              <div className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">
+              <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">
                 Por cobrar
               </div>
               <div className="font-mono text-[22px] font-extrabold leading-none tabular-nums">
                 {formatMoney(kpis.porCobrar)}
               </div>
-              <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">
+              <div className="mt-0.5 font-mono text-[10px] tracking-[0.08em] text-[#6B665C]">
                 {kpis.n} {kpis.n === 1 ? "VENTA" : "VENTAS"}
               </div>
             </div>
             <div className="border-r border-border p-4 md:px-5">
-              <div className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">
+              <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">
                 Vencido +30 días
               </div>
               <div className="font-mono text-[22px] font-extrabold leading-none tabular-nums text-[#DC2626]">
                 {formatMoney(kpis.vencido)}
               </div>
-              <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">
+              <div className="mt-0.5 font-mono text-[10px] tracking-[0.08em] text-[#6B665C]">
                 LO QUE HAY QUE PERSEGUIR
               </div>
             </div>
             <div className="border-r border-border p-4 md:px-5">
-              <div className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">
+              <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">
                 Cobrado este mes
               </div>
-              <div className="font-mono text-[22px] font-extrabold leading-none tabular-nums text-[#16A34A]">
+              <div className="font-mono text-[22px] font-extrabold leading-none tabular-nums text-[#12843C]">
                 {formatMoney(kpis.cobradoMes)}
               </div>
             </div>
             <div className="p-4 md:px-5">
-              <div className="mb-2 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">
+              <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">
                 Antigüedad
               </div>
-              <div className="space-y-1 font-mono text-[10px] tabular-nums">
+              <div className="space-y-1 font-mono text-[12px] tabular-nums">
                 <div className="flex justify-between gap-2">
-                  <span className="text-[#16A34A]">0-7 D</span>
+                  <span className="text-[#12843C]">0-7 D</span>
                   <span>{formatMoney(kpis.buckets.corriente)}</span>
                 </div>
                 <div className="flex justify-between gap-2">
-                  <span className="text-[#C79100]">8-30 D</span>
+                  <span className="text-[#8A6508]">8-30 D</span>
                   <span>{formatMoney(kpis.buckets.medio)}</span>
                 </div>
                 <div className="flex justify-between gap-2">
@@ -384,10 +384,10 @@ function CobranzaPage() {
         <RailSection num="01" label="SALDOS" padded={false} last>
           {filas.length === 0 ? (
             <div className="px-6 py-14 text-center">
-              <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-[#8A857C]">
+              <p className="font-mono text-[13px] uppercase tracking-[0.14em] text-[#57524A]">
                 Sin saldos pendientes
               </p>
-              <p className="mt-1.5 font-mono text-[9px] uppercase tracking-[0.1em] text-[#B5B0A6]">
+              <p className="mt-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-[#767066]">
                 Aquí aparecen las ventas cerradas que aún no están liquidadas
               </p>
             </div>
@@ -401,10 +401,10 @@ function CobranzaPage() {
                     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3.5 transition-colors hover:bg-[#EDBA1A]/[0.04]">
                       <div className="min-w-[190px] flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="font-mono text-xs font-bold text-[#C79100]">
+                          <span className="font-mono text-xs font-bold text-[#8A6508]">
                             {f.venta.folio}
                           </span>
-                          <span className={`font-mono text-[9px] font-bold tabular-nums ${BUCKET_COLOR[f.bucket]}`}>
+                          <span className={`font-mono text-[11px] font-bold tabular-nums ${BUCKET_COLOR[f.bucket]}`}>
                             {f.dias}D
                           </span>
                         </div>
@@ -412,7 +412,7 @@ function CobranzaPage() {
                           {f.venta.cliente_nombre}
                         </div>
                         {f.venta.cliente_empresa && (
-                          <div className="text-[10px] text-muted-foreground">
+                          <div className="text-[12px] text-muted-foreground">
                             {f.venta.cliente_empresa}
                           </div>
                         )}
@@ -421,9 +421,9 @@ function CobranzaPage() {
                       {/* Avance de cobro */}
                       <div className="w-40">
                         <div className="h-2 bg-[#F1EFEA]">
-                          <div className="h-full bg-[#16A34A]" style={{ width: `${pct}%` }} />
+                          <div className="h-full bg-[#12843C]" style={{ width: `${pct}%` }} />
                         </div>
-                        <div className="mt-1 font-mono text-[9px] text-[#7C766A]">
+                        <div className="mt-1 font-mono text-[11px] text-[#6B665C]">
                           {pct}% · {formatMoney(f.pagado)} DE {formatMoney(f.total)}
                         </div>
                       </div>
@@ -432,7 +432,7 @@ function CobranzaPage() {
                         <div className="font-mono text-sm font-bold tabular-nums text-[#DC2626]">
                           {formatMoney(f.saldo)}
                         </div>
-                        <div className="font-mono text-[8px] uppercase tracking-[0.12em] text-[#7C766A]">
+                        <div className="font-mono text-[10px] uppercase tracking-[0.12em] text-[#6B665C]">
                           Saldo
                         </div>
                       </div>
@@ -443,7 +443,7 @@ function CobranzaPage() {
                             size="sm"
                             variant="ghost"
                             onClick={() => setDetalle(abierto ? null : f.venta.id)}
-                            className="font-mono text-[9px] uppercase tracking-[0.1em]"
+                            className="font-mono text-[11px] uppercase tracking-[0.1em]"
                           >
                             {f.pagos.length} {f.pagos.length === 1 ? "pago" : "pagos"}
                           </Button>
@@ -451,7 +451,7 @@ function CobranzaPage() {
                         <Button
                           size="sm"
                           onClick={() => setPagoVenta(f.venta)}
-                          className="bg-[#EDBA1A] font-mono text-[9px] uppercase tracking-[0.1em] text-[#1B1A17] hover:bg-[#EDBA1A]/90"
+                          className="bg-[#EDBA1A] font-mono text-[11px] uppercase tracking-[0.1em] text-[#1B1A17] hover:bg-[#EDBA1A]/90"
                         >
                           Registrar pago
                         </Button>
@@ -462,19 +462,19 @@ function CobranzaPage() {
                       <div className="border-t border-[#EFEDE8] bg-[#FAF9F7] px-5 py-3">
                         <div className="space-y-1.5">
                           {f.pagos.map((p) => (
-                            <div key={p.id} className="flex items-center gap-3 font-mono text-[10px]">
-                              <span className="w-24 text-[#7C766A]">
+                            <div key={p.id} className="flex items-center gap-3 font-mono text-[12px]">
+                              <span className="w-24 text-[#6B665C]">
                                 {new Date(p.fecha).toLocaleDateString("es-MX")}
                               </span>
-                              <span className="w-28 font-bold tabular-nums text-[#16A34A]">
+                              <span className="w-28 font-bold tabular-nums text-[#12843C]">
                                 {formatMoney(Number(p.monto))}
                               </span>
-                              <span className="w-32 text-[#8A857C]">{p.metodo}</span>
-                              <span className="flex-1 truncate text-[#8A857C]">{p.nota ?? ""}</span>
+                              <span className="w-32 text-[#57524A]">{p.metodo}</span>
+                              <span className="flex-1 truncate text-[#57524A]">{p.nota ?? ""}</span>
                               <button
                                 onClick={() => borrarPago(p.id)}
                                 title="Eliminar pago"
-                                className="text-[#B5B0A6] transition-colors hover:text-[#DC2626]"
+                                className="text-[#767066] transition-colors hover:text-[#DC2626]"
                               >
                                 <Trash2 className="h-3.5 w-3.5" />
                               </button>
@@ -491,7 +491,7 @@ function CobranzaPage() {
         </RailSection>
       </div>
 
-      <p className="mt-3 font-mono text-[9px] uppercase tracking-[0.14em] text-[#8A857C]">
+      <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-[#57524A]">
         Solo aparecen ventas CERRADAS con saldo · Ordenadas de la más antigua a
         la más reciente · El estado de pago se calcula solo a partir de los pagos
         registrados

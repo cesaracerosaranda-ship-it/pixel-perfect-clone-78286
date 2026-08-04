@@ -56,7 +56,7 @@ export const Route = createFileRoute("/.lovable/oauth/consent")({
         <h1 className="mb-2 text-lg font-semibold text-[#2E2B27]">
           No se pudo cargar esta autorización
         </h1>
-        <p className="text-sm text-[#8A857C]">
+        <p className="text-sm text-[#57524A]">
           {String((error as Error)?.message ?? error)}
         </p>
       </div>
@@ -96,7 +96,7 @@ function Consent() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#FAF9F7] px-4">
       <div className="w-full max-w-md rounded-none border border-[#E5E2DC] bg-white p-8">
-        <p className="mb-2 font-mono text-[10px] uppercase tracking-[0.3em] text-[#8A857C]">
+        <p className="mb-2 font-mono text-[12px] uppercase tracking-[0.3em] text-[#57524A]">
           VIALUX Control
         </p>
         <h1 className="mb-4 text-xl font-semibold text-[#2E2B27]">
@@ -117,7 +117,7 @@ function Consent() {
           <Button
             onClick={() => decide(true)}
             disabled={busy}
-            className="flex-1 bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#C99B0E]"
+            className="flex-1 bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#8A6508]"
           >
             Aprobar
           </Button>

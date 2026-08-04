@@ -20,13 +20,13 @@ function Seccion({
   return (
     <section className="grid grid-cols-[48px_1fr] border-b border-border">
       <div className="flex flex-col items-center border-r border-border pt-6">
-        <span className="font-mono text-xs font-bold text-[#C79100]">{num}</span>
+        <span className="font-mono text-xs font-bold text-[#8A6508]">{num}</span>
       </div>
       <div className="px-5 py-6 md:px-8">
-        <h2 className="mb-3 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-[#C79100]">
+        <h2 className="mb-3 font-mono text-[13px] font-bold uppercase tracking-[0.2em] text-[#8A6508]">
           {titulo}
         </h2>
-        <div className="space-y-3 text-[13px] leading-relaxed text-[#2E2B27]">
+        <div className="space-y-3 text-[14px] leading-relaxed text-[#2E2B27]">
           {children}
         </div>
       </div>
@@ -41,13 +41,13 @@ function AvisoPrivacidad() {
         style={{
           height: "2px",
           background:
-            "linear-gradient(to right, transparent 0%, #C99B0E 20%, #EDBA1A 50%, #C99B0E 80%, transparent 100%)",
+            "linear-gradient(to right, transparent 0%, #8A6508 20%, #EDBA1A 50%, #8A6508 80%, transparent 100%)",
         }}
       />
       <header className="border-b border-[#3A3936] bg-[#343331]">
         <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-6 py-4">
           <img src={logoT} alt="VIALUX" className="h-9 w-auto" />
-          <span className="font-mono text-[9px] uppercase tracking-[0.24em] text-[#9B968E]">
+          <span className="font-mono text-[11px] uppercase tracking-[0.24em] text-[#A8A29A]">
             Aviso de Privacidad
           </span>
         </div>
@@ -55,13 +55,13 @@ function AvisoPrivacidad() {
 
       <main className="mx-auto w-full max-w-3xl px-6 py-10">
         <div className="mb-6">
-          <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#7C766A]">
+          <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-[#6B665C]">
             Documento legal · VIALUX
           </div>
           <h1 className="mt-1 text-2xl font-extrabold uppercase tracking-[0.06em] text-[#2E2B27]">
             Aviso de Privacidad
           </h1>
-          <p className="mt-2 font-mono text-[10px] uppercase tracking-[0.1em] text-[#8A857C]">
+          <p className="mt-2 font-mono text-[12px] uppercase tracking-[0.1em] text-[#57524A]">
             Última actualización: {ACTUALIZADO}
           </p>
         </div>
@@ -78,7 +78,7 @@ function AvisoPrivacidad() {
               Contacto:{" "}
               <a
                 href={`mailto:${CONTACT_EMAIL.toLowerCase()}`}
-                className="font-semibold text-[#C79100] underline-offset-2 hover:underline"
+                className="font-semibold text-[#8A6508] underline-offset-2 hover:underline"
               >
                 {CONTACT_EMAIL.toLowerCase()}
               </a>{" "}
@@ -163,7 +163,7 @@ function AvisoPrivacidad() {
               Para ejercer estos derechos, escriba a{" "}
               <a
                 href={`mailto:${CONTACT_EMAIL.toLowerCase()}`}
-                className="font-semibold text-[#C79100] underline-offset-2 hover:underline"
+                className="font-semibold text-[#8A6508] underline-offset-2 hover:underline"
               >
                 {CONTACT_EMAIL.toLowerCase()}
               </a>{" "}
@@ -192,7 +192,7 @@ function AvisoPrivacidad() {
           </Seccion>
         </div>
 
-        <p className="mt-6 text-center font-mono text-[9px] uppercase tracking-[0.2em] text-[#8A857C]">
+        <p className="mt-6 text-center font-mono text-[11px] uppercase tracking-[0.2em] text-[#57524A]">
           VIALUX · Señalización vial de precisión · Monterrey, Nuevo León, México
         </p>
       </main>

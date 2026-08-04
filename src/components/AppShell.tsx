@@ -33,7 +33,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         style={{
           height: "2px",
           background:
-            "linear-gradient(to right, transparent 0%, #C99B0E 20%, #EDBA1A 50%, #C99B0E 80%, transparent 100%)",
+            "linear-gradient(to right, transparent 0%, #8A6508 20%, #EDBA1A 50%, #8A6508 80%, transparent 100%)",
         }}
       />
 
@@ -55,10 +55,10 @@ export function AppShell({ children }: { children: ReactNode }) {
                 <Link
                   key={t.to}
                   to={t.to}
-                  className="px-4 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#8C867A] transition-colors hover:bg-white/[0.06] hover:text-white"
+                  className="px-4 py-2 font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[#A8A29A] transition-colors hover:bg-white/[0.06] hover:text-white"
                   activeProps={{
                     className:
-                      "px-4 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#EDBA1A]",
+                      "px-4 py-2 font-mono text-[12px] font-bold uppercase tracking-[0.2em] bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#EDBA1A]",
                   }}
                   activeOptions={{ exact: t.to === "/" }}
                 >
@@ -69,7 +69,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 type="button"
                 onClick={handleSignOut}
                 title="Cerrar sesión"
-                className="ml-2 flex items-center gap-1.5 px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#8C867A] transition-colors hover:bg-white/[0.06] hover:text-white"
+                className="ml-2 flex items-center gap-1.5 px-3 py-2 font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[#A8A29A] transition-colors hover:bg-white/[0.06] hover:text-white"
               >
                 <LogOut className="h-3.5 w-3.5" />
                 Salir
@@ -83,10 +83,10 @@ export function AppShell({ children }: { children: ReactNode }) {
 
       <footer className="border-t border-[#3A3936] bg-[#343331] py-3">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6">
-          <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#4A4842]">
+          <span className="font-mono text-[11px] uppercase tracking-[0.3em] text-[#4A4842]">
             © 2026 VIALUX
           </span>
-          <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#7C766A]">
+          <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#A8A29A]">
             Señalización Vial · Monterrey, N.L.
           </span>
           <div className="flex items-center gap-1.5">
@@ -94,7 +94,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#10B981] opacity-60" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#10B981]" />
             </span>
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#7C766A]">
+            <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#A8A29A]">
               En línea
             </span>
           </div>

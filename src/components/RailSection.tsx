@@ -22,9 +22,9 @@ export function RailSection({
       className={`grid grid-cols-[64px_1fr] ${last ? "" : "border-b border-border"}`}
     >
       <div className="flex flex-col items-center gap-2.5 border-r border-border pt-[18px]">
-        <div className="font-mono text-xs font-bold text-[#C79100]">{num}</div>
+        <div className="font-mono text-xs font-bold text-[#8A6508]">{num}</div>
         <div
-          className="font-mono text-[8px] uppercase tracking-[0.3em] text-[#7C766A]"
+          className="font-mono text-[10px] uppercase tracking-[0.3em] text-[#6B665C]"
           style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
         >
           {label}
@@ -48,7 +48,7 @@ export function PageTitle({
   return (
     <div className="mb-6 flex items-end justify-between">
       <div className="space-y-1">
-        <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#7C766A]">
+        <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-[#6B665C]">
           {kicker}
         </div>
         <h1 className="text-2xl font-extrabold uppercase tracking-[0.08em]">{title}</h1>

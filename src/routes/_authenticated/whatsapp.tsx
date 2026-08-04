@@ -55,13 +55,13 @@ type Mensaje = {
 
 const PIPELINE = [
   { value: "nuevo", label: "NUEVO", cls: "bg-[#EDBA1A] text-[#1B1A17]" },
-  { value: "potencial", label: "POTENCIAL", cls: "bg-[#F1EFEA] text-[#8A857C]" },
-  { value: "seguimiento", label: "SEGUIMIENTO", cls: "bg-[#C79100] text-white" },
+  { value: "potencial", label: "POTENCIAL", cls: "bg-[#F1EFEA] text-[#57524A]" },
+  { value: "seguimiento", label: "SEGUIMIENTO", cls: "bg-[#8A6508] text-white" },
   { value: "vendido", label: "VENDIDO", cls: "bg-[#10B981] text-white" },
   { value: "perdido", label: "PERDIDO", cls: "bg-[#DC2626] text-white" },
 ];
 const pipeCls = (p: string) =>
-  PIPELINE.find((x) => x.value === p)?.cls ?? "bg-[#F1EFEA] text-[#8A857C]";
+  PIPELINE.find((x) => x.value === p)?.cls ?? "bg-[#F1EFEA] text-[#57524A]";
 
 function iniciales(nombre: string, wa_id: string) {
   const base = (nombre || "").trim();
@@ -139,7 +139,7 @@ function ClientePanel({
   if (!conv.cliente_id) {
     return (
       <div className="flex items-center justify-between gap-3 border-b border-border bg-[#FAF9F7] px-3 py-2">
-        <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#8A857C]">
+        <span className="font-mono text-[11px] uppercase tracking-[0.15em] text-[#57524A]">
           Sin cliente ligado
         </span>
         <Popover open={open} onOpenChange={setOpen}>
@@ -147,7 +147,7 @@ function ClientePanel({
             <Button
               variant="outline"
               size="sm"
-              className="h-7 gap-1.5 font-mono text-[9px] uppercase tracking-[0.15em]"
+              className="h-7 gap-1.5 font-mono text-[11px] uppercase tracking-[0.15em]"
             >
               <Link2 className="h-3 w-3" /> Ligar cliente
             </Button>
@@ -165,7 +165,7 @@ function ClientePanel({
                     >
                       <div>
                         <div className="text-xs font-bold uppercase">{sugerido.nombre}</div>
-                        <div className="font-mono text-[10px] text-[#C79100]">
+                        <div className="font-mono text-[12px] text-[#8A6508]">
                           {sugerido.telefono}
                         </div>
                       </div>
@@ -182,7 +182,7 @@ function ClientePanel({
                       <div>
                         <div className="text-xs font-semibold uppercase">{c.nombre}</div>
                         {c.empresa && (
-                          <div className="text-[10px] text-muted-foreground">{c.empresa}</div>
+                          <div className="text-[12px] text-muted-foreground">{c.empresa}</div>
                         )}
                       </div>
                     </CommandItem>
@@ -200,14 +200,14 @@ function ClientePanel({
   return (
     <div className="border-b border-border bg-[#FAF9F7] px-3 py-2">
       <div className="mb-1.5 flex items-center justify-between gap-2">
-        <span className="font-mono text-[9px] uppercase tracking-[0.15em] text-[#C79100]">
+        <span className="font-mono text-[11px] uppercase tracking-[0.15em] text-[#8A6508]">
           Cliente · {conv.clientes?.nombre ?? "—"}
         </span>
         <div className="flex items-center gap-1">
           <Button
             variant="outline"
             size="sm"
-            className="h-7 gap-1.5 font-mono text-[9px] uppercase tracking-[0.15em]"
+            className="h-7 gap-1.5 font-mono text-[11px] uppercase tracking-[0.15em]"
             onClick={() =>
               navigate({
                 to: "/",
@@ -229,7 +229,7 @@ function ClientePanel({
         </div>
       </div>
       {cots.length === 0 ? (
-        <p className="font-mono text-[9px] text-muted-foreground">
+        <p className="font-mono text-[11px] text-muted-foreground">
           SIN COTIZACIONES REGISTRADAS
         </p>
       ) : (
@@ -240,8 +240,8 @@ function ClientePanel({
               className="border border-border bg-white px-2 py-1"
               title={`${q.cantidad} pzas · ${q.estado}`}
             >
-              <span className="font-mono text-[9px] font-bold text-[#C79100]">{q.folio}</span>
-              <span className="ml-1.5 font-mono text-[9px]">{formatMoney(Number(q.total))}</span>
+              <span className="font-mono text-[11px] font-bold text-[#8A6508]">{q.folio}</span>
+              <span className="ml-1.5 font-mono text-[11px]">{formatMoney(Number(q.total))}</span>
             </div>
           ))}
         </div>
@@ -397,7 +397,7 @@ function WhatsAppPage() {
         title="WhatsApp"
         right={
           totalNoLeidos > 0 ? (
-            <div className="bg-[#EDBA1A] px-3 py-1.5 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#1B1A17]">
+            <div className="bg-[#EDBA1A] px-3 py-1.5 font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[#1B1A17]">
               {totalNoLeidos} sin leer
             </div>
           ) : undefined
@@ -423,7 +423,7 @@ function WhatsAppPage() {
               <p className="p-6 text-center text-xs text-muted-foreground">Cargando…</p>
             ) : conversaciones.length === 0 ? (
               <div className="p-6 text-center">
-                <MessageCircle className="mx-auto mb-2 h-6 w-6 text-[#D8D5CE]" />
+                <MessageCircle className="mx-auto mb-2 h-6 w-6 text-[#948D80]" />
                 <p className="text-xs text-muted-foreground">
                   Aún no hay conversaciones. Llegarán aquí en cuanto un cliente escriba
                   al número conectado.
@@ -440,7 +440,7 @@ function WhatsAppPage() {
                       activa ? "bg-[#EDBA1A]/[0.06]" : "hover:bg-muted/50"
                     }`}
                   >
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center bg-[#EDBA1A] font-mono text-[11px] font-extrabold text-[#1B1A17]">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center bg-[#EDBA1A] font-mono text-[13px] font-extrabold text-[#1B1A17]">
                       {iniciales(c.nombre_contacto, c.wa_id)}
                     </div>
                     <div className="min-w-0 flex-1">
@@ -448,26 +448,26 @@ function WhatsAppPage() {
                         <span className="truncate text-xs font-bold">
                           {c.nombre_contacto || c.wa_id}
                         </span>
-                        <span className="shrink-0 font-mono text-[9px] text-muted-foreground">
+                        <span className="shrink-0 font-mono text-[11px] text-muted-foreground">
                           {horaCorta(c.ultima_actividad)}
                         </span>
                       </div>
                       <div className="mt-0.5 flex items-center gap-1.5">
-                        <span className="truncate text-[11px] text-muted-foreground">
+                        <span className="truncate text-[13px] text-muted-foreground">
                           {c.ultimo_mensaje || "—"}
                         </span>
                         {c.no_leidos > 0 && (
-                          <span className="ml-auto flex h-4 min-w-4 shrink-0 items-center justify-center bg-[#10B981] px-1 font-mono text-[9px] font-bold text-white">
+                          <span className="ml-auto flex h-4 min-w-4 shrink-0 items-center justify-center bg-[#10B981] px-1 font-mono text-[11px] font-bold text-white">
                             {c.no_leidos}
                           </span>
                         )}
                       </div>
                       <div className="mt-1 flex items-center gap-1.5">
-                        <span className={`px-1.5 py-0.5 font-mono text-[8px] font-bold uppercase tracking-wider ${pipeCls(c.pipeline)}`}>
+                        <span className={`px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider ${pipeCls(c.pipeline)}`}>
                           {PIPELINE.find((p) => p.value === c.pipeline)?.label ?? c.pipeline}
                         </span>
                         {c.clientes?.nombre && (
-                          <span className="truncate font-mono text-[8px] uppercase tracking-wider text-[#C79100]">
+                          <span className="truncate font-mono text-[10px] uppercase tracking-wider text-[#8A6508]">
                             · {c.clientes.nombre}
                           </span>
                         )}
@@ -484,7 +484,7 @@ function WhatsAppPage() {
         <div className="flex min-h-[560px] flex-col">
           {!sel ? (
             <div className="flex flex-1 flex-col items-center justify-center p-8 text-center">
-              <MessageCircle className="mb-3 h-8 w-8 text-[#D8D5CE]" />
+              <MessageCircle className="mb-3 h-8 w-8 text-[#948D80]" />
               <p className="text-sm text-muted-foreground">
                 Selecciona una conversación para ver los mensajes.
               </p>
@@ -494,17 +494,17 @@ function WhatsAppPage() {
               {/* Encabezado */}
               <div className="flex items-center justify-between gap-3 border-b border-border p-3">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center bg-[#EDBA1A] font-mono text-[11px] font-extrabold text-[#1B1A17]">
+                  <div className="flex h-9 w-9 items-center justify-center bg-[#EDBA1A] font-mono text-[13px] font-extrabold text-[#1B1A17]">
                     {iniciales(sel.nombre_contacto, sel.wa_id)}
                   </div>
                   <div>
                     <div className="text-sm font-bold">
                       {sel.nombre_contacto || sel.wa_id}
                     </div>
-                    <div className="font-mono text-[10px] text-muted-foreground">
+                    <div className="font-mono text-[12px] text-muted-foreground">
                       +{sel.wa_id}
                       {sel.clientes?.nombre && (
-                        <span className="text-[#C79100]"> · {sel.clientes.nombre}</span>
+                        <span className="text-[#8A6508]"> · {sel.clientes.nombre}</span>
                       )}
                     </div>
                   </div>
@@ -513,7 +513,7 @@ function WhatsAppPage() {
                   value={sel.pipeline}
                   onValueChange={(v) => cambiarPipeline(sel.id, v)}
                 >
-                  <SelectTrigger className="w-[150px] bg-background font-mono text-[10px] uppercase">
+                  <SelectTrigger className="w-[150px] bg-background font-mono text-[12px] uppercase">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -549,7 +549,7 @@ function WhatsAppPage() {
                         className={`flex ${saliente ? "justify-end" : "justify-start"}`}
                       >
                         <div
-                          className={`max-w-[75%] px-3 py-2 text-[13px] leading-snug ${
+                          className={`max-w-[75%] px-3 py-2 text-[14px] leading-snug ${
                             saliente
                               ? "bg-[#EDBA1A] text-[#1B1A17]"
                               : "border border-border bg-white text-[#2E2B27]"
@@ -557,7 +557,7 @@ function WhatsAppPage() {
                         >
                           <div className="whitespace-pre-wrap break-words">{m.texto}</div>
                           <div
-                            className={`mt-1 text-right font-mono text-[8px] ${saliente ? "text-[#1B1A17]/60" : "text-muted-foreground"}`}
+                            className={`mt-1 text-right font-mono text-[10px] ${saliente ? "text-[#1B1A17]/60" : "text-muted-foreground"}`}
                           >
                             {horaCorta(m.timestamp_wa)}
                           </div>
@@ -585,7 +585,7 @@ function WhatsAppPage() {
                   <Button
                     type="submit"
                     disabled={enviando || !borrador.trim()}
-                    className="shrink-0 bg-[#EDBA1A] font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#1B1A17] hover:bg-[#EDBA1A]/90"
+                    className="shrink-0 bg-[#EDBA1A] font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[#1B1A17] hover:bg-[#EDBA1A]/90"
                   >
                     {enviando ? (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />

@@ -354,7 +354,7 @@ function CotizadorPage() {
     <div className="mx-auto w-full max-w-7xl px-6 py-8">
       <div className="mb-6 flex items-end justify-between">
         <div className="space-y-1">
-          <div className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#7C766A]">
+          <div className="font-mono text-[11px] uppercase tracking-[0.3em] text-[#6B665C]">
             Módulo · Cotizaciones
           </div>
           <h1 className="text-2xl font-extrabold uppercase tracking-[0.08em]">Cotizador</h1>
@@ -380,7 +380,7 @@ function CotizadorPage() {
             <Button
               onClick={handlePdf}
               disabled={saving}
-              className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#EDBA1A]/90"
+              className="font-mono text-[12px] font-bold uppercase tracking-[0.2em] bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#EDBA1A]/90"
             >
               <Download className="mr-1.5 h-3.5 w-3.5" /> PDF
             </Button>
@@ -388,7 +388,7 @@ function CotizadorPage() {
               onClick={handleSave}
               disabled={saving || isSaved}
               variant="outline"
-              className={`font-mono text-[10px] font-bold uppercase tracking-[0.2em] ${isSaved ? "border-[#16A34A]/40 text-[#16A34A]" : ""}`}
+              className={`font-mono text-[12px] font-bold uppercase tracking-[0.2em] ${isSaved ? "border-[#12843C]/40 text-[#12843C]" : ""}`}
             >
               {isSaved ? (
                 <><CheckCircle2 className="mr-1.5 h-3.5 w-3.5" /> Guardada</>
@@ -396,16 +396,16 @@ function CotizadorPage() {
                 <><Save className="mr-1.5 h-3.5 w-3.5" /> Guardar</>
               )}
             </Button>
-            <Button onClick={handleWhatsApp} disabled={saving} variant="outline" className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#8A857C]">
+            <Button onClick={handleWhatsApp} disabled={saving} variant="outline" className="font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[#57524A]">
               <MessageCircle className="mr-1.5 h-3.5 w-3.5" /> WhatsApp
             </Button>
-            <Button onClick={handleMail} disabled={saving} variant="outline" className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#8A857C]">
+            <Button onClick={handleMail} disabled={saving} variant="outline" className="font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[#57524A]">
               <Mail className="mr-1.5 h-3.5 w-3.5" /> Correo
             </Button>
             <Button
               onClick={handleReset}
               variant="ghost"
-              className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] col-span-2 text-muted-foreground"
+              className="font-mono text-[12px] font-bold uppercase tracking-[0.2em] col-span-2 text-muted-foreground"
             >
               <RotateCcw className="mr-1.5 h-3.5 w-3.5" /> Nueva cotización
             </Button>
@@ -422,7 +422,7 @@ function CotizadorPage() {
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3 py-1">
-            <p className="font-mono text-[10px] leading-relaxed text-[#7C766A]">
+            <p className="font-mono text-[12px] leading-relaxed text-[#6B665C]">
               PDF DESCARGADO. ADJÚNTALO EN WHATSAPP Y PEGA ESTE TEXTO
               {copiado ? " (YA COPIADO)" : ""}.
             </p>

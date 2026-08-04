@@ -42,7 +42,7 @@ export function InventarioBadge() {
     n === undefined ? "—" : n.toLocaleString("es-MX");
 
   const accent = isLow ? "text-red-400" : "text-[#EDBA1A]";
-  const label = isLow ? "text-red-400" : "text-[#C99B0E]";
+  const label = isLow ? "text-red-400" : "text-[#D9AE3A]";
 
   return (
     <div
@@ -53,12 +53,12 @@ export function InventarioBadge() {
     >
       <Package className={`h-3.5 w-3.5 ${accent}`} />
       <div className="flex items-baseline gap-1.5">
-        <span className={`font-mono text-[9px] uppercase tracking-[0.2em] ${label}`}>Boyas</span>
+        <span className={`font-mono text-[11px] uppercase tracking-[0.2em] ${label}`}>Boyas</span>
         <span className={`font-mono text-sm font-bold ${accent}`}>{fmt(boyas)}</span>
       </div>
       <div className="h-3.5 w-px bg-[#EDBA1A]/25" />
       <div className="flex items-baseline gap-1.5">
-        <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#C99B0E]">Clavos</span>
+        <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#D9AE3A]">Clavos</span>
         <span className="font-mono text-sm font-bold text-[#EDBA1A]">{fmt(clavos)}</span>
       </div>
     </div>

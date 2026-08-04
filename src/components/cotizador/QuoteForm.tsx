@@ -57,7 +57,7 @@ function Field({
 }) {
   return (
     <div className="space-y-1.5">
-      <Label className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#8A857C]">
+      <Label className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#57524A]">
         {label}
       </Label>
       {children}
@@ -68,7 +68,7 @@ function Field({
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <div className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#C79100]">
+    <div className="font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[#8A6508]">
       {children}
     </div>
   );
@@ -98,7 +98,7 @@ function ClientSearch({ onSelect }: { onSelect: (c: ClienteOption) => void }) {
         <Button
           variant="outline"
           size="sm"
-          className="gap-2 font-mono text-[9px] uppercase tracking-[0.15em] text-[#8A857C]"
+          className="gap-2 font-mono text-[11px] uppercase tracking-[0.15em] text-[#57524A]"
         >
           <Search className="h-3 w-3" /> Buscar cliente existente
         </Button>
@@ -119,7 +119,7 @@ function ClientSearch({ onSelect }: { onSelect: (c: ClienteOption) => void }) {
                     <div className="font-semibold uppercase">{c.nombre}</div>
                     {c.empresa && <div className="text-xs text-muted-foreground">{c.empresa}</div>}
                     {c.contacto_nombre && (
-                      <div className="mt-0.5 text-[10px] text-[#8A857C]">
+                      <div className="mt-0.5 text-[12px] text-[#57524A]">
                         Solicita: {c.contacto_nombre}
                         {c.contacto_telefono && ` · ${c.contacto_telefono}`}
                       </div>
@@ -214,7 +214,7 @@ export function QuoteForm({ state, update, errors = {} }: Props) {
                 maxLength={5}
               />
               {state.cp.length === 5 && cpData && (
-                <p className="mt-1 font-mono text-[10px] uppercase tracking-wide text-[#7C766A]">
+                <p className="mt-1 font-mono text-[12px] uppercase tracking-wide text-[#6B665C]">
                   · {cpData.municipio}, {cpData.estado}
                 </p>
               )}
@@ -247,18 +247,18 @@ export function QuoteForm({ state, update, errors = {} }: Props) {
                   <div className="flex items-center gap-3">
                     <RadioGroupItem value={k} id={`p-${k}`} />
                     <div className="space-y-0.5">
-                      <div className="text-[13px] font-bold uppercase tracking-[0.06em]">
+                      <div className="text-[14px] font-bold uppercase tracking-[0.06em]">
                         {p.label}
                       </div>
-                      <div className="font-mono text-[9px] tracking-[0.08em] text-[#C99B0E]">
+                      <div className="font-mono text-[11px] tracking-[0.08em] text-[#8A6508]">
                         {p.sku}
                       </div>
                     </div>
                   </div>
-                  <div className="font-mono text-[11px] text-[#8C867A]">
-                    <span className="text-[#C79100]">C/F</span>{" "}
+                  <div className="font-mono text-[13px] text-[#6B665C]">
+                    <span className="text-[#8A6508]">C/F</span>{" "}
                     {formatMoney(p.conFactura)} ·{" "}
-                    <span className="text-[#8A857C]">S/F</span>{" "}
+                    <span className="text-[#57524A]">S/F</span>{" "}
                     {formatMoney(p.sinFactura)}
                   </div>
                 </label>
@@ -369,7 +369,7 @@ export function QuoteForm({ state, update, errors = {} }: Props) {
                 checked={state.incluyeFlete}
                 onCheckedChange={(v) => update("incluyeFlete", v)}
               />
-              <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-[#8C867A]">
+              <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#6B665C]">
                 Incluir flete
               </span>
             </div>
@@ -412,7 +412,7 @@ export function QuoteForm({ state, update, errors = {} }: Props) {
               </Field>
             </div>
           ) : (
-            <div className="font-mono text-[10px] uppercase tracking-[0.08em] text-[#7C766A]">
+            <div className="font-mono text-[12px] uppercase tracking-[0.08em] text-[#6B665C]">
               Sin flete — se cotiza por separado
             </div>
           )}

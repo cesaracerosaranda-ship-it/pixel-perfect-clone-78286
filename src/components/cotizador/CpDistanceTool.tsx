@@ -35,8 +35,8 @@ export function CpDistanceTool({
   return (
     <section className="border border-border bg-card p-5">
       <div className="mb-4 flex items-center gap-2">
-        <ArrowLeftRight className="h-3.5 w-3.5 text-[#C79100]" />
-        <h3 className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-[#C79100]">
+        <ArrowLeftRight className="h-3.5 w-3.5 text-[#8A6508]" />
+        <h3 className="font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[#8A6508]">
           Comparador de destino alterno
         </h3>
       </div>
@@ -44,18 +44,18 @@ export function CpDistanceTool({
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
         {/* Origen (CP del cliente) */}
         <div className="border border-border bg-background px-3 py-2.5">
-          <div className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#8A857C]">
+          <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#57524A]">
             CP del cliente
           </div>
           {originCp.length === 5 ? (
             <>
               <div className="font-mono text-sm font-bold">{originCp}</div>
-              <div className="mt-0.5 text-[10px] leading-tight text-muted-foreground">
+              <div className="mt-0.5 text-[12px] leading-tight text-muted-foreground">
                 {originMunicipio ? `${originMunicipio}, ${originEstado}` : "—"}
               </div>
             </>
           ) : (
-            <div className="mt-1 text-[10px] text-muted-foreground">
+            <div className="mt-1 text-[12px] text-muted-foreground">
               Captura el CP del cliente arriba
             </div>
           )}
@@ -65,19 +65,19 @@ export function CpDistanceTool({
         <div className="flex items-center justify-center py-1 sm:px-2">
           {km != null ? (
             <div className="text-center">
-              <div className="font-mono text-xl font-black leading-none text-[#C79100] tabular-nums">
+              <div className="font-mono text-xl font-black leading-none text-[#8A6508] tabular-nums">
                 {km}
               </div>
-              <div className="font-mono text-[8px] tracking-[0.2em] text-[#8A857C]">KM</div>
+              <div className="font-mono text-[10px] tracking-[0.2em] text-[#57524A]">KM</div>
             </div>
           ) : (
-            <ArrowLeftRight className="h-4 w-4 text-[#D8D5CE]" />
+            <ArrowLeftRight className="h-4 w-4 text-[#948D80]" />
           )}
         </div>
 
         {/* Destino alterno */}
         <div className="border border-border bg-background px-3 py-2.5">
-          <div className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#8A857C]">
+          <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#57524A]">
             CP alterno
           </div>
           <Input
@@ -88,7 +88,7 @@ export function CpDistanceTool({
             className="mt-0.5 h-7 border-0 bg-transparent p-0 font-mono text-sm font-bold shadow-none focus-visible:ring-0"
           />
           {destComplete && (
-            <div className="mt-0.5 text-[10px] leading-tight text-muted-foreground">
+            <div className="mt-0.5 text-[12px] leading-tight text-muted-foreground">
               {isFetching
                 ? "Buscando…"
                 : dest?.municipio
@@ -102,8 +102,8 @@ export function CpDistanceTool({
       {/* Mensaje de apoyo */}
       {km != null && dest && (
         <div className="mt-3 flex items-start gap-2 border border-[#EDBA1A]/25 bg-[#EDBA1A]/5 px-3 py-2.5">
-          <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#C79100]" />
-          <div className="text-[11px] leading-relaxed">
+          <MapPin className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#8A6508]" />
+          <div className="text-[13px] leading-relaxed">
             {km <= 60 ? (
               <>
                 <span className="font-bold">{dest.municipio}</span> está a{" "}
@@ -122,7 +122,7 @@ export function CpDistanceTool({
       )}
 
       {originCp.length === 5 && !originOk && (
-        <div className="mt-3 font-mono text-[10px] text-[#8A857C]">
+        <div className="mt-3 font-mono text-[12px] text-[#57524A]">
           El CP del cliente no tiene coordenada registrada; no se puede calcular la distancia.
         </div>
       )}

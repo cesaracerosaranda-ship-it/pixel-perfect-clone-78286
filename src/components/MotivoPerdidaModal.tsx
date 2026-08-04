@@ -80,7 +80,7 @@ export function MotivoPerdidaModal({
         {row && (
           <div className="space-y-4 py-1">
             <div className="border border-border bg-[#FAF9F7] px-3 py-2">
-              <div className="font-mono text-[10px] uppercase tracking-[0.16em] text-[#8A857C]">
+              <div className="font-mono text-[12px] uppercase tracking-[0.16em] text-[#57524A]">
                 {row.folio} · {row.cantidad} PZS · {formatMoney(Number(row.total))}
               </div>
               <div className="mt-0.5 text-xs font-bold uppercase">
@@ -99,7 +99,7 @@ export function MotivoPerdidaModal({
                     className={`border px-3 py-2.5 text-left text-xs font-semibold transition-colors ${
                       activo
                         ? "border-[#DC2626] bg-[#DC2626]/10 text-[#DC2626]"
-                        : "border-border bg-card text-[#2E2B27] hover:border-[#8A857C]"
+                        : "border-border bg-card text-[#2E2B27] hover:border-[#57524A]"
                     }`}
                   >
                     {m}
@@ -109,7 +109,7 @@ export function MotivoPerdidaModal({
             </div>
 
             <div className="space-y-1.5">
-              <Label className="font-mono text-[8px] uppercase tracking-[0.2em] text-[#8A857C]">
+              <Label className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#57524A]">
                 Detalle {motivo === "Otro" ? "(requerido)" : "(opcional)"}
               </Label>
               <Textarea

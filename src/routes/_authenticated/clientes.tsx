@@ -159,15 +159,15 @@ function ClientDetail({
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
         <div className="rounded-md border border-border bg-background/40 p-3 text-center">
-          <div className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Cotizaciones</div>
-          <div className="font-mono text-xl font-bold text-[#C79100]">{cliente.total_cotizaciones}</div>
+          <div className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">Cotizaciones</div>
+          <div className="font-mono text-xl font-bold text-[#8A6508]">{cliente.total_cotizaciones}</div>
         </div>
         <div className="rounded-md border border-border bg-background/40 p-3 text-center">
-          <div className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Total</div>
+          <div className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">Total</div>
           <div className="font-mono text-base font-bold">{formatMoney(cliente.total_historico)}</div>
         </div>
         <div className="rounded-md border border-border bg-background/40 p-3 text-center">
-          <div className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Promedio</div>
+          <div className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">Promedio</div>
           <div className="font-mono text-base font-bold">{formatMoney(ticketPromedio)}</div>
         </div>
       </div>
@@ -187,7 +187,7 @@ function ClientDetail({
         ) : (
           <>
             <Button variant="outline" size="icon" onClick={save}>
-              <Check className="h-4 w-4 text-[#16A34A]" />
+              <Check className="h-4 w-4 text-[#12843C]" />
             </Button>
             <Button variant="outline" size="icon" onClick={() => setEditing(false)}>
               <X className="h-4 w-4 text-[#DC2626]" />
@@ -200,38 +200,38 @@ function ClientDetail({
       {editing ? (
         <div className="space-y-4 rounded-lg border border-border bg-card p-4">
           <div>
-            <div className="mb-2 font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-[#C79100]">Dirigida a (aparece en PDF)</div>
+            <div className="mb-2 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A6508]">Dirigida a (aparece en PDF)</div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Empresa</Label>
+                <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">Empresa</Label>
                 <Input value={form.empresa} onChange={(e) => setForm((f) => ({ ...f, empresa: e.target.value }))} />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Teléfono</Label>
+                <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">Teléfono</Label>
                 <Input value={form.telefono} onChange={(e) => setForm((f) => ({ ...f, telefono: e.target.value }))} className="font-mono" />
               </div>
             </div>
             <div className="mt-3 space-y-1.5">
-              <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Email</Label>
+              <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">Email</Label>
               <Input value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
             </div>
           </div>
           <div className="h-px bg-border" />
           <div>
-            <div className="mb-2 text-[9px] font-bold uppercase tracking-[0.18em] text-[#8A857C]">Contacto (quién solicita)</div>
+            <div className="mb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-[#57524A]">Contacto (quién solicita)</div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Nombre</Label>
+                <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">Nombre</Label>
                 <Input value={form.contacto_nombre} onChange={(e) => setForm((f) => ({ ...f, contacto_nombre: e.target.value }))} placeholder="EJ. ANA MEDINA" />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Teléfono</Label>
+                <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">Teléfono</Label>
                 <Input value={form.contacto_telefono} onChange={(e) => setForm((f) => ({ ...f, contacto_telefono: e.target.value }))} className="font-mono" placeholder="8112345678" />
               </div>
             </div>
           </div>
           <div className="space-y-1.5">
-            <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Notas internas</Label>
+            <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">Notas internas</Label>
             <Textarea value={form.notas} onChange={(e) => setForm((f) => ({ ...f, notas: e.target.value }))} rows={2} />
           </div>
         </div>
@@ -239,7 +239,7 @@ function ClientDetail({
         <div className="space-y-3 rounded-lg border border-border bg-card p-4 text-sm">
           {(cliente.telefono || cliente.empresa || cliente.email) && (
             <div>
-              <div className="mb-1.5 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-[#C79100]">Dirigida a</div>
+              <div className="mb-1.5 font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-[#8A6508]">Dirigida a</div>
               <div className="space-y-1">
                 {cliente.empresa && (
                   <div className="flex justify-between">
@@ -264,7 +264,7 @@ function ClientDetail({
           )}
           {(cliente.contacto_nombre || cliente.contacto_telefono) && (
             <div>
-              <div className="mb-1.5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#8A857C]">Contacto (quien solicita)</div>
+              <div className="mb-1.5 text-[11px] font-bold uppercase tracking-[0.16em] text-[#57524A]">Contacto (quien solicita)</div>
               <div className="space-y-1">
                 {cliente.contacto_nombre && (
                   <div className="flex justify-between">
@@ -292,7 +292,7 @@ function ClientDetail({
 
       {/* Quotes */}
       <div>
-        <div className="mb-3 text-[10px] font-bold uppercase tracking-[0.16em] text-[#8A857C]">
+        <div className="mb-3 text-[12px] font-bold uppercase tracking-[0.16em] text-[#57524A]">
           Cotizaciones
         </div>
         {cliente.cotizaciones.length === 0 ? (
@@ -306,21 +306,21 @@ function ClientDetail({
               >
                 <div>
                   <div className="flex items-center gap-1.5">
-                    <span className="font-mono text-xs font-bold text-[#C79100]">{q.folio}</span>
+                    <span className="font-mono text-xs font-bold text-[#8A6508]">{q.folio}</span>
                     {q.es_historica && (
-                      <span className="bg-[#F1EFEA] px-1.5 py-0.5 font-mono text-[8px] font-bold uppercase tracking-wider text-[#8A857C]">
+                      <span className="bg-[#F1EFEA] px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-[#57524A]">
                         HISTÓRICA
                       </span>
                     )}
                   </div>
-                  <div className="font-mono text-[10px] text-muted-foreground">
+                  <div className="font-mono text-[12px] text-muted-foreground">
                     {new Date(q.fecha).toLocaleDateString("es-MX")} · {q.cantidad} pzas × {formatMoney(Number(q.precio_unitario))}
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="font-mono text-sm font-bold">{formatMoney(Number(q.total))}</span>
                   <span
-                    className={`px-2 py-0.5 font-mono text-[8px] font-bold uppercase tracking-[0.12em] ${ESTADO_CLASS[q.estado] ?? "bg-muted text-foreground"}`}
+                    className={`px-2 py-0.5 font-mono text-[10px] font-bold uppercase tracking-[0.12em] ${ESTADO_CLASS[q.estado] ?? "bg-muted text-foreground"}`}
                   >
                     {q.estado}
                   </span>
@@ -388,14 +388,14 @@ function DocumentosSection({ cliente }: { cliente: ClienteConStats }) {
 
   return (
     <div>
-      <div className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-[#8A857C]">
+      <div className="mb-3 font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-[#57524A]">
         Expediente documental
       </div>
 
       {/* Controles de carga */}
       <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_auto]">
         <Select value={tipo} onValueChange={setTipo}>
-          <SelectTrigger className="bg-background font-mono text-[10px] uppercase">
+          <SelectTrigger className="bg-background font-mono text-[12px] uppercase">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -407,7 +407,7 @@ function DocumentosSection({ cliente }: { cliente: ClienteConStats }) {
           </SelectContent>
         </Select>
         <Select value={cotizacionId} onValueChange={setCotizacionId}>
-          <SelectTrigger className="bg-background font-mono text-[10px] uppercase">
+          <SelectTrigger className="bg-background font-mono text-[12px] uppercase">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -423,7 +423,7 @@ function DocumentosSection({ cliente }: { cliente: ClienteConStats }) {
           variant="outline"
           disabled={subiendo}
           onClick={() => fileRef.current?.click()}
-          className="font-mono text-[9px] font-bold uppercase tracking-[0.15em] text-[#8A857C]"
+          className="font-mono text-[11px] font-bold uppercase tracking-[0.15em] text-[#57524A]"
         >
           {subiendo ? (
             <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
@@ -463,16 +463,16 @@ function DocumentosSection({ cliente }: { cliente: ClienteConStats }) {
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-1.5">
                     <span
-                      className={`px-1.5 py-0.5 font-mono text-[8px] font-bold uppercase tracking-wider ${
+                      className={`px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider ${
                         d.tipo === "cotizacion"
                           ? "bg-[#EDBA1A] text-[#1B1A17]"
-                          : "bg-[#F1EFEA] text-[#8A857C]"
+                          : "bg-[#F1EFEA] text-[#57524A]"
                       }`}
                     >
                       {docTipoLabel(d.tipo)}
                     </span>
                     {folio && (
-                      <span className="font-mono text-[9px] font-bold text-[#C79100]">
+                      <span className="font-mono text-[11px] font-bold text-[#8A6508]">
                         {folio}
                       </span>
                     )}
@@ -491,7 +491,7 @@ function DocumentosSection({ cliente }: { cliente: ClienteConStats }) {
                       {d.nombre_archivo}
                     </span>
                   )}
-                  <div className="font-mono text-[9px] text-muted-foreground">
+                  <div className="font-mono text-[11px] text-muted-foreground">
                     {new Date(d.created_at).toLocaleDateString("es-MX")}
                     {d.size_bytes ? ` · ${Math.max(1, Math.round(d.size_bytes / 1024))} KB` : ""}
                   </div>
@@ -564,12 +564,12 @@ function NuevoClienteDialog({
         <div className="space-y-5 py-2">
           {/* Sección: Dirigida a */}
           <div>
-            <div className="mb-3 font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-[#C79100]">
+            <div className="mb-3 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#8A6508]">
               Dirigida a — aparece en el PDF
             </div>
             <div className="space-y-3">
               <div className="space-y-1.5">
-                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Nombre *</Label>
+                <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">Nombre *</Label>
                 <Input
                   value={form.nombre}
                   onChange={f("nombre")}
@@ -579,16 +579,16 @@ function NuevoClienteDialog({
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Empresa</Label>
+                  <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">Empresa</Label>
                   <Input value={form.empresa} onChange={f("empresa")} placeholder="—" />
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Teléfono</Label>
+                  <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">Teléfono</Label>
                   <Input value={form.telefono} onChange={f("telefono")} placeholder="8112345678" className="font-mono" />
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Email</Label>
+                <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">Email</Label>
                 <Input value={form.email} onChange={f("email")} placeholder="correo@ejemplo.com" />
               </div>
             </div>
@@ -596,22 +596,22 @@ function NuevoClienteDialog({
 
           <div className="relative flex items-center gap-3">
             <div className="h-px flex-1 bg-border" />
-            <span className="text-[9px] uppercase tracking-[0.16em] text-muted-foreground">Contacto (opcional)</span>
+            <span className="text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Contacto (opcional)</span>
             <div className="h-px flex-1 bg-border" />
           </div>
 
           {/* Sección: Contacto */}
           <div>
-            <div className="mb-3 text-[9px] font-bold uppercase tracking-[0.18em] text-[#8A857C]">
+            <div className="mb-3 text-[11px] font-bold uppercase tracking-[0.18em] text-[#57524A]">
               Quién solicita la cotización
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Nombre del contacto</Label>
+                <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">Nombre del contacto</Label>
                 <Input value={form.contacto_nombre} onChange={f("contacto_nombre")} placeholder="EJ. ANA MEDINA" />
               </div>
               <div className="space-y-1.5">
-                <Label className="text-[10px] uppercase tracking-[0.14em] text-[#8A857C]">Teléfono del contacto</Label>
+                <Label className="text-[12px] uppercase tracking-[0.14em] text-[#57524A]">Teléfono del contacto</Label>
                 <Input value={form.contacto_telefono} onChange={f("contacto_telefono")} placeholder="8112345678" className="font-mono" />
               </div>
             </div>
@@ -698,7 +698,7 @@ function ClientesPage() {
         right={
           <Button
             onClick={() => setShowNew(true)}
-            className="bg-[#EDBA1A] font-mono text-[9px] font-bold uppercase tracking-[0.2em] text-[#1B1A17] hover:bg-[#EDBA1A]/90"
+            className="bg-[#EDBA1A] font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-[#1B1A17] hover:bg-[#EDBA1A]/90"
           >
             <UserPlus className="mr-1.5 h-3.5 w-3.5" /> Nuevo Cliente
           </Button>
@@ -710,25 +710,25 @@ function ClientesPage() {
         <RailSection num="00" label="INDICADORES" padded={false}>
           <div className="grid grid-cols-1 sm:grid-cols-3">
             <div className="border-r border-border p-4 md:px-5">
-              <div className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">Clientes activos</div>
-              <div className="font-mono text-[22px] font-extrabold leading-none text-[#C79100] tabular-nums">
+              <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">Clientes activos</div>
+              <div className="font-mono text-[22px] font-extrabold leading-none text-[#8A6508] tabular-nums">
                 {clientesQuery.data?.length ?? "—"}
               </div>
-              <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">EN DIRECTORIO</div>
+              <div className="mt-0.5 font-mono text-[10px] tracking-[0.08em] text-[#6B665C]">EN DIRECTORIO</div>
             </div>
             <div className="border-r border-border p-4 md:px-5">
-              <div className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">Total histórico</div>
+              <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">Total histórico</div>
               <div className="font-mono text-[22px] font-extrabold leading-none tabular-nums">
                 {formatMoney(totalHistorico)}
               </div>
-              <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">ACUMULADO DE COTIZACIONES</div>
+              <div className="mt-0.5 font-mono text-[10px] tracking-[0.08em] text-[#6B665C]">ACUMULADO DE COTIZACIONES</div>
             </div>
             <div className="p-4 md:px-5">
-              <div className="mb-1.5 font-mono text-[8px] uppercase tracking-[0.2em] text-[#C99B0E]">Ticket promedio</div>
+              <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">Ticket promedio</div>
               <div className="font-mono text-[22px] font-extrabold leading-none tabular-nums">
                 {formatMoney(ticketPromedio)}
               </div>
-              <div className="mt-0.5 font-mono text-[8px] tracking-[0.08em] text-[#7C766A]">POR CLIENTE</div>
+              <div className="mt-0.5 font-mono text-[10px] tracking-[0.08em] text-[#6B665C]">POR CLIENTE</div>
             </div>
           </div>
         </RailSection>
@@ -748,7 +748,7 @@ function ClientesPage() {
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="border-b border-border bg-[#F5F3EF] font-mono text-[8px] uppercase tracking-[0.2em] text-[#8A857C]">
+              <thead className="border-b border-border bg-[#F5F3EF] font-mono text-[10px] uppercase tracking-[0.2em] text-[#57524A]">
                 <tr>
                   <th className="px-4 py-3 text-left font-bold">Cliente</th>
                   <th className="px-4 py-3 text-left font-bold">Teléfono</th>
@@ -780,25 +780,25 @@ function ClientesPage() {
                     >
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center bg-[#EDBA1A] font-mono text-[11px] font-extrabold text-[#1B1A17]">
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center bg-[#EDBA1A] font-mono text-[13px] font-extrabold text-[#1B1A17]">
                             {initials(c.nombre)}
                           </div>
                           <div>
                             <div className="text-xs font-bold uppercase">{c.nombre}</div>
-                            <div className="text-[10px] text-muted-foreground">
+                            <div className="text-[12px] text-muted-foreground">
                               {c.empresa || "Sin empresa"}
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 font-mono text-[10px] text-muted-foreground">
+                      <td className="px-4 py-3 font-mono text-[12px] text-muted-foreground">
                         {c.telefono || "—"}
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-xs">{c.total_cotizaciones}</td>
-                      <td className="px-4 py-3 text-right font-mono text-xs font-bold text-[#C79100]">
+                      <td className="px-4 py-3 text-right font-mono text-xs font-bold text-[#8A6508]">
                         {formatMoney(c.total_historico)}
                       </td>
-                      <td className="px-4 py-3 font-mono text-[10px] text-muted-foreground">
+                      <td className="px-4 py-3 font-mono text-[12px] text-muted-foreground">
                         {c.ultima_cotizacion
                           ? new Date(c.ultima_cotizacion).toLocaleDateString("es-MX")
                           : "—"}
