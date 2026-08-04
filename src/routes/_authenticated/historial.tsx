@@ -45,6 +45,8 @@ import type { ProductoKey } from "@/lib/vialux/constants";
 import { generateFolio } from "@/lib/vialux/quote-actions";
 import type { Tables } from "@/integrations/supabase/types";
 import { RailSection, PageTitle } from "@/components/RailSection";
+import { TableroEmbudo } from "@/components/TableroEmbudo";
+import { LayoutGrid, Rows3 } from "lucide-react";
 import { BandaCargando, BandaError, textoError } from "@/components/EstadoConsulta";
 import { upsertCliente } from "@/lib/vialux/clientes";
 import {
@@ -683,6 +685,10 @@ function HistorialPage() {
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<"all" | Estado>("all");
+  // Tabla y tablero son la MISMA información: una para buscar y editar en
+  // detalle, otra para ver el embudo y mover de etapa. Tenerlas como pestañas
+  // separadas duplicaba la pantalla sin agregar nada.
+  const [vista, setVista] = useState<"tabla" | "tablero">("tabla");
   const [fleteRow, setFleteRow] = useState<CotizacionRow | null>(null);
   const [perdidaRow, setPerdidaRow] = useState<CotizacionRow | null>(null);
   const [showHistorica, setShowHistorica] = useState(false);
@@ -866,8 +872,29 @@ function HistorialPage() {
       {/* Page header */}
       <PageTitle
         kicker="Módulo · Registro"
-        title="Historial"
+        title="Ventas"
         right={
+          <div className="flex items-center gap-3">
+            <div className="flex border border-border" role="group" aria-label="Vista del registro">
+              {([
+                { k: "tabla", l: "Tabla", I: Rows3 },
+                { k: "tablero", l: "Tablero", I: LayoutGrid },
+              ] as const).map(({ k, l, I }) => (
+                <button
+                  key={k}
+                  type="button"
+                  onClick={() => setVista(k)}
+                  aria-pressed={vista === k}
+                  className={`flex items-center gap-1.5 px-3 py-2 font-mono text-[11px] uppercase tracking-[0.1em] transition-colors ${
+                    vista === k
+                      ? "bg-[#EDBA1A] text-[#1B1A17]"
+                      : "text-[#57524A] hover:bg-[#F1EFEA]"
+                  }`}
+                >
+                  <I className="h-3.5 w-3.5" aria-hidden="true" /> {l}
+                </button>
+              ))}
+            </div>
           <Button
             onClick={() => setShowHistorica(true)}
             variant="outline"
@@ -876,6 +903,7 @@ function HistorialPage() {
             <History className="h-3.5 w-3.5" />
             + Registrar venta histórica
           </Button>
+          </div>
         }
       />
 
@@ -1008,7 +1036,8 @@ function HistorialPage() {
           )}
         </RailSection>
 
-        {/* 01 REGISTRO */}
+        {/* 01 REGISTRO — tabla y tablero son la misma información */}
+        {vista === "tabla" && (
         <RailSection num="01" label="REGISTRO" padded={false} last>
           <div className="flex flex-wrap gap-3 border-b border-border p-4">
             <div className="relative min-w-[240px] flex-1">
@@ -1179,7 +1208,14 @@ function HistorialPage() {
             </table>
           </div>
         </RailSection>
+        )}
       </div>
+
+      {vista === "tablero" && (
+        <div className="mt-4">
+          <TableroEmbudo />
+        </div>
+      )}
 
       {fleteRow && (
         <AgregarFleteModal

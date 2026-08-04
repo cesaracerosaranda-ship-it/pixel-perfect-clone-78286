@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { BitacoraCliente } from "@/components/BitacoraCliente";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney } from "@/lib/vialux/constants";
@@ -329,6 +330,12 @@ function ClientDetail({
             ))}
           </div>
         )}
+      </div>
+
+      {/* La bitácora va ANTES del expediente: lo que se habló pesa más en el
+          día a día que los papeles archivados. */}
+      <div className="border-t border-border pt-5">
+        <BitacoraCliente clienteId={cliente.id} />
       </div>
 
       <DocumentosSection cliente={cliente} />

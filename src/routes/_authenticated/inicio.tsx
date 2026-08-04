@@ -1,10 +1,14 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { MessageCircle, Calculator, Clock, AlertTriangle } from "lucide-react";
+import { MessageCircle, Calculator, Clock, AlertTriangle, Bell, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney } from "@/lib/vialux/constants";
 import { normalizarTelefono } from "@/lib/vialux/telefono";
+import {
+  contactosRecientes, ultimoContactoPorCliente, recordatoriosVigentes,
+  marcarCumplida, diasDesde as diasDesdeISO, type Contacto,
+} from "@/lib/vialux/contactos";
 import type { Tables } from "@/integrations/supabase/types";
 import { RailSection, PageTitle } from "@/components/RailSection";
 import { BandaCargando, BandaError, textoError } from "@/components/EstadoConsulta";
@@ -25,6 +29,9 @@ const DIAS_SIN_RESPUESTA = 2;   // cotizado/enviado sin movimiento = cabo suelto
 const DIAS_VIGENCIA = 7;        // la vigencia declarada en el PDF
 const DIAS_COBRO_VENCIDO = 30;  // saldo que ya pasó de "reciente" a "hay que perseguir"
 const DIAS_RECOMPRA = 60;       // cliente que compró y no ha vuelto
+// Si ya hablaste con alguien hace poco, no tiene caso que el panel te empuje a
+// perseguirlo otra vez: el contacto reciente silencia sus colas.
+const DIAS_SILENCIO = 2;
 
 function dias(iso: string | null | undefined): number {
   if (!iso) return 0;
@@ -165,6 +172,11 @@ function InicioPage() {
     },
   });
 
+  const contactosQuery = useQuery({
+    queryKey: ["contactos"],
+    queryFn: () => contactosRecientes(),
+  });
+
   useEffect(() => {
     const ch = supabase
       .channel("inicio")
@@ -184,13 +196,29 @@ function InicioPage() {
     return m;
   }, [pagosQuery.data]);
 
+  const contactos = contactosQuery.data ?? [];
+  const ultimoContacto = useMemo(() => ultimoContactoPorCliente(contactos), [contactos]);
+  const recordatorios = useMemo(() => recordatoriosVigentes(contactos), [contactos]);
+
+  /** true si ya se habló con ese cliente hace menos de DIAS_SILENCIO. */
+  const habloReciente = (clienteId: string | null) => {
+    if (!clienteId) return false;
+    const c = ultimoContacto.get(clienteId);
+    return !!c && diasDesdeISO(c.fecha) < DIAS_SILENCIO;
+  };
+
   const colas = useMemo(() => {
     const enProceso = cots.filter((c) => c.estado === "cotizado" || c.estado === "enviado");
 
     // 00 · Sin respuesta: lo que lleva días quieto. Se ordena por MONTO, no por
     // antigüedad: perseguir primero lo que más pesa en la venta.
     const sinRespuesta = enProceso
-      .filter((c) => dias(c.updated_at) >= DIAS_SIN_RESPUESTA && dias(c.fecha) <= DIAS_VIGENCIA)
+      .filter(
+        (c) =>
+          dias(c.updated_at) >= DIAS_SIN_RESPUESTA &&
+          dias(c.fecha) <= DIAS_VIGENCIA &&
+          !habloReciente(c.cliente_id),
+      )
       .sort((a, b) => Number(b.total) - Number(a.total));
 
     // 01 · Vigencia: pasada la vigencia, el precio ya no es válido. O se recotiza
@@ -226,10 +254,12 @@ function InicioPage() {
       .slice(0, 12);
 
     return { sinRespuesta, vencidas, porCobrar, recompra };
-  }, [cots, pagadoPor]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cots, pagadoPor, ultimoContacto]);
 
   const totalPendientes =
-    colas.sinRespuesta.length + colas.vencidas.length + colas.porCobrar.length + colas.recompra.length;
+    recordatorios.length + colas.sinRespuesta.length + colas.vencidas.length +
+    colas.porCobrar.length + colas.recompra.length;
   const dineroEnJuego =
     colas.sinRespuesta.reduce((s, c) => s + Number(c.total), 0) +
     colas.vencidas.reduce((s, c) => s + Number(c.total), 0);
@@ -267,9 +297,10 @@ function InicioPage() {
       )}
 
       {/* Resumen: el dinero que está esperando una acción tuya */}
-      <div className="mb-4 grid grid-cols-2 gap-px border border-border bg-border md:grid-cols-4">
+      <div className="mb-4 grid grid-cols-2 gap-px border border-border bg-border md:grid-cols-5">
         {[
           { l: "En juego", v: formatMoney(dineroEnJuego), s: "SIN RESPUESTA + VENCIDAS", c: "text-[#8A6508]" },
+          { l: "Recordatorios", v: String(recordatorios.length), s: "COMPROMISOS QUE TOCAN", c: recordatorios.length ? "text-[#8A6508]" : "" },
           { l: "Sin respuesta", v: String(colas.sinRespuesta.length), s: `${DIAS_SIN_RESPUESTA}+ DÍAS QUIETAS`, c: "" },
           { l: "Vigencia vencida", v: String(colas.vencidas.length), s: "PRECIO YA NO VÁLIDO", c: colas.vencidas.length ? "text-[#DC2626]" : "" },
           { l: "Cobro vencido", v: String(colas.porCobrar.length), s: `${DIAS_COBRO_VENCIDO}+ DÍAS`, c: colas.porCobrar.length ? "text-[#DC2626]" : "" },
@@ -289,6 +320,51 @@ function InicioPage() {
       <div className="border border-border bg-card">
         <Cola
           num="00"
+          label="COMPROMISOS"
+          titulo="Recordatorios"
+          descripcion="Lo que tú mismo te apuntaste al registrar un contacto. A diferencia del resto, esto no lo dedujo el sistema — lo prometiste."
+          vacio="Sin compromisos para hoy"
+          filas={recordatorios.map((r) => {
+            const cot = cots.find((c) => c.id === r.cotizacion_id) ?? null;
+            const cli = cots.find((c) => c.cliente_id === r.cliente_id);
+            const nombre = cli?.cliente_nombre ?? "Cliente";
+            const atraso = Math.max(0, Math.floor(
+              (Date.now() - new Date(`${r.proxima_fecha}T12:00:00`).getTime()) / 86_400_000));
+            const wa = urlWhatsApp(cli?.cliente_telefono ?? null, `Hola, le escribo de VIALUX para dar seguimiento.`);
+            return (
+              <FilaAccion
+                key={r.id}
+                titulo={nombre}
+                subtitulo={r.proxima_accion}
+                monto={cot ? Number(cot.total) : 0}
+                meta={atraso === 0 ? "HOY" : `ATRASADO ${atraso}D`}
+                urgente={atraso > 0}
+                acciones={
+                  <>
+                    {wa && (
+                      <BotonAccion href={wa} etiqueta={`Escribir por WhatsApp a ${nombre}`}>
+                        <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" /> WhatsApp
+                      </BotonAccion>
+                    )}
+                    <BotonAccion
+                      etiqueta="Marcar el compromiso como cumplido"
+                      onClick={async () => {
+                        const e = await marcarCumplida(r.id);
+                        if (e) return;
+                        void qc.invalidateQueries({ queryKey: ["contactos"] });
+                      }}
+                    >
+                      <Check className="h-3.5 w-3.5" aria-hidden="true" /> Hecha
+                    </BotonAccion>
+                  </>
+                }
+              />
+            );
+          })}
+        />
+
+        <Cola
+          num="01"
           label="SEGUIMIENTO"
           titulo="Sin respuesta"
           descripcion={`Cotizaciones que llevan ${DIAS_SIN_RESPUESTA} días o más sin movimiento y siguen dentro de vigencia. Ordenadas por monto: primero lo que más pesa.`}
@@ -325,7 +401,7 @@ function InicioPage() {
         />
 
         <Cola
-          num="01"
+          num="02"
           label="VIGENCIA"
           titulo="Vigencia vencida"
           descripcion={`Pasaron más de ${DIAS_VIGENCIA} días: el precio que cotizaste ya no es válido. Recotiza o ciérrala como perdida — dejarlas abiertas ensucia el embudo.`}
@@ -362,7 +438,7 @@ function InicioPage() {
         />
 
         <Cola
-          num="02"
+          num="03"
           label="COBRANZA"
           titulo="Cobro vencido"
           descripcion={`Ventas cerradas con saldo desde hace ${DIAS_COBRO_VENCIDO} días o más. El detalle completo y el registro de pagos están en Cobranza.`}
@@ -401,7 +477,7 @@ function InicioPage() {
         />
 
         <Cola
-          num="03"
+          num="04"
           label="RECOMPRA"
           titulo="Ya les toca"
           descripcion={`Clientes que compraron hace ${DIAS_RECOMPRA} días o más y no han vuelto a pedir. Son los más baratos de reactivar: ya te conocen y ya te compraron.`}
@@ -450,8 +526,9 @@ function InicioPage() {
 
       <p className="mt-3 flex items-start gap-2 font-mono text-[11px] uppercase leading-relaxed tracking-[0.1em] text-[#57524A]">
         <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-        Los días se cuentan desde el último cambio de la cotización · Los mensajes
-        de WhatsApp se abren precargados pero NO se envían solos
+        Registrar un contacto silencia a ese cliente por {DIAS_SILENCIO} días · Los días se
+        cuentan desde el último cambio de la cotización · Los mensajes de WhatsApp
+        se abren precargados pero NO se envían solos
       </p>
     </div>
   );

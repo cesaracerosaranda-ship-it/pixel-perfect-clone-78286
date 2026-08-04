@@ -9,9 +9,8 @@ import { LogOut } from "lucide-react";
 const tabs = [
   { to: "/inicio", label: "Inicio" },
   { to: "/", label: "Cotizador" },
-  { to: "/pipeline", label: "Pipeline" },
   { to: "/cobranza", label: "Cobranza" },
-  { to: "/historial", label: "Historial" },
+  { to: "/historial", label: "Ventas" },
   { to: "/clientes", label: "Clientes" },
   { to: "/whatsapp", label: "WhatsApp" },
 ] as const;

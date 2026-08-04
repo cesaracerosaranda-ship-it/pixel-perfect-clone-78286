@@ -1,12 +1,11 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney } from "@/lib/vialux/constants";
 import type { Tables } from "@/integrations/supabase/types";
-import { RailSection, PageTitle } from "@/components/RailSection";
-import { BandaCargando, BandaError, textoError } from "@/components/EstadoConsulta";
+import { RailSection } from "@/components/RailSection";
 import { MotivoPerdidaModal } from "@/components/MotivoPerdidaModal";
 import {
   DropdownMenu,
@@ -16,10 +15,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { ChevronDown, Search, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
-
-export const Route = createFileRoute("/_authenticated/pipeline")({
-  component: PipelinePage,
-});
 
 type Estado = "cotizado" | "enviado" | "cerrado" | "perdido";
 type Cot = Tables<"cotizaciones">;
@@ -42,7 +37,7 @@ function motivoDe(r: Cot): string | null {
   return v && v.trim() ? v : null;
 }
 
-function PipelinePage() {
+export function TableroEmbudo() {
   const qc = useQueryClient();
   const navigate = useNavigate();
   const [arrastrando, setArrastrando] = useState<string | null>(null);
@@ -183,41 +178,8 @@ function PipelinePage() {
   };
 
   return (
-    <div className="mx-auto w-full max-w-[1600px] px-6 py-8">
-      <PageTitle
-        kicker="MÓDULO · EMBUDO"
-        title="PIPELINE"
-        right={
-          <div className="flex items-baseline gap-2">
-            <span className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#57524A]">
-              Tasa de cierre
-            </span>
-            <span
-              className={`font-mono text-lg font-extrabold tabular-nums ${
-                winRate === null
-                  ? "text-[#57524A]"
-                  : winRate >= 50
-                    ? "text-[#12843C]"
-                    : winRate >= 30
-                      ? "text-[#8A6508]"
-                      : "text-[#DC2626]"
-              }`}
-            >
-              {winRate === null ? "—" : `${winRate}%`}
-            </span>
-          </div>
-        }
-      />
-
-      {cotsQuery.isLoading && <BandaCargando mensaje="Cargando el embudo…" />}
-      {cotsQuery.isError && (
-        <BandaError
-          mensaje={textoError(cotsQuery.error)}
-          onReintentar={() => void cotsQuery.refetch()}
-        />
-      )}
-
-      <div className="mt-6 flex items-center gap-2 border border-border bg-card px-4 py-2.5">
+    <div>
+      <div className="flex items-center gap-2 border border-border bg-card px-4 py-2.5">
         <Search className="h-4 w-4 shrink-0 text-[#767066]" aria-hidden="true" />
         <Input
           value={busqueda}
