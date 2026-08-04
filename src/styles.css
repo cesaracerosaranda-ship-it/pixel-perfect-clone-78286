@@ -183,3 +183,40 @@
     transition: background 0.2s;
   }
 }
+
+/* ── Accesibilidad global ─────────────────────────────────────────────────── */
+
+/* Enlace de salto: primer elemento tabulable de la página. Sin él, llegar al
+   contenido obliga a tabular las seis pestañas del nav en cada carga. */
+.vx-skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -3rem;
+  z-index: 100;
+  background: #EDBA1A;
+  color: #1B1A17;
+  padding: 0.6rem 1.1rem;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition: top 0.15s ease-out;
+}
+.vx-skip-link:focus {
+  top: 0.75rem;
+}
+
+/* Respeta la preferencia del sistema: hay ~48 transiciones declaradas y
+   ninguna la consultaba. No se eliminan del todo —eso rompe estados que
+   dependen del final de la transición— sino que se vuelven instantáneas. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

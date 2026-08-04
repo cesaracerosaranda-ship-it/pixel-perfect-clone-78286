@@ -28,6 +28,10 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
+      <a href="#contenido" className="vx-skip-link">
+        Saltar al contenido
+      </a>
+
       {/* Top accent line */}
       <div
         style={{
@@ -85,7 +89,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <main className="flex-1">{children}</main>
+      <main id="contenido" tabIndex={-1} className="flex-1">
+        {children}
+      </main>
 
       <footer className="border-t border-[#3A3936] bg-[#343331] py-3">
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6">

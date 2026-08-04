@@ -14,7 +14,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Search, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 export const Route = createFileRoute("/_authenticated/pipeline")({
   component: PipelinePage,
@@ -47,6 +48,7 @@ function PipelinePage() {
   const [arrastrando, setArrastrando] = useState<string | null>(null);
   const [sobre, setSobre] = useState<Estado | null>(null);
   const [perdidaRow, setPerdidaRow] = useState<Cot | null>(null);
+  const [busqueda, setBusqueda] = useState("");
 
   const cotsQuery = useQuery({
     queryKey: ["cotizaciones"],
@@ -91,12 +93,23 @@ function PipelinePage() {
     const base: Record<Estado, Cot[]> = {
       cotizado: [], enviado: [], cerrado: [], perdido: [],
     };
-    for (const r of cotsQuery.data ?? []) {
+    // El filtro se aplica ANTES de repartir: así los totales de cada columna
+    // reflejan lo que se está viendo, no el universo completo.
+    const q = busqueda.trim().toLowerCase();
+    const fuente = q
+      ? (cotsQuery.data ?? []).filter(
+          (r) =>
+            r.folio.toLowerCase().includes(q) ||
+            r.cliente_nombre.toLowerCase().includes(q) ||
+            (r.cliente_empresa ?? "").toLowerCase().includes(q),
+        )
+      : (cotsQuery.data ?? []);
+    for (const r of fuente) {
       const e = r.estado as Estado;
       if (base[e]) base[e].push(r);
     }
     return base;
-  }, [cotsQuery.data]);
+  }, [cotsQuery.data, busqueda]);
 
   const totales = useMemo(() => {
     const t = {} as Record<Estado, { n: number; monto: number }>;
@@ -204,7 +217,28 @@ function PipelinePage() {
         />
       )}
 
-      <div className="mt-6 border border-border bg-card">
+      <div className="mt-6 flex items-center gap-2 border border-border bg-card px-4 py-2.5">
+        <Search className="h-4 w-4 shrink-0 text-[#767066]" aria-hidden="true" />
+        <Input
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          placeholder="Buscar folio, cliente o empresa…"
+          aria-label="Buscar en el embudo"
+          className="h-8 border-0 bg-transparent px-0 text-[13px] shadow-none focus-visible:ring-0"
+        />
+        {busqueda && (
+          <button
+            type="button"
+            onClick={() => setBusqueda("")}
+            aria-label="Limpiar búsqueda"
+            className="shrink-0 p-1 text-[#767066] transition-colors hover:text-[#2E2B27]"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        )}
+      </div>
+
+      <div className="mt-3 border border-border bg-card">
         <RailSection num="00" label="EMBUDO" padded={false} last>
           <div className="grid grid-cols-1 gap-px bg-border md:grid-cols-2 xl:grid-cols-4">
             {COLUMNAS.map((col) => {
