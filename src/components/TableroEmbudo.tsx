@@ -201,7 +201,14 @@ export function TableroEmbudo() {
       </div>
 
       <div className="mt-3 border border-border bg-card">
-        <RailSection num="00" label="EMBUDO" padded={false} last>
+        <RailSection
+          num="00"
+          label="EMBUDO"
+          titulo="Embudo por etapa"
+          descripcion="Arrastra una tarjeta o usa su menú Mover para cambiar de etapa. Los totales de cada columna reflejan el filtro aplicado."
+          padded={false}
+          last
+        >
           <div className="grid grid-cols-1 gap-px bg-border md:grid-cols-2 xl:grid-cols-4">
             {COLUMNAS.map((col) => {
               const filas = porColumna[col.key];
@@ -336,9 +343,7 @@ export function TableroEmbudo() {
       </div>
 
       <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-[#57524A]">
-        Arrastra una tarjeta entre columnas para cambiar su estado · Clic para
-        duplicarla en el cotizador · Las de más de 7 días en proceso se marcan
-        vencidas
+        Las cotizaciones con más de 7 días en proceso se marcan como vencidas
       </p>
 
       <MotivoPerdidaModal

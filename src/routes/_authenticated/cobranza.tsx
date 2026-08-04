@@ -335,7 +335,13 @@ function CobranzaPage() {
 
       <div className="border border-border bg-card">
         {/* 00 RESUMEN */}
-        <RailSection num="00" label="RESUMEN" padded={false}>
+        <RailSection
+          num="00"
+          label="RESUMEN"
+          titulo="Estado de la cobranza"
+          descripcion="La antigüedad se cuenta desde la fecha de la venta, no desde el último pago: lo que lleva más tiempo abierto es lo que hay que perseguir."
+          padded={false}
+        >
           <div className="grid grid-cols-2 md:grid-cols-4">
             <div className="border-r border-border p-4 md:px-5">
               <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">
@@ -390,7 +396,19 @@ function CobranzaPage() {
         </RailSection>
 
         {/* 01 SALDOS */}
-        <RailSection num="01" label="SALDOS" padded={false} last>
+        <RailSection
+          num="01"
+          label="SALDOS"
+          titulo="Ventas con saldo"
+          descripcion="Solo aparecen las cerradas que aún deben algo, de la más antigua a la más reciente. El estado de pago se calcula solo a partir de los pagos registrados."
+          meta={
+            <span className="font-mono text-[11px] tracking-[0.08em] text-[#57524A]">
+              {filas.length} {filas.length === 1 ? "VENTA" : "VENTAS"}
+            </span>
+          }
+          padded={false}
+          last
+        >
           {filas.length === 0 ? (
             <div className="px-6 py-14 text-center">
               <p className="font-mono text-[13px] uppercase tracking-[0.14em] text-[#57524A]">
@@ -500,12 +518,6 @@ function CobranzaPage() {
           )}
         </RailSection>
       </div>
-
-      <p className="mt-3 font-mono text-[11px] uppercase tracking-[0.14em] text-[#57524A]">
-        Solo aparecen ventas CERRADAS con saldo · Ordenadas de la más antigua a
-        la más reciente · El estado de pago se calcula solo a partir de los pagos
-        registrados
-      </p>
 
       <RegistrarPagoModal
         venta={pagoVenta}

@@ -917,7 +917,13 @@ function HistorialPage() {
 
       <div className="border border-border bg-card">
         {/* 00 INDICADORES */}
-        <RailSection num="00" label="INDICADORES" padded={false}>
+        <RailSection
+          num="00"
+          label="INDICADORES"
+          titulo="Cómo va el periodo"
+          descripcion="La tasa de cierre se calcula solo sobre lo ya decidido: lo que sigue en proceso no castiga el número."
+          padded={false}
+        >
           <div className="grid grid-cols-2 md:grid-cols-4">
             <div className="group border-r border-border p-4 md:px-5">
               <div className="mb-1.5 flex items-center justify-between gap-2">
@@ -1038,7 +1044,19 @@ function HistorialPage() {
 
         {/* 01 REGISTRO — tabla y tablero son la misma información */}
         {vista === "tabla" && (
-        <RailSection num="01" label="REGISTRO" padded={false} last>
+        <RailSection
+          num="01"
+          label="REGISTRO"
+          titulo="Cotizaciones"
+          descripcion="Todo el histórico, con búsqueda y filtro por estado. Cambia a vista Tablero para mover cotizaciones entre etapas."
+          meta={
+            <span className="font-mono text-[11px] tracking-[0.08em] text-[#57524A]">
+              {rows.length} {rows.length === 1 ? "REGISTRO" : "REGISTROS"}
+            </span>
+          }
+          padded={false}
+          last
+        >
           <div className="flex flex-wrap gap-3 border-b border-border p-4">
             <div className="relative min-w-[240px] flex-1">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />

@@ -715,7 +715,13 @@ function ClientesPage() {
 
       <div className="border border-border bg-card">
         {/* 00 INDICADORES */}
-        <RailSection num="00" label="INDICADORES" padded={false}>
+        <RailSection
+          num="00"
+          label="INDICADORES"
+          titulo="Cartera de clientes"
+          descripcion="Cuánto pesa cada cliente en el histórico. Abre uno para ver su bitácora y su expediente."
+          padded={false}
+        >
           <div className="grid grid-cols-1 sm:grid-cols-3">
             <div className="border-r border-border p-4 md:px-5">
               <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">Clientes activos</div>
@@ -742,7 +748,19 @@ function ClientesPage() {
         </RailSection>
 
         {/* 01 DIRECTORIO */}
-        <RailSection num="01" label="DIRECTORIO" padded={false} last>
+        <RailSection
+          num="01"
+          label="DIRECTORIO"
+          titulo="Directorio"
+          descripcion="Cada ficha guarda contacto, cotizaciones previas, bitácora de conversación y expediente documental."
+          meta={
+            <span className="font-mono text-[11px] tracking-[0.08em] text-[#57524A]">
+              {rows.length} {rows.length === 1 ? "CLIENTE" : "CLIENTES"}
+            </span>
+          }
+          padded={false}
+          last
+        >
           <div className="border-b border-border p-4">
             <div className="relative">
               <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
