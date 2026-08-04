@@ -7,6 +7,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { LogOut } from "lucide-react";
 
 const tabs = [
+  { to: "/inicio", label: "Inicio" },
   { to: "/", label: "Cotizador" },
   { to: "/pipeline", label: "Pipeline" },
   { to: "/cobranza", label: "Cobranza" },
@@ -47,7 +48,7 @@ export function AppShell({ children }: { children: ReactNode }) {
             una sola fila, y comprimirlas sacrificaría lo que acabamos de ganar. */}
         <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-6 py-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
           <div className="flex items-center justify-between gap-4">
-            <Link to="/" search={{ duplicate: undefined, clienteId: undefined }} className="block shrink-0">
+            <Link to="/inicio" className="block shrink-0">
               <img src={logoT} alt="VIALUX" className="h-10 w-auto" />
             </Link>
             <InventarioBadge />
