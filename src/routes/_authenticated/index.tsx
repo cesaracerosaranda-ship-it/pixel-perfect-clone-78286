@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, Mail, MessageCircle, Save, RotateCcw, CheckCircle2, Copy, Check } from "lucide-react";
+import { Download, Mail, MessageCircle, Save, RotateCcw, CheckCircle2, Copy, Check, Loader2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -43,17 +43,31 @@ function CotizadorPage() {
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [waResumen, setWaResumen] = useState<string | null>(null);
   const [copiado, setCopiado] = useState(false);
+  // Al llegar con ?duplicate= o ?clienteId= el formulario se rellena por red.
+  // Sin este estado el usuario ve un formulario VACÍO unos instantes y no sabe
+  // si la acción funcionó — y si la consulta falla, se queda vacío sin aviso.
+  const [precarga, setPrecarga] = useState<"idle" | "cargando" | "error">(
+    duplicate || clienteId ? "cargando" : "idle",
+  );
 
   // Prefill if duplicating
   useEffect(() => {
     if (!duplicate) return;
     (async () => {
-      const { data } = await supabase
+      setPrecarga("cargando");
+      const { data, error } = await supabase
         .from("cotizaciones")
         .select("*")
         .eq("id", duplicate)
         .maybeSingle();
-      if (!data) return;
+      if (error || !data) {
+        setPrecarga("error");
+        toast.error(
+          error ? `No se pudo cargar la cotización: ${error.message}`
+                : "No se encontró la cotización que se quiere duplicar",
+        );
+        return;
+      }
       let emailCliente = "";
       if (data.cliente_id) {
         const { data: cli } = await supabase
@@ -88,6 +102,7 @@ function CotizadorPage() {
       };
       setState(next);
       void navigate({ to: "/", search: {} as never, replace: true });
+      setPrecarga("idle");
       toast.success("Cotización duplicada en el formulario");
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -97,12 +112,20 @@ function CotizadorPage() {
   useEffect(() => {
     if (!clienteId) return;
     (async () => {
-      const { data } = await supabase
+      setPrecarga("cargando");
+      const { data, error } = await supabase
         .from("clientes")
         .select("*")
         .eq("id", clienteId)
         .maybeSingle();
-      if (!data) return;
+      if (error || !data) {
+        setPrecarga("error");
+        toast.error(
+          error ? `No se pudo cargar el cliente: ${error.message}`
+                : "No se encontró el cliente",
+        );
+        return;
+      }
       setState((s) => ({
         ...s,
         cliente: data.nombre,
@@ -111,6 +134,7 @@ function CotizadorPage() {
         email: data.email ?? "",
       }));
       void navigate({ to: "/", search: {} as never, replace: true });
+      setPrecarga("idle");
       toast.success(`Cliente ${data.nombre} cargado`);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -366,6 +390,41 @@ function CotizadorPage() {
           </div>
         )}
       </div>
+
+      {precarga === "cargando" && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="mb-4 flex items-center gap-3 border border-border bg-card px-5 py-3.5"
+        >
+          <Loader2 className="h-4 w-4 shrink-0 animate-spin text-[#8A6508]" aria-hidden="true" />
+          <span className="font-mono text-[12px] uppercase tracking-[0.16em] text-[#57524A]">
+            {duplicate ? "Cargando la cotización a duplicar…" : "Cargando los datos del cliente…"}
+          </span>
+        </div>
+      )}
+
+      {precarga === "error" && (
+        <div
+          role="alert"
+          className="mb-4 flex flex-wrap items-center justify-between gap-3 border border-[#DC2626]/40 bg-[#DC2626]/[0.06] px-5 py-3.5"
+        >
+          <div className="flex items-center gap-3">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-[#DC2626]" aria-hidden="true" />
+            <span className="text-[13px] font-semibold text-[#DC2626]">
+              No se pudieron cargar los datos — el formulario está en blanco.
+            </span>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => window.location.reload()}
+            className="font-mono text-[11px] uppercase tracking-[0.14em]"
+          >
+            Reintentar
+          </Button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
         <QuoteForm state={state} update={update} errors={formErrors} />

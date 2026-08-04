@@ -38,27 +38,33 @@ export function AppShell({ children }: { children: ReactNode }) {
       />
 
       <header className="border-b border-[#3A3936] bg-[#343331]">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-6 px-6 py-3">
-          {/* Brand */}
-          <Link to="/" search={{ duplicate: undefined, clienteId: undefined }} className="block">
-            <img src={logoT} alt="VIALUX" className="h-10 w-auto" />
-          </Link>
-
-          {/* Right: inventory + separator + nav */}
-          <div className="flex items-center gap-4">
+        {/* En pantallas angostas el nav baja a su propio renglón y se desplaza
+            en horizontal: seis pestañas con tipografía legible ya no caben en
+            una sola fila, y comprimirlas sacrificaría lo que acabamos de ganar. */}
+        <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-6 py-3 lg:flex-row lg:items-center lg:justify-between lg:gap-6">
+          <div className="flex items-center justify-between gap-4">
+            <Link to="/" search={{ duplicate: undefined, clienteId: undefined }} className="block shrink-0">
+              <img src={logoT} alt="VIALUX" className="h-10 w-auto" />
+            </Link>
             <InventarioBadge />
+          </div>
 
-            <div className="h-5 w-px bg-[#4A4842]" />
+          <div className="flex items-center gap-4">
+            <div className="hidden h-5 w-px shrink-0 bg-[#4A4842] lg:block" />
 
-            <nav className="flex items-center gap-1">
+            <nav
+              aria-label="Navegación principal"
+              className="-mx-1 flex items-center gap-1 overflow-x-auto px-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            >
               {tabs.map((t) => (
                 <Link
                   key={t.to}
                   to={t.to}
-                  className="px-4 py-2 font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[#A8A29A] transition-colors hover:bg-white/[0.06] hover:text-white"
+                  className="shrink-0 whitespace-nowrap px-4 py-2 font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[#A8A29A] transition-colors hover:bg-white/[0.06] hover:text-white"
                   activeProps={{
+                    "aria-current": "page",
                     className:
-                      "px-4 py-2 font-mono text-[12px] font-bold uppercase tracking-[0.2em] bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#EDBA1A]",
+                      "shrink-0 whitespace-nowrap px-4 py-2 font-mono text-[12px] font-bold uppercase tracking-[0.2em] bg-[#EDBA1A] text-[#1B1A17] hover:bg-[#EDBA1A]",
                   }}
                   activeOptions={{ exact: t.to === "/" }}
                 >
@@ -69,7 +75,7 @@ export function AppShell({ children }: { children: ReactNode }) {
                 type="button"
                 onClick={handleSignOut}
                 title="Cerrar sesión"
-                className="ml-2 flex items-center gap-1.5 px-3 py-2 font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[#A8A29A] transition-colors hover:bg-white/[0.06] hover:text-white"
+                className="ml-2 flex shrink-0 items-center gap-1.5 whitespace-nowrap px-3 py-2 font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[#A8A29A] transition-colors hover:bg-white/[0.06] hover:text-white"
               >
                 <LogOut className="h-3.5 w-3.5" />
                 Salir

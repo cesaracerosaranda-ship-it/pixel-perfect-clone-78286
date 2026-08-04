@@ -887,6 +887,7 @@ function HistorialPage() {
                 <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">Inventario</span>
                 <button
                   onClick={() => setShowInventario(true)}
+                  aria-label="Actualizar inventario"
                   title="Actualizar inventario"
                   className="text-[#57524A] opacity-40 transition-opacity hover:text-[#8A6508] group-hover:opacity-100"
                 >
@@ -1120,6 +1121,7 @@ function HistorialPage() {
                                 size="icon"
                                 variant="ghost"
                                 onClick={() => setFleteRow(r)}
+                                aria-label="Agregar flete y crear revisión"
                                 title="Agregar flete (crear revisión)"
                               >
                                 <Truck className="h-4 w-4 text-[#57524A]" />
@@ -1129,13 +1131,14 @@ function HistorialPage() {
                               size="icon"
                               variant="ghost"
                               onClick={() => duplicate(r.id)}
+                              aria-label="Duplicar en cotizador"
                               title="Duplicar en cotizador"
                             >
                               <Copy className="h-4 w-4" />
                             </Button>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>
-                                <Button size="icon" variant="ghost" title="Eliminar">
+                                <Button size="icon" variant="ghost" aria-label="Eliminar cotización" title="Eliminar">
                                   <Trash2 className="h-4 w-4 text-[#DC2626]" />
                                 </Button>
                               </AlertDialogTrigger>

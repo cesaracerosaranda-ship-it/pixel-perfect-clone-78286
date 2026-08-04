@@ -473,6 +473,7 @@ function CobranzaPage() {
                               <span className="flex-1 truncate text-[#57524A]">{p.nota ?? ""}</span>
                               <button
                                 onClick={() => borrarPago(p.id)}
+                                aria-label="Eliminar pago"
                                 title="Eliminar pago"
                                 className="text-[#767066] transition-colors hover:text-[#DC2626]"
                               >

@@ -500,6 +500,7 @@ function DocumentosSection({ cliente }: { cliente: ClienteConStats }) {
                   size="icon"
                   variant="ghost"
                   onClick={() => onDelete(d)}
+                  aria-label="Eliminar documento"
                   title="Eliminar documento"
                 >
                   <Trash2 className="h-4 w-4 text-[#DC2626]" />
