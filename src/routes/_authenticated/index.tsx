@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Download, Mail, MessageCircle, Save, RotateCcw, CheckCircle2, Copy, Check, Loader2, AlertTriangle } from "lucide-react";
+import { Download, Mail, MessageCircle, Save, RotateCcw, CheckCircle2, Copy, Check, Loader2, AlertTriangle, FileText } from "lucide-react";
 import { toast } from "sonner";
 import {
   Dialog,
@@ -22,6 +22,7 @@ import {
   type QuoteRow,
 } from "@/lib/vialux/quote-actions";
 import { generateQuotePdf } from "@/lib/pdf/generateQuotePdf";
+import { generateFichaPdf } from "@/lib/pdf/generateFichaPdf";
 import { upsertCliente } from "@/lib/vialux/clientes";
 import { archivarCotizacionPdf, ligaPdfCotizacion } from "@/lib/vialux/documentos";
 
@@ -454,6 +455,20 @@ function CotizadorPage() {
               ) : (
                 <><Save className="mr-1.5 h-3.5 w-3.5" /> Guardar</>
               )}
+            </Button>
+            <Button
+              onClick={async () => {
+                try {
+                  await generateFichaPdf();
+                  toast.success("Ficha técnica generada — archivo nuevo, sin marca de reenvío");
+                } catch (e) {
+                  toast.error((e as Error).message);
+                }
+              }}
+              variant="outline"
+              className="font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[#57524A]"
+            >
+              <FileText className="mr-1.5 h-3.5 w-3.5" /> Ficha técnica
             </Button>
             <Button onClick={handleWhatsApp} disabled={saving} variant="outline" className="font-mono text-[12px] font-bold uppercase tracking-[0.2em] text-[#57524A]">
               <MessageCircle className="mr-1.5 h-3.5 w-3.5" /> WhatsApp
