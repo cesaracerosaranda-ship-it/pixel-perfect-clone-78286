@@ -31,15 +31,12 @@ no el nombre del archivo en `supabase/migrations/`.
 ## A · Lo que César hace SIN Claude
 
 **Con fecha límite — antes del 15/ago (día de pago de S4)**
-- [ ] **Montar la campaña consolidada** (~1 h). Guía en
-      `plan-marketing-inhouse.md` §7 "Semana 2". Resumen: duplicar
-      `Ventas-Mensajes || Boyas 3 precios || Ubis || 1.12.25` → renombrar
-      `VIALUX || Consolidada || 08.26` → $200/día → borrar el anuncio duplicado y
-      crear uno con **"Usar publicación existente"** (la de AD Boyas 3 precios 2,
-      con sus 211 reacciones) → publicar.
-- [ ] Al publicar: **apagar** las dos campañas débiles (IG 10.12.25 y Nuevas img
-      AI). Dejar viva la ganadora 3-5 días como seguro.
-- [ ] Comparar consolidada vs viejas → decisión S4 → avisar la salida.
+- [x] **Campaña consolidada montada y publicada** el 5/ago 14:25. Ver §I.
+- [x] Apagadas las dos débiles (`IG 10.12.25` y `Nuevas img AI 20.03.26`).
+- [ ] **9-11/ago:** apagar `Ubis || 1.12.25` (cutover completo).
+- [ ] **11-13/ago:** leer resultados. Criterio: ≤$25/conv contra el baseline de
+      **$20.35** de la ganadora.
+- [ ] **13-14/ago:** decisión S4 → avisar la salida.
 
 **Sin fecha**
 - [ ] Al recibir clavos del proveedor: capturar el conteo real en el modal de
@@ -187,3 +184,46 @@ sesión. Para saber el estado real: `git log --oneline -5` y
 origin/main` antes de hacer push, o se pierde trabajo suyo. Y si aparecen errores
 de TypeScript raros después de un `git checkout --`, casi siempre es
 `routeTree.gen.ts` viejo: se arregla con `npm run build`.
+
+---
+
+## I · Campaña consolidada — publicada 5/ago 14:25
+
+`VIALUX || Consolidada || 08.26` · conjunto `WAB || 3 precios || Abierta || FB ||
+25-55` · **$200 MXN/día** · publicación existente **122132714372977393**
+(1/dic/2025, la de las 215 reacciones) · anuncio único `AD Boyas 3 precios 2`.
+
+Duplicada de la ganadora sin tocar una sola variable: público abierto, 14
+ubicaciones con sus radios, FB Feeds+Reels, 25-55, Highest volume. Lo único que
+cambia entre la ganadora y ésta es **quién opera la campaña** — ése es el
+experimento.
+
+**Baseline a vencer: $20.35/conv** (67 conversaciones, $1,363.65, 30 días).
+Las débiles quedaron en $48.83 y $55.94 — peor que el $42/$50 de julio.
+
+**NO TOCAR hasta el 11/ago.** Cada edición reinicia el aprendizaje. Los primeros
+2-3 días va a marcar $35-40/conv: es normal al cuadruplicar el presupuesto
+($45 → $200/día), no es que haya fallado. El número que decide es del día 4.
+
+### Trampas de Meta encontradas al montarla (para la próxima)
+
+- **Al duplicar, Meta pre-palomea 5 "recommendations"** que cambian público
+  (Advantage+ audience), ubicaciones (Advantage+ placements) y presupuesto.
+  Desmarcar **"Select all recommendations"**. Reaparecen luego como toggle
+  ("Reach more people likely to respond") y como tarjetas *Apply now* en cada
+  pantalla, incluido el resumen de publicación. Nunca aceptarlas: contaminan la
+  comparación contra S4.
+- **"Show existing reactions" del duplicado NO basta.** El anuncio copiado nace
+  como *Create ad* = publicación nueva en ceros. Hay que cambiar **Ad setup →
+  Use existing posts**.
+- **El explorador de publicaciones no encuentra las de anuncios.** Ni en
+  *Published posts* ni en *Ads posts*. Se saca el ID abriendo el anuncio original
+  → Preview → compartir → *Facebook post with comments* → el número va en la URL.
+- **Una recarga reconectó solo el "Shopify Product Catalog"** en Ad sources.
+  Verificar que quede en *Not connected*.
+- **El duplicado nace con conjunto y anuncios APAGADOS.** Publicar no los
+  enciende: la campaña queda en *"Ad sets inactive"* y gasta $0. Hay que
+  encenderlos a mano en las pestañas **Ad sets** y **Ads**.
+- El resumen de publicación **trunca la lista de ubicaciones** (mostró 5 de 14).
+  No es pérdida de datos: se verifica con el *Audience definition* del conjunto
+  (debe seguir en ~24.3-28.7 M).
