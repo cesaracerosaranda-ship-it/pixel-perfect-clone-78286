@@ -34,6 +34,8 @@ const DIAS_RECOMPRA = 60;       // cliente que compró y no ha vuelto
 // Si ya hablaste con alguien hace poco, no tiene caso que el panel te empuje a
 // perseguirlo otra vez: el contacto reciente silencia sus colas.
 const DIAS_SILENCIO = 2;
+// La cola de seguimiento se corta: una lista de treinta no se ataca, se ignora.
+const TOP_SEGUIMIENTO = 5;
 
 function dias(iso: string | null | undefined): number {
   if (!iso) return 0;
@@ -220,8 +222,13 @@ function InicioPage() {
   const colas = useMemo(() => {
     const enProceso = cots.filter((c) => c.estado === "cotizado" || c.estado === "enviado");
 
-    // 00 · Sin respuesta: lo que lleva días quieto. Se ordena por MONTO, no por
-    // antigüedad: perseguir primero lo que más pesa en la venta.
+    // 00 · Sin respuesta: las cinco que más conviene atacar HOY.
+    // Ordenar solo por monto mandaba a perseguir cotizaciones grandes pero casi
+    // vencidas antes que otras frescas y sanas. El puntaje pondera el monto por
+    // qué tan viva sigue: una recién enviada conserva todo su peso, una al
+    // borde de la vigencia conserva la mitad.
+    const calor = (c: Cot) =>
+      Number(c.total) * (1 - Math.min(dias(c.fecha) / DIAS_VIGENCIA, 1) * 0.5);
     const sinRespuesta = enProceso
       .filter(
         (c) =>
@@ -229,17 +236,26 @@ function InicioPage() {
           dias(c.fecha) <= DIAS_VIGENCIA &&
           !habloReciente(c.cliente_id),
       )
-      .sort((a, b) => Number(b.total) - Number(a.total));
+      .sort((a, b) => calor(b) - calor(a))
+      .slice(0, TOP_SEGUIMIENTO);
 
     // 01 · Vigencia: pasada la vigencia, el precio ya no es válido. O se recotiza
     // o se cierra como perdida — dejarlas abiertas ensucia el embudo.
+    // Recién vencidas primero: una cotización que caducó ayer sigue tibia y se
+    // recupera con una llamada; una de hace dos meses ya es arqueología. El
+    // orden inverso ponía lo irrecuperable al principio de la lista.
     const vencidas = enProceso
       .filter((c) => dias(c.fecha) > DIAS_VIGENCIA)
-      .sort((a, b) => dias(b.fecha) - dias(a.fecha));
+      .sort((a, b) => dias(a.fecha) - dias(b.fecha));
 
     // 02 · Por cobrar vencido
+    // Solo las marcadas a crédito: una venta cerrada ya está cobrada.
     const porCobrar = cots
-      .filter((c) => c.estado === "cerrado")
+      .filter(
+        (c) =>
+          c.estado === "cerrado" &&
+          (c as { cobro_pendiente?: boolean }).cobro_pendiente === true,
+      )
       .map((c) => ({ c, saldo: Number(c.total) - (pagadoPor.get(c.id) ?? 0), d: dias(c.fecha) }))
       .filter((x) => x.saldo > 0.01 && x.d >= DIAS_COBRO_VENCIDO)
       .sort((a, b) => b.d - a.d);
@@ -378,7 +394,7 @@ function InicioPage() {
           num="01"
           label="SEGUIMIENTO"
           titulo="Sin respuesta"
-          descripcion={`Cotizaciones que llevan ${DIAS_SIN_RESPUESTA} días o más sin movimiento y siguen dentro de vigencia. Ordenadas por monto: primero lo que más pesa.`}
+          descripcion={`Las ${TOP_SEGUIMIENTO} que más conviene atacar hoy: ${DIAS_SIN_RESPUESTA} días o más sin movimiento, aún dentro de vigencia, y ordenadas por monto ponderado según qué tan frescas sigan.`}
           vacio="Nada pendiente de seguimiento"
           filas={colas.sinRespuesta.map((c) => {
             const d = dias(c.updated_at);
@@ -422,7 +438,7 @@ function InicioPage() {
           num="02"
           label="VIGENCIA"
           titulo="Vigencia vencida"
-          descripcion={`Pasaron más de ${DIAS_VIGENCIA} días: el precio que cotizaste ya no es válido. Recotiza o ciérrala como perdida — dejarlas abiertas ensucia el embudo.`}
+          descripcion={`Pasaron más de ${DIAS_VIGENCIA} días y el precio ya no es válido. De la más reciente a la más vieja: la que acaba de vencer todavía se recupera.`}
           vacio="Ninguna cotización vencida"
           filas={colas.vencidas.map((c) => {
             const d = dias(c.fecha);
@@ -466,7 +482,7 @@ function InicioPage() {
           num="03"
           label="COBRANZA"
           titulo="Cobro vencido"
-          descripcion={`Ventas cerradas con saldo desde hace ${DIAS_COBRO_VENCIDO} días o más. El detalle completo y el registro de pagos están en Cobranza.`}
+          descripcion={`Solo las ventas marcadas con cobro pendiente que ya llevan ${DIAS_COBRO_VENCIDO} días o más. Lo normal es que esté vacía: aquí se cobra antes de cerrar.`}
           vacio="Sin saldos vencidos"
           filas={colas.porCobrar.map(({ c, saldo, d }) => {
             const wa = urlWhatsApp(

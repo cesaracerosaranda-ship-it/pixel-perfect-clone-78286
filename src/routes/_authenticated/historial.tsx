@@ -856,6 +856,20 @@ function HistorialPage() {
     await aplicarEstado(id, estado);
   };
 
+  /** Marca una venta como vendida a crédito — la excepción, no la regla. */
+  const cobroPendienteDe = (r: CotizacionRow) =>
+    (r as { cobro_pendiente?: boolean }).cobro_pendiente === true;
+
+  const toggleCobro = async (r: CotizacionRow) => {
+    const nuevo = !cobroPendienteDe(r);
+    const { error } = await supabase
+      .from("cotizaciones")
+      .update({ cobro_pendiente: nuevo } as never)
+      .eq("id", r.id);
+    if (error) toast.error(error.message);
+    else toast.success(nuevo ? "Marcada con cobro pendiente" : "Marcada como cobrada");
+  };
+
   const removeRow = async (id: string) => {
     const { error } = await supabase.from("cotizaciones").delete().eq("id", id);
     if (error) toast.error(error.message);
@@ -1172,6 +1186,16 @@ function HistorialPage() {
                                   {ESTADO_LABEL[e]}
                                 </DropdownMenuItem>
                               ))}
+                              {estado === "cerrado" && (
+                                <DropdownMenuItem
+                                  onClick={() => toggleCobro(r)}
+                                  className="border-t border-border text-[#8A6508]"
+                                >
+                                  {cobroPendienteDe(r)
+                                    ? "Quitar cobro pendiente"
+                                    : "Marcar cobro pendiente"}
+                                </DropdownMenuItem>
+                              )}
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </td>

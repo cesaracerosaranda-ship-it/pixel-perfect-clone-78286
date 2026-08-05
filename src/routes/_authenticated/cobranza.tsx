@@ -267,7 +267,11 @@ function CobranzaPage() {
   }, [pagosQuery.data]);
 
   const filas = useMemo(() => {
+    // Una venta cerrada YA ESTÁ COBRADA salvo que se marque lo contrario: en
+    // VIALUX el pago ocurre antes de cerrar. Sin este filtro el módulo tomaba
+    // todo el histórico como deuda vencida.
     return (ventasQuery.data ?? [])
+      .filter((v) => (v as { cobro_pendiente?: boolean }).cobro_pendiente === true)
       .map((v) => {
         const pagos = pagosPorVenta.get(v.id) ?? [];
         const pagado = pagos.reduce((s, p) => s + Number(p.monto), 0);
@@ -279,6 +283,21 @@ function CobranzaPage() {
       .filter((f) => f.saldo > 0.01)
       .sort((a, b) => b.dias - a.dias);
   }, [ventasQuery.data, pagosPorVenta]);
+
+  /** Ingresos registrados, por mes. El historial real de dinero que entró. */
+  const ingresos = useMemo(() => {
+    const pagos = pagosQuery.data ?? [];
+    const porMes = new Map<string, number>();
+    for (const p of pagos) {
+      const k = p.fecha.slice(0, 7);
+      porMes.set(k, (porMes.get(k) ?? 0) + Number(p.monto));
+    }
+    const meses = [...porMes.entries()].sort((a, b) => (a[0] < b[0] ? 1 : -1)).slice(0, 6);
+    const total = pagos.reduce((s, p) => s + Number(p.monto), 0);
+    const ahora = new Date();
+    const claveMes = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, "0")}`;
+    return { meses, total, mesActual: porMes.get(claveMes) ?? 0, n: pagos.length };
+  }, [pagosQuery.data]);
 
   const kpis = useMemo(() => {
     const porCobrar = filas.reduce((s, f) => s + f.saldo, 0);
@@ -339,59 +358,66 @@ function CobranzaPage() {
         <RailSection
           num="00"
           label="RESUMEN"
-          titulo="Estado de la cobranza"
-          descripcion="La antigüedad se cuenta desde la fecha de la venta, no desde el último pago: lo que lleva más tiempo abierto es lo que hay que perseguir."
+          titulo="Ingresos registrados"
+          descripcion="Historial del dinero que ha entrado, por mes. Se alimenta de los pagos que registres en cada venta — sirve como respaldo de la operación, no como lista de cobro."
           padded={false}
         >
           <div className="grid grid-cols-2 md:grid-cols-4">
             <div className="border-r border-border p-4 md:px-5">
               <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">
-                Por cobrar
-              </div>
-              <div className="font-mono text-[22px] font-extrabold leading-none tabular-nums">
-                {formatMoney(kpis.porCobrar)}
-              </div>
-              <div className="mt-0.5 font-mono text-[10px] tracking-[0.08em] text-[#6B665C]">
-                {kpis.n} {kpis.n === 1 ? "VENTA" : "VENTAS"}
-              </div>
-            </div>
-            <div className="border-r border-border p-4 md:px-5">
-              <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">
-                Vencido +30 días
-              </div>
-              <div className="font-mono text-[22px] font-extrabold leading-none tabular-nums text-[#DC2626]">
-                {formatMoney(kpis.vencido)}
-              </div>
-              <div className="mt-0.5 font-mono text-[10px] tracking-[0.08em] text-[#6B665C]">
-                LO QUE HAY QUE PERSEGUIR
-              </div>
-            </div>
-            <div className="border-r border-border p-4 md:px-5">
-              <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">
                 Cobrado este mes
               </div>
               <div className="font-mono text-[22px] font-extrabold leading-none tabular-nums text-[#12843C]">
-                {formatMoney(kpis.cobradoMes)}
+                {formatMoney(ingresos.mesActual)}
+              </div>
+            </div>
+            <div className="border-r border-border p-4 md:px-5">
+              <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">
+                Total registrado
+              </div>
+              <div className="font-mono text-[22px] font-extrabold leading-none tabular-nums">
+                {formatMoney(ingresos.total)}
+              </div>
+              <div className="mt-0.5 font-mono text-[10px] tracking-[0.08em] text-[#6B665C]">
+                {ingresos.n} {ingresos.n === 1 ? "PAGO" : "PAGOS"}
+              </div>
+            </div>
+            <div className="border-r border-border p-4 md:px-5">
+              <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">
+                Con saldo abierto
+              </div>
+              <div
+                className={`font-mono text-[22px] font-extrabold leading-none tabular-nums ${
+                  kpis.porCobrar > 0 ? "text-[#DC2626]" : "text-[#12843C]"
+                }`}
+              >
+                {formatMoney(kpis.porCobrar)}
+              </div>
+              <div className="mt-0.5 font-mono text-[10px] tracking-[0.08em] text-[#6B665C]">
+                SOLO VENTAS MARCADAS
               </div>
             </div>
             <div className="p-4 md:px-5">
               <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">
-                Antigüedad
+                Últimos meses
               </div>
-              <div className="space-y-1 font-mono text-[12px] tabular-nums">
-                <div className="flex justify-between gap-2">
-                  <span className="text-[#12843C]">0-7 D</span>
-                  <span>{formatMoney(kpis.buckets.corriente)}</span>
+              {ingresos.meses.length === 0 ? (
+                <p className="font-mono text-[10px] text-[#767066]">SIN PAGOS REGISTRADOS</p>
+              ) : (
+                <div className="space-y-1 font-mono text-[10px] tabular-nums">
+                  {ingresos.meses.slice(0, 3).map(([m, v]) => (
+                    <div key={m} className="flex justify-between gap-2">
+                      <span className="text-[#57524A]">
+                        {new Date(`${m}-15T12:00:00`).toLocaleDateString("es-MX", {
+                          month: "short",
+                          year: "2-digit",
+                        }).toUpperCase()}
+                      </span>
+                      <span>{formatMoney(v)}</span>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex justify-between gap-2">
-                  <span className="text-[#8A6508]">8-30 D</span>
-                  <span>{formatMoney(kpis.buckets.medio)}</span>
-                </div>
-                <div className="flex justify-between gap-2">
-                  <span className="text-[#DC2626]">+30 D</span>
-                  <span>{formatMoney(kpis.buckets.vencido)}</span>
-                </div>
-              </div>
+              )}
             </div>
           </div>
         </RailSection>
@@ -400,8 +426,8 @@ function CobranzaPage() {
         <RailSection
           num="01"
           label="SALDOS"
-          titulo="Ventas con saldo"
-          descripcion="Solo aparecen las cerradas que aún deben algo, de la más antigua a la más reciente. El estado de pago se calcula solo a partir de los pagos registrados."
+          titulo="Con saldo abierto"
+          descripcion="Solo las ventas marcadas con cobro pendiente — crédito o anticipo. Lo normal es que esté vacía: en VIALUX se cobra antes de cerrar."
           meta={
             <span className="font-mono text-[11px] tracking-[0.08em] text-[#57524A]">
               {filas.length} {filas.length === 1 ? "VENTA" : "VENTAS"}
@@ -412,11 +438,11 @@ function CobranzaPage() {
         >
           {filas.length === 0 ? (
             <div className="px-6 py-14 text-center">
-              <p className="font-mono text-[13px] uppercase tracking-[0.14em] text-[#57524A]">
-                Sin saldos pendientes
+              <p className="font-mono text-[13px] uppercase tracking-[0.14em] text-[#12843C]">
+                Todo cobrado
               </p>
               <p className="mt-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-[#767066]">
-                Aquí aparecen las ventas cerradas que aún no están liquidadas
+Ninguna venta quedó con saldo. Si alguna se va a crédito, márcala desde Ventas y aparecerá aquí
               </p>
             </div>
           ) : (
