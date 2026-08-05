@@ -4,6 +4,15 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Dialog,
   DialogContent,
   DialogFooter,
@@ -18,16 +27,42 @@ type Cot = Tables<"cotizaciones">;
 /**
  * Marcar PERDIDO sin decir por qué tira la información más valiosa del embudo.
  * Los motivos son canónicos para que el dato sea agregable después (el panel de
- * Historial los agrupa por la parte anterior al guión largo).
+ * Ventas los agrupa por la parte anterior al guión largo).
+ *
+ * La lista viene de las etiquetas reales de WhatsApp Business, no de un catálogo
+ * genérico. El cambio de fondo: "no responde" era UN motivo y en la operación
+ * real son DOS problemas distintos, con arreglos distintos —
+ *   · post-campaña: llegó del anuncio, se le saludó y nunca contestó
+ *     → es calidad de lead, se corrige en la segmentación del anuncio
+ *   · post-contacto: hubo conversación de verdad y luego silencio
+ *     → es proceso de venta, se corrige en el seguimiento
+ * Mezclarlos escondía cuál de los dos está sangrando.
+ *
+ * Se agrupan para que la lista larga siga siendo escaneable.
  */
-export const MOTIVOS_PERDIDA = [
-  "Precio",
-  "Tiempo de entrega",
-  "Sin inventario",
-  "Eligió competencia",
-  "No responde",
-  "Otro",
+export const GRUPOS_MOTIVO = [
+  {
+    grupo: "Sin respuesta",
+    motivos: ["Sin respuesta post-campaña", "Sin respuesta post-contacto"],
+  },
+  {
+    grupo: "Objeción comercial",
+    motivos: [
+      "Precio",
+      "Costo del flete",
+      "Tiempo de entrega",
+      "Sin inventario",
+      "Eligió competencia",
+    ],
+  },
+  {
+    grupo: "No calificaba",
+    motivos: ["No era cliente", "Buscaba otro producto", "Es proveedor"],
+  },
+  { grupo: "Otro", motivos: ["Otro"] },
 ] as const;
+
+export const MOTIVOS_PERDIDA = GRUPOS_MOTIVO.flatMap((g) => g.motivos);
 
 /** Lectura defensiva: la columna existe solo tras la migración 20260802190000. */
 export function motivoPerdidaDe(r: Cot): string | null {
@@ -88,24 +123,29 @@ export function MotivoPerdidaModal({
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              {MOTIVOS_PERDIDA.map((m) => {
-                const activo = motivo === m;
-                return (
-                  <button
-                    key={m}
-                    type="button"
-                    onClick={() => setMotivo(m)}
-                    className={`border px-3 py-2.5 text-left text-xs font-semibold transition-colors ${
-                      activo
-                        ? "border-[#DC2626] bg-[#DC2626]/10 text-[#DC2626]"
-                        : "border-border bg-card text-[#2E2B27] hover:border-[#57524A]"
-                    }`}
-                  >
-                    {m}
-                  </button>
-                );
-              })}
+            <div className="space-y-1.5">
+              <Label className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#57524A]">
+                Motivo
+              </Label>
+              <Select value={motivo} onValueChange={setMotivo}>
+                <SelectTrigger className="text-[13px]">
+                  <SelectValue placeholder="Elige el motivo…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {GRUPOS_MOTIVO.map((g) => (
+                    <SelectGroup key={g.grupo}>
+                      <SelectLabel className="font-mono text-[10px] uppercase tracking-[0.18em] text-[#8A6508]">
+                        {g.grupo}
+                      </SelectLabel>
+                      {g.motivos.map((m) => (
+                        <SelectItem key={m} value={m} className="text-[13px]">
+                          {m}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-1.5">
