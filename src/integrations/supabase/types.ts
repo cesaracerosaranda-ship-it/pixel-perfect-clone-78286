@@ -180,6 +180,7 @@ export type Database = {
           cliente_id: string | null
           cliente_nombre: string
           cliente_telefono: string | null
+          cobro_pendiente: boolean
           cp_destino: string | null
           created_at: string
           descripcion_producto: string
@@ -216,6 +217,7 @@ export type Database = {
           cliente_id?: string | null
           cliente_nombre?: string
           cliente_telefono?: string | null
+          cobro_pendiente?: boolean
           cp_destino?: string | null
           created_at?: string
           descripcion_producto?: string
@@ -252,6 +254,7 @@ export type Database = {
           cliente_id?: string | null
           cliente_nombre?: string
           cliente_telefono?: string | null
+          cobro_pendiente?: boolean
           cp_destino?: string | null
           created_at?: string
           descripcion_producto?: string
