@@ -251,11 +251,7 @@ function InicioPage() {
     // 02 · Por cobrar vencido
     // Solo las marcadas a crédito: una venta cerrada ya está cobrada.
     const porCobrar = cots
-      .filter(
-        (c) =>
-          c.estado === "cerrado" &&
-          (c as { cobro_pendiente?: boolean }).cobro_pendiente === true,
-      )
+      .filter((c) => c.estado === "cerrado" && c.cobro_pendiente)
       .map((c) => ({ c, saldo: Number(c.total) - (pagadoPor.get(c.id) ?? 0), d: dias(c.fecha) }))
       .filter((x) => x.saldo > 0.01 && x.d >= DIAS_COBRO_VENCIDO)
       .sort((a, b) => b.d - a.d);

@@ -857,14 +857,13 @@ function HistorialPage() {
   };
 
   /** Marca una venta como vendida a crédito — la excepción, no la regla. */
-  const cobroPendienteDe = (r: CotizacionRow) =>
-    (r as { cobro_pendiente?: boolean }).cobro_pendiente === true;
+  const cobroPendienteDe = (r: CotizacionRow) => r.cobro_pendiente;
 
   const toggleCobro = async (r: CotizacionRow) => {
     const nuevo = !cobroPendienteDe(r);
     const { error } = await supabase
       .from("cotizaciones")
-      .update({ cobro_pendiente: nuevo } as never)
+      .update({ cobro_pendiente: nuevo })
       .eq("id", r.id);
     if (error) toast.error(error.message);
     else toast.success(nuevo ? "Marcada con cobro pendiente" : "Marcada como cobrada");

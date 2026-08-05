@@ -271,7 +271,7 @@ function CobranzaPage() {
     // VIALUX el pago ocurre antes de cerrar. Sin este filtro el módulo tomaba
     // todo el histórico como deuda vencida.
     return (ventasQuery.data ?? [])
-      .filter((v) => (v as { cobro_pendiente?: boolean }).cobro_pendiente === true)
+      .filter((v) => v.cobro_pendiente)
       .map((v) => {
         const pagos = pagosPorVenta.get(v.id) ?? [];
         const pagado = pagos.reduce((s, p) => s + Number(p.monto), 0);
