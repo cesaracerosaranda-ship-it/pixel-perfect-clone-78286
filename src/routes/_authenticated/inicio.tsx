@@ -570,7 +570,7 @@ function InicioPage() {
           if (!perdidaRow) return;
           const { error } = await supabase
             .from("cotizaciones")
-            .update({ estado: "perdido", motivo_perdida: motivo } as never)
+            .update({ estado: "perdido", motivo_perdida: motivo })
             .eq("id", perdidaRow.id);
           if (error) return;
           setPerdidaRow(null);

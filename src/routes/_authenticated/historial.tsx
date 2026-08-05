@@ -614,7 +614,7 @@ function ActualizarInventarioModal({
       boyas_disponibles: b,
     };
     if (clavosSupported) payload.clavos_disponibles = c;
-    const { error } = await supabase.from("inventario").update(payload as never).eq("id", 1);
+    const { error } = await supabase.from("inventario").update(payload).eq("id", 1);
     setSaving(false);
     if (error) {
       toast.error(error.message);
@@ -818,7 +818,7 @@ function HistorialPage() {
 
     const { error } = await supabase
       .from("cotizaciones")
-      .update(patch as never)
+      .update(patch)
       .eq("id", id);
 
     if (error) {

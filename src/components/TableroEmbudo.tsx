@@ -130,7 +130,7 @@ export function TableroEmbudo() {
 
     const { error } = await supabase
       .from("cotizaciones")
-      .update(patch as never)
+      .update(patch)
       .eq("id", id);
 
     if (error) {
