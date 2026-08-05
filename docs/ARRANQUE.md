@@ -1,135 +1,176 @@
 # ARRANQUE — Punto exacto para retomar
 
-Última actualización: 3/ago/2026. Este documento es el único que hay que leer para
-continuar. Los detalles viven en `plan-marketing-inhouse.md`,
+Última actualización: **5/ago/2026**. Este documento es el único que hay que leer
+para continuar. Los detalles viven en `plan-marketing-inhouse.md`,
 `adopcion-corteclaro.md` y `whatsapp-runbook.md`.
 
 ---
 
-## A · Lo que César hace SIN Claude (no requiere sesión)
+## 0 · LO PRIMERO al abrir la sesión
 
-**Domingo 3/ago**
-- [x] ~~Capturar inventario~~ — HECHO: 500 boyas · 2,000 clavos.
-
-**Lunes 4/ago — montar la campaña (~1 h)**
-- [ ] Seguir la guía de `plan-marketing-inhouse.md` §7 "Semana 2". Resumen:
-      duplicar `Ventas-Mensajes || Boyas 3 precios || Ubis || 1.12.25` →
-      renombrar `VIALUX || Consolidada || 08.26` → $200/día → borrar el anuncio
-      duplicado y crear uno con **"Usar publicación existente"** (la de
-      AD Boyas 3 precios 2, con sus 211 reacciones) → publicar.
-- [ ] Al publicar: **apagar** las dos campañas débiles (IG 10.12.25 y
-      Nuevas img AI). Dejar viva solo la ganadora 3-5 días como seguro.
-- [ ] Días siguientes: 5 min/día (gasto, conversaciones, $/conv).
-
-**Martes-miércoles 5-6/ago**
-- [ ] Al recibir clavos: capturar el conteo real en el mismo modal.
-
-**Antes del 15/ago**
-- [ ] Comparar consolidada vs viejas → decisión S4 → avisar la salida.
-
----
-
-## B · Migraciones — APLICADAS ✅ (Lovable, 3/ago)
-
-Ya corren en producción: el trigger de clavos (20260802130000) y el motivo de
-pérdida (20260802190000). Nada pendiente aquí.
-
-Si en el futuro se agrega otra migración, el prompt para Lovable es:
-
-```
-Ejecuta la migración SQL que está en supabase/migrations/NOMBRE.sql tal cual,
-sin modificarla. Confírmame que quedó aplicada.
-```
-
----
-
-## C · Construido el 3/ago
-
-- ✅ **Motivo de pérdida obligatorio** — modal con 6 motivos canónicos + detalle.
-- ✅ **Tasa de cierre + panel "por qué se pierde"** en el resumen de Historial
-  (motivos ordenados por DINERO perdido).
-- ✅ **Módulo Pipeline** (`/pipeline`, nueva pestaña) — kanban con $ y conteo por
-  columna, drag & drop, marca de vencida a los 7 días, mismos candados que
-  Historial.
-
-✅ **Migraciones aplicadas** — todo lo anterior ya funciona en producción.
-
-✅ **Texto de WhatsApp ajustado** (3/ago) — tuteo y sin cortesías de relleno:
-arranca en "Te comparto la cotización…" y cierra en "Adjunto el PDF con el
-detalle completo." Aplica al modal de copiar y al botón de WhatsApp directo.
-
-## C2 · Construido el 3/ago (tarde) — falta migración
-
-- ✅ **Módulo Cobranza** (`/cobranza`, pestaña nueva) — ventas cerradas con
-  saldo, ordenadas de la más antigua; avance de cobro, antigüedad en semáforo
-  (0-7 / 8-30 / +30 d), desglose de pagos, registro y borrado de pagos. KPIs:
-  por cobrar, vencido +30 d, cobrado en el mes. El estado de pago lo DERIVA un
-  trigger desde los pagos (no se captura a mano).
-- ✅ **Normalización de captura** — nombre/empresa/correo/teléfono se ordenan al
-  salir del campo en el cotizador (`src/lib/vialux/normaliza.ts`, 11/11 casos).
-
-**Pendiente:** pegar en Lovable →
+**Un solo paso bloqueante:** pegar esto en Lovable.
 
 ```
 Ejecuta tal cual, sin modificarla, la migración
-supabase/migrations/20260803140000_cobranza.sql. Después regenera los tipos de
-TypeScript para que incluya la tabla `pagos`. Confírmame ambas cosas.
+supabase/migrations/20260804180000_cobro_pendiente.sql. Después regenera los
+tipos de TypeScript. Confírmame ambas cosas.
 ```
 
-Sin la migración, Cobranza carga y muestra todo como pendiente, pero no permite
-registrar pagos.
+Sin esa columna, **Cobranza sigue mostrando como deuda ventas que ya se pagaron**
+y el botón "Marcar cobro pendiente" de Ventas falla al guardar. Todo lo demás de
+la app funciona con o sin ella.
 
-### Siguiente en construir (orden de `adopcion-corteclaro.md`)
-4. **Rastreo público por token** (1-2 días) — después del corte S4. Es lo único
-   grande que queda de la lista de CorteClaro.
+Cómo verificar que quedó (sin abrir Supabase):
 
-## D · Lo que sigue pendiente de decisión o insumo
+```bash
+grep -c cobro_pendiente src/integrations/supabase/types.ts
+```
 
-- **Fotos de obra instalada** (César) — para la serie orgánica del feed. El shot
-  list está en `plan-marketing-inhouse.md` Apéndice C.
-- **Claude Design** — el brief está listo en
-  `marketing/creativos/BRIEF-claude-design.md`; se difirió a los refreshes
-  post-corte. Retomar cuando haya holgura.
-- **Conector MCP de Meta Ads** (`mcp.facebook.com/ads`) — hallazgo del artículo
-  practicaly.ai (2/ago). Si la cuenta lo tiene habilitado, sustituiría la
-  integración con la Marketing API del plan: Claude consultaría métricas y Ad
-  Library directo, sin exports manuales. Añadir como conector personalizado por
-  URL y probar. **Sin verificar** (no aparece en el registro; ~40% de cuentas no
-  tienen el permiso). No bloquea nada: es mejora de flujo, no requisito.
-  Del mismo artículo se DESCARTA la generación de creativo con IA (contradice
-  el dato propio: $35 vs $20) y la cadencia de muchas variantes (con ~90
-  conversaciones/mes fragmentar impide salir del aprendizaje).
-- **Actualizar en Meta la URL del aviso de privacidad** a
-  `https://control.vialuxmty.com/privacidad` (hoy apunta al dominio de Lovable,
-  que sigue vivo — no urge, pero se ve mejor en la revisión de verificación).
-- **Estructura de portafolios en Meta** — renombrar "Celosias" a la razón social
-  de la CSF, sacar Lattice Works a su propio portafolio, quitar/despublicar CRG
-  Safety. Requisito previo a la Business Verification.
-- **WhatsApp fase pesada** (coexistencia del número real + captura de `referral`
-  + backfill del historial): **después del 15/ago**, en sesión dedicada, con
-  `whatsapp-runbook.md` a la mano. El token de prueba caduca cada 24 h — dar por
-  hecho que habrá que renovarlo antes de probar cualquier cosa.
+Debe devolver 2 o más después de que Lovable regenere los tipos y se haga
+`git pull`. Si devuelve 0, la migración no corrió.
 
 ---
 
-## E · Dominio propio ✅ (3/ago)
+## A · Lo que César hace SIN Claude
 
-La app vive en **https://control.vialuxmty.com** (registro A a 185.158.133.1,
-creado automáticamente por la integración de Lovable con Cloudflare; no hubo que
-capturar nada a mano). Verificado: SSL válido, `/`, `/auth` y `/privacidad`
-responden 200. La URL vieja `pixel-perfect-clone-78286.lovable.app` sigue activa,
-así que nada de lo registrado en Meta se cayó. La raíz `vialuxmty.com` queda
-libre para la landing pública.
+**Con fecha límite — antes del 15/ago (día de pago de S4)**
+- [ ] **Montar la campaña consolidada** (~1 h). Guía en
+      `plan-marketing-inhouse.md` §7 "Semana 2". Resumen: duplicar
+      `Ventas-Mensajes || Boyas 3 precios || Ubis || 1.12.25` → renombrar
+      `VIALUX || Consolidada || 08.26` → $200/día → borrar el anuncio duplicado y
+      crear uno con **"Usar publicación existente"** (la de AD Boyas 3 precios 2,
+      con sus 211 reacciones) → publicar.
+- [ ] Al publicar: **apagar** las dos campañas débiles (IG 10.12.25 y Nuevas img
+      AI). Dejar viva la ganadora 3-5 días como seguro.
+- [ ] Comparar consolidada vs viejas → decisión S4 → avisar la salida.
+
+**Sin fecha**
+- [ ] Al recibir clavos del proveedor: capturar el conteo real en el modal de
+      inventario.
+- [ ] Fotos de obra instalada para la serie orgánica (shot list en
+      `plan-marketing-inhouse.md` Apéndice C).
+- [ ] Probar en el celular si la respuesta rápida de WhatsApp Business admite
+      adjunto: Ajustes → Herramientas para la empresa → Respuestas rápidas → +.
+      Si no admite archivo, el flujo bueno es generar la ficha desde la app cada
+      vez (ya está construido) — así nunca sale con "reenviado muchas veces".
 
 ---
 
-## F · Estado del repo (3/ago)
+## B · Migraciones
 
-Todo está commiteado y pusheado a `main`. Últimos trabajos:
-- Motivo de pérdida + tasa de cierre + panel "por qué se pierde" + módulo Pipeline
-- Trigger de clavos + fix del modal de inventario (migraciones ya aplicadas)
-- Plan de marketing in-house completo, con benchmark competitivo y guía de
-  montaje de campaña
-- Creativos: `marketing/creativos/` (v1 técnico, v2 ficha, v4a/v4b con foto real
-  + las fotos originales en `fotos/`)
-- Mapa de adopción de CorteClaro
+| Migración | Estado |
+|---|---|
+| `20260802130000_inventario_clavos_trigger.sql` | ✅ aplicada |
+| `20260802190000_motivo_perdida.sql` | ✅ aplicada |
+| `20260803140000_cobranza.sql` (tabla `pagos`) | ✅ aplicada |
+| `20260804120000_bitacora.sql` (tabla `contactos`) | ✅ aplicada 4/ago |
+| `20260804180000_cobro_pendiente.sql` | ⛔ **PENDIENTE** — ver §0 |
+
+Lovable **no** aplica solo las migraciones del repo: siempre hay que pedírselo
+con el prompt de §0 cambiando el nombre del archivo.
+
+---
+
+## C · Construido 4-5/ago
+
+- ✅ **Panel INICIO** (`/`) — cinco colas de acción, cada una con su botón de
+  WhatsApp con texto ya redactado (nunca se envía solo), Recotizar y Perdida:
+  `00 Recordatorios` · `01 Sin respuesta` · `02 Vigencia vencida` ·
+  `03 Cobro vencido` · `04 Recompra`.
+  Un cliente con quien ya se habló en las últimas 48 h **no aparece** — la cola
+  refleja lo que falta hacer, no todo lo que existe.
+- ✅ **Seguimiento = top 5 por "calor"** — monto ponderado por qué tan fresca
+  sigue la cotización. Ordenar solo por monto mandaba a perseguir cotizaciones
+  grandes pero casi vencidas antes que otras vivas.
+- ✅ **Vigencia de lo recién vencido a lo más viejo** — la que caducó ayer se
+  recupera con una llamada; la de hace dos meses es arqueología.
+- ✅ **Bitácora + recordatorios por cliente** (tabla `contactos`) — una tarea
+  siempre nace de una conversación, por eso es una sola tabla. Atajos de fecha:
+  Mañana / En 3 días / En 1 semana / En 15 días.
+- ✅ **Motivos de pérdida desde las etiquetas reales de WhatsApp Business** —
+  agrupados en Select. Clave del diseño: "no responde" son DOS problemas
+  distintos — *post-campaña* es calidad de lead (se arregla en la segmentación
+  del anuncio) y *post-contacto* es proceso de venta (se arregla en el
+  seguimiento). Juntarlos escondía cuál de los dos está sangrando.
+- ✅ **Teléfono visible en toda la app** (`TelefonoCliente`) — muchos clientes se
+  guardan como "A QUIEN CORRESPONDA" y el teléfono es lo único que los distingue
+  y la llave para hallar la conversación en WhatsApp.
+- ✅ **Ficha técnica generada desde la app** — se regenera cada vez, así nunca
+  lleva la marca "reenviado muchas veces". Corrige dos cosas del PDF viejo que se
+  reenviaba: el correo del dominio en vez del de Gmail, y la tercera
+  configuración (boya + clavos + reflejantes) que faltaba.
+- ✅ **Cobranza reorientada** — ver §D, es el cambio con más contexto detrás.
+- ✅ **Encabezado de sección con riel numerado** en todas las pantallas
+  (`RailSection`), para que no se pierdan los límites entre secciones.
+
+---
+
+## D · Cobranza — el supuesto que estaba mal (leer antes de tocarla)
+
+El módulo se diseñó asumiendo que **cerrar una venta y cobrarla son momentos
+distintos**, y que una venta cerrada sin pagos registrados era dinero por cobrar.
+En VIALUX **el pago ocurre ANTES de cerrar**: todo el histórico aparecía como
+deuda vencida cuando ya estaba pagado.
+
+Se invirtió el default con `cobro_pendiente`: **una venta está saldada salvo que
+se marque lo contrario**, a mano, desde el menú de estado en Ventas, para el caso
+excepcional del crédito o el anticipo. Inicio respeta el mismo filtro.
+
+El módulo ahora sirve para **historial de ingresos** (cobrado en el mes, total
+registrado, desglose de los últimos 6 meses), no para cobrar.
+
+Pendiente de decidir con César qué más entra ahí: pidió "historial de
+transferencias, cotizaciones enviadas y aprobadas, guías". Las guías ya viven en
+`documentos`; falta ver si conviene una vista consolidada o solo enlazar.
+
+---
+
+## E · Lo que sigue en construir
+
+1. **Rastreo público por token** (1-2 días) — lo único grande que queda de
+   `adopcion-corteclaro.md`. Después del corte S4.
+2. **Cola de contacto post-entrega** — se descartó hacer encuestas de servicio al
+   volumen actual: con ~5 ventas/semana la muestra no dice nada y quema contacto.
+   Un mensaje a los pocos días de entregado sí.
+3. **WhatsApp fase pesada** — coexistencia del número real + captura de
+   `referral`/`ctwa_clid` + backfill del historial. **Después del 15/ago**, en
+   sesión dedicada, con `whatsapp-runbook.md` a la mano. El token de prueba caduca
+   cada 24 h: dar por hecho que hay que renovarlo antes de probar nada.
+4. **Migrar los ~431 hex hardcodeados a variables CSS** — deuda técnica, no urge.
+
+---
+
+## F · Pendientes de César en Meta (no bloquean nada de la app)
+
+- Actualizar la URL del aviso de privacidad a
+  `https://control.vialuxmty.com/privacidad`.
+- Estructura de portafolios: renombrar "Celosias" a la razón social de la CSF,
+  sacar Lattice Works a su propio portafolio, despublicar CRG Safety. Requisito
+  previo a la Business Verification.
+- **Conector MCP de Meta Ads** (`mcp.facebook.com/ads`) — **sin verificar**, ~40%
+  de las cuentas no tienen el permiso. Si existe, sustituye los exports manuales.
+  Es mejora de flujo, no requisito.
+
+---
+
+## G · Números de referencia (baseline real, 4/ago)
+
+De las listas de WhatsApp Business: **307 conversaciones fugadas** (206
+post-campaña + 101 post-contacto) contra **60 ventas** ≈ **5% de conversación a
+venta**. Es la primera línea base real que existe. Toda mejora de seguimiento se
+mide contra ese 5%.
+
+Costo por conversación propio: **$20** (vs $35 del creativo generado con IA — por
+eso se descartó esa vía). La app vive en **https://control.vialuxmty.com**.
+
+---
+
+## H · Estado del repo (5/ago)
+
+Todo commiteado y pusheado a `main`. Último commit: `b00937f` — fix de Cobranza y
+orden de las colas. Árbol limpio, build en verde, `npx tsc --noEmit` sin errores.
+
+**Ojo con el repo:** Lovable es co-editor. Siempre `git fetch && git rebase
+origin/main` antes de hacer push, o se pierde trabajo suyo. Y si aparecen errores
+de TypeScript raros después de un `git checkout --`, casi siempre es
+`routeTree.gen.ts` viejo: se arregla con `npm run build`.
