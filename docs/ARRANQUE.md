@@ -8,26 +8,23 @@ para continuar. Los detalles viven en `plan-marketing-inhouse.md`,
 
 ## 0 · LO PRIMERO al abrir la sesión
 
-**Un solo paso bloqueante:** pegar esto en Lovable.
+**No hay paso bloqueante.** `cobro_pendiente` ya está en producción desde el
+5/ago (commit `fe1bb65`, del bot de Lovable). Cobranza e Inicio ya filtran bien.
 
-```
-Ejecuta tal cual, sin modificarla, la migración
-supabase/migrations/20260804180000_cobro_pendiente.sql. Después regenera los
-tipos de TypeScript. Confírmame ambas cosas.
-```
-
-Sin esa columna, **Cobranza sigue mostrando como deuda ventas que ya se pagaron**
-y el botón "Marcar cobro pendiente" de Ventas falla al guardar. Todo lo demás de
-la app funciona con o sin ella.
-
-Cómo verificar que quedó (sin abrir Supabase):
+Cómo confirmarlo en un segundo, sin abrir Supabase:
 
 ```bash
 grep -c cobro_pendiente src/integrations/supabase/types.ts
 ```
 
-Debe devolver 2 o más después de que Lovable regenere los tipos y se haga
-`git pull`. Si devuelve 0, la migración no corrió.
+Debe devolver **2 o más** (hoy da 3: `Row`, `Insert`, `Update`). Si da 0, los
+tipos vienen de un checkout viejo — `git pull` antes de concluir nada.
+
+**Ojo con cómo se ve una migración aplicada:** Lovable no ejecuta el archivo del
+repo con su nombre. Copia el SQL y lo vuelve a commitear bajo un nombre suyo
+(`20260805165937_0eab3897-….sql`, contenido idéntico). Así que el archivo
+original puede *parecer* que nunca corrió. La prueba real es siempre `types.ts`,
+no el nombre del archivo en `supabase/migrations/`.
 
 ---
 
@@ -64,10 +61,19 @@ Debe devolver 2 o más después de que Lovable regenere los tipos y se haga
 | `20260802190000_motivo_perdida.sql` | ✅ aplicada |
 | `20260803140000_cobranza.sql` (tabla `pagos`) | ✅ aplicada |
 | `20260804120000_bitacora.sql` (tabla `contactos`) | ✅ aplicada 4/ago |
-| `20260804180000_cobro_pendiente.sql` | ⛔ **PENDIENTE** — ver §0 |
+| `20260804180000_cobro_pendiente.sql` | ✅ aplicada 5/ago (como `20260805165937_…`) |
 
-Lovable **no** aplica solo las migraciones del repo: siempre hay que pedírselo
-con el prompt de §0 cambiando el nombre del archivo.
+Lovable **no** aplica solo las migraciones del repo: siempre hay que pedírselo,
+con este prompt cambiando el nombre del archivo.
+
+```
+Ejecuta tal cual, sin modificarla, la migración
+supabase/migrations/<ARCHIVO>.sql. Después regenera los tipos de
+TypeScript. Confírmame ambas cosas.
+```
+
+Y verificar en `types.ts`, no por el nombre del archivo — Lovable recommitea el
+SQL bajo un nombre propio (ver §0).
 
 ---
 
@@ -167,8 +173,15 @@ eso se descartó esa vía). La app vive en **https://control.vialuxmty.com**.
 
 ## H · Estado del repo (5/ago)
 
-Todo commiteado y pusheado a `main`. Último commit: `b00937f` — fix de Cobranza y
-orden de las colas. Árbol limpio, build en verde, `npx tsc --noEmit` sin errores.
+Al 5/ago: árbol limpio, `npx tsc --noEmit` sin errores y `npm run build` en
+verde. La migración de `cobro_pendiente` y sus tipos entraron en `fe1bb65` (bot
+de Lovable).
+
+⚠️ **Hay dos commits locales SIN pushear** (docs + limpieza de casts). Antes de
+subirlos: `git fetch && git rebase origin/main`. No fijar aquí el hash del
+último commit — se pudre en cuanto Lovable o tú commitean, y eso ya costó una
+sesión. Para saber el estado real: `git log --oneline -5` y
+`git rev-list --left-right --count HEAD...origin/main`.
 
 **Ojo con el repo:** Lovable es co-editor. Siempre `git fetch && git rebase
 origin/main` antes de hacer push, o se pierde trabajo suyo. Y si aparecen errores
