@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { MessageCircle, Calculator, Clock, AlertTriangle, Bell, Check } from "lucide-react";
+import { MessageCircle, Calculator, Clock, AlertTriangle, Bell, Check, XCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney } from "@/lib/vialux/constants";
 import { normalizarTelefono } from "@/lib/vialux/telefono";
@@ -11,6 +11,8 @@ import {
 } from "@/lib/vialux/contactos";
 import type { Tables } from "@/integrations/supabase/types";
 import { RailSection, PageTitle } from "@/components/RailSection";
+import { TelefonoCliente } from "@/components/TelefonoCliente";
+import { MotivoPerdidaModal } from "@/components/MotivoPerdidaModal";
 import { BandaCargando, BandaError, textoError } from "@/components/EstadoConsulta";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
@@ -48,10 +50,11 @@ function urlWhatsApp(tel: string | null, texto: string): string | null {
 // ─── Fila de acción ──────────────────────────────────────────────────────────
 
 function FilaAccion({
-  titulo, subtitulo, monto, meta, urgente, acciones,
+  titulo, subtitulo, telefono, monto, meta, urgente, acciones,
 }: {
   titulo: string;
   subtitulo?: string | null;
+  telefono?: string | null;
   monto: number;
   meta: string;
   urgente?: boolean;
@@ -61,9 +64,12 @@ function FilaAccion({
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3.5 transition-colors hover:bg-[#EDBA1A]/[0.04]">
       <div className="min-w-[200px] flex-1">
         <div className="text-[13px] font-bold uppercase">{titulo}</div>
-        {subtitulo && (
-          <div className="truncate text-[12px] text-muted-foreground">{subtitulo}</div>
-        )}
+        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5">
+          {subtitulo && (
+            <span className="truncate text-[12px] text-muted-foreground">{subtitulo}</span>
+          )}
+          <TelefonoCliente tel={telefono} icono className="text-[11px] text-[#57524A]" />
+        </div>
       </div>
       <div className="w-28 text-right font-mono text-[13px] font-bold tabular-nums">
         {formatMoney(monto)}
@@ -143,6 +149,10 @@ function Cola({
 function InicioPage() {
   const qc = useQueryClient();
   const navigate = useNavigate();
+  // Reforzar la venta o darla por perdida son las dos salidas de la misma
+  // decisión: tenerlas juntas evita que las cotizaciones muertas se queden
+  // eternamente en la cola inflando el "en proceso".
+  const [perdidaRow, setPerdidaRow] = useState<Cot | null>(null);
 
   const cotsQuery = useQuery({
     queryKey: ["cotizaciones"],
@@ -336,6 +346,7 @@ function InicioPage() {
                 key={r.id}
                 titulo={nombre}
                 subtitulo={r.proxima_accion}
+                telefono={cli?.cliente_telefono}
                 monto={cot ? Number(cot.total) : 0}
                 meta={atraso === 0 ? "HOY" : `ATRASADO ${atraso}D`}
                 urgente={atraso > 0}
@@ -380,6 +391,7 @@ function InicioPage() {
                 key={c.id}
                 titulo={c.cliente_nombre}
                 subtitulo={`${c.folio} · ${c.cantidad} PZS${c.cliente_empresa && c.cliente_empresa !== "-" ? ` · ${c.cliente_empresa}` : ""}`}
+                telefono={c.cliente_telefono}
                 monto={Number(c.total)}
                 meta={`${d}D SIN MOVER`}
                 urgente={d >= 5}
@@ -392,6 +404,12 @@ function InicioPage() {
                     )}
                     <BotonAccion onClick={() => irACotizar(c)} etiqueta={`Recotizar ${c.folio}`}>
                       <Calculator className="h-3.5 w-3.5" aria-hidden="true" /> Recotizar
+                    </BotonAccion>
+                    <BotonAccion
+                      onClick={() => setPerdidaRow(c)}
+                      etiqueta={`Marcar ${c.folio} como perdida`}
+                    >
+                      <XCircle className="h-3.5 w-3.5" aria-hidden="true" /> Perdida
                     </BotonAccion>
                   </>
                 }
@@ -417,6 +435,7 @@ function InicioPage() {
                 key={c.id}
                 titulo={c.cliente_nombre}
                 subtitulo={`${c.folio} · ${c.cantidad} PZS`}
+                telefono={c.cliente_telefono}
                 monto={Number(c.total)}
                 meta={`VENCIDA HACE ${d - DIAS_VIGENCIA}D`}
                 urgente
@@ -429,6 +448,12 @@ function InicioPage() {
                     )}
                     <BotonAccion onClick={() => irACotizar(c)} etiqueta={`Recotizar ${c.folio}`}>
                       <Calculator className="h-3.5 w-3.5" aria-hidden="true" /> Recotizar
+                    </BotonAccion>
+                    <BotonAccion
+                      onClick={() => setPerdidaRow(c)}
+                      etiqueta={`Marcar ${c.folio} como perdida`}
+                    >
+                      <XCircle className="h-3.5 w-3.5" aria-hidden="true" /> Perdida
                     </BotonAccion>
                   </>
                 }
@@ -453,6 +478,7 @@ function InicioPage() {
                 key={c.id}
                 titulo={c.cliente_nombre}
                 subtitulo={`${c.folio} · SALDO DE ${formatMoney(Number(c.total))}`}
+                telefono={c.cliente_telefono}
                 monto={saldo}
                 meta={`${d}D DE ANTIGÜEDAD`}
                 urgente
@@ -493,6 +519,7 @@ function InicioPage() {
                 key={c.id}
                 titulo={c.cliente_nombre}
                 subtitulo={`ÚLTIMA COMPRA: ${c.folio} · ${c.cantidad} PZS`}
+                telefono={c.cliente_telefono}
                 monto={Number(c.total)}
                 meta={`HACE ${d}D`}
                 acciones={
@@ -523,6 +550,21 @@ function InicioPage() {
           </div>
         )}
       </div>
+
+      <MotivoPerdidaModal
+        row={perdidaRow}
+        onOpenChange={(v) => { if (!v) setPerdidaRow(null); }}
+        onConfirm={async (motivo) => {
+          if (!perdidaRow) return;
+          const { error } = await supabase
+            .from("cotizaciones")
+            .update({ estado: "perdido", motivo_perdida: motivo } as never)
+            .eq("id", perdidaRow.id);
+          if (error) return;
+          setPerdidaRow(null);
+          void qc.invalidateQueries({ queryKey: ["cotizaciones"] });
+        }}
+      />
 
       <p className="mt-3 flex items-start gap-2 font-mono text-[11px] uppercase leading-relaxed tracking-[0.1em] text-[#57524A]">
         <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />

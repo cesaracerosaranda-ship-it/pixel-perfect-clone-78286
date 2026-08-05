@@ -7,6 +7,7 @@ import { formatMoney } from "@/lib/vialux/constants";
 import type { Tables } from "@/integrations/supabase/types";
 import { RailSection } from "@/components/RailSection";
 import { MotivoPerdidaModal } from "@/components/MotivoPerdidaModal";
+import { TelefonoCliente } from "@/components/TelefonoCliente";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -274,6 +275,10 @@ export function TableroEmbudo() {
                                 {r.cliente_empresa}
                               </div>
                             )}
+                            <TelefonoCliente
+                              tel={r.cliente_telefono}
+                              className="mt-0.5 text-[11px] text-[#57524A]"
+                            />
                             <div className="mt-1.5 flex items-center justify-between font-mono text-[11px] text-[#57524A]">
                               <span>{r.cantidad} PZS</span>
                               <span className={vencida ? "font-bold text-[#DC2626]" : ""}>

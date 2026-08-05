@@ -46,6 +46,7 @@ import { generateFolio } from "@/lib/vialux/quote-actions";
 import type { Tables } from "@/integrations/supabase/types";
 import { RailSection, PageTitle } from "@/components/RailSection";
 import { TableroEmbudo } from "@/components/TableroEmbudo";
+import { TelefonoCliente } from "@/components/TelefonoCliente";
 import { LayoutGrid, Rows3 } from "lucide-react";
 import { BandaCargando, BandaError, textoError } from "@/components/EstadoConsulta";
 import { upsertCliente } from "@/lib/vialux/clientes";
@@ -1133,6 +1134,10 @@ function HistorialPage() {
                         </td>
                         <td className="px-4 py-3 text-xs font-bold uppercase">
                           {r.cliente_nombre}
+                          <TelefonoCliente
+                            tel={r.cliente_telefono}
+                            className="mt-0.5 block text-[11px] font-normal normal-case text-[#57524A]"
+                          />
                           {estado === "perdido" && motivoDe(r) && (
                             <div
                               className="mt-0.5 font-mono text-[11px] font-normal normal-case tracking-wide text-[#DC2626]"

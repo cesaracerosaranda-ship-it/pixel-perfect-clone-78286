@@ -17,6 +17,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { formatMoney } from "@/lib/vialux/constants";
 import type { Tables } from "@/integrations/supabase/types";
 import { RailSection, PageTitle } from "@/components/RailSection";
+import { TelefonoCliente } from "@/components/TelefonoCliente";
 import { BandaCargando, BandaError, textoError } from "@/components/EstadoConsulta";
 
 export const Route = createFileRoute("/_authenticated/cobranza")({
@@ -443,6 +444,10 @@ function CobranzaPage() {
                             {f.venta.cliente_empresa}
                           </div>
                         )}
+                        <TelefonoCliente
+                          tel={f.venta.cliente_telefono}
+                          className="mt-0.5 text-[11px] text-[#57524A]"
+                        />
                       </div>
 
                       {/* Avance de cobro */}

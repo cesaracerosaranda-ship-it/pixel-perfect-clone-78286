@@ -26,6 +26,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { BitacoraCliente } from "@/components/BitacoraCliente";
+import { TelefonoCliente } from "@/components/TelefonoCliente";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney } from "@/lib/vialux/constants";
@@ -817,8 +818,12 @@ function ClientesPage() {
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 font-mono text-[12px] text-muted-foreground">
-                        {c.telefono || "—"}
+                      <td className="px-4 py-3">
+                        {c.telefono ? (
+                          <TelefonoCliente tel={c.telefono} className="text-[12px] text-[#2E2B27]" />
+                        ) : (
+                          <span className="font-mono text-[12px] text-[#767066]">—</span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-right font-mono text-xs">{c.total_cotizaciones}</td>
                       <td className="px-4 py-3 text-right font-mono text-xs font-bold text-[#8A6508]">
