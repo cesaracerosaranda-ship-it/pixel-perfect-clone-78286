@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Plus, Trash2, Check, Bell } from "lucide-react";
+import { Plus, Trash2, Check, Bell, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -9,7 +9,7 @@ import {
   Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
 import {
-  contactosDe, registrarContacto, marcarCumplida, borrarContacto,
+  contactosDe, registrarContacto, marcarCumplida, borrarContacto, completarSeguimiento,
   TIPOS_CONTACTO, type Contacto, type TipoContacto,
 } from "@/lib/vialux/contactos";
 
@@ -165,6 +165,78 @@ function RegistrarContactoModal({
 
 // ─── Bitácora ────────────────────────────────────────────────────────────────
 
+/**
+ * La nota de una entrada, editable en el sitio.
+ *
+ * Hace falta porque el seguimiento de Inicio se registra de un clic y la nota
+ * llega después: si esa tira se cierra antes de escribirla, la entrada queda
+ * vacía y sin este editor no habría dónde completarla.
+ */
+function NotaEditable({
+  contactoId, nota, onGuardada,
+}: {
+  contactoId: string;
+  nota: string;
+  onGuardada: () => void;
+}) {
+  const [editando, setEditando] = useState(false);
+  const [texto, setTexto] = useState(nota);
+  const [guardando, setGuardando] = useState(false);
+
+  if (!editando) {
+    return (
+      <div className="mt-1.5 flex items-start gap-2">
+        <p
+          className={`flex-1 whitespace-pre-wrap text-[13px] leading-relaxed ${
+            nota.trim() ? "" : "italic text-[#767066]"
+          }`}
+        >
+          {nota.trim() || "Sin nota — toca el lápiz para escribirla"}
+        </p>
+        <button
+          type="button"
+          aria-label="Editar la nota"
+          onClick={() => { setTexto(nota); setEditando(true); }}
+          className="shrink-0 text-[#948D80] transition-colors hover:text-[#8A6508]"
+        >
+          <Pencil className="h-3.5 w-3.5" />
+        </button>
+      </div>
+    );
+  }
+
+  const guardar = async () => {
+    setGuardando(true);
+    const e = await completarSeguimiento(contactoId, { nota: texto });
+    setGuardando(false);
+    if (e) { toast.error(e); return; }
+    setEditando(false);
+    toast.success("Nota actualizada");
+    onGuardada();
+  };
+
+  return (
+    <div className="mt-1.5 flex flex-wrap items-start gap-2">
+      <Textarea
+        value={texto}
+        onChange={(e) => setTexto(e.target.value)}
+        rows={3}
+        autoFocus
+        aria-label="Nota de la bitácora"
+        className="min-w-[200px] flex-1 text-[13px]"
+      />
+      <div className="flex gap-1">
+        <Button size="sm" onClick={() => void guardar()} disabled={guardando}>
+          {guardando ? "Guardando…" : "Guardar"}
+        </Button>
+        <Button size="sm" variant="outline" onClick={() => setEditando(false)} disabled={guardando}>
+          Cancelar
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export function BitacoraCliente({ clienteId }: { clienteId: string }) {
   const [items, setItems] = useState<Contacto[] | null>(null);
   const [abierto, setAbierto] = useState(false);
@@ -235,7 +307,12 @@ export function BitacoraCliente({ clienteId }: { clienteId: string }) {
                   </div>
                 </div>
 
-                <p className="mt-1.5 whitespace-pre-wrap text-[13px] leading-relaxed">{c.nota}</p>
+                <NotaEditable
+                  contactoId={c.id}
+                  nota={c.nota}
+                  onGuardada={cargar}
+                />
+
 
                 {c.proxima_accion && (
                   <div className="mt-2.5 flex flex-wrap items-center gap-2 border-t border-[#EFEDE8] pt-2">

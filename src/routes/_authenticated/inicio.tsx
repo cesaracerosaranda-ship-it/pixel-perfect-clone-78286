@@ -10,6 +10,7 @@ import {
   contactosRecientes, ultimoContactoPorCliente, recordatoriosVigentes,
   diasDesde as diasDesdeISO, type Contacto,
 } from "@/lib/vialux/contactos";
+import { nombreParaMostrar } from "@/lib/vialux/clientes";
 import type { Tables } from "@/integrations/supabase/types";
 import { RailSection, PageTitle } from "@/components/RailSection";
 import { TelefonoCliente } from "@/components/TelefonoCliente";
@@ -182,8 +183,15 @@ function InicioPage() {
 
   // ─── La lista del día ─────────────────────────────────────────────────────
   const lista = useMemo(() => {
-    const claveDe = (c: { cliente_id: string | null; cliente_nombre: string }) =>
-      (c.cliente_id ?? c.cliente_nombre).toLowerCase();
+    /**
+     * Con qué identidad se deduplica la fila. Sin `nombreParaMostrar`, dos
+     * cotizaciones distintas a "A QUIEN CORRESPONDA" de empresas distintas
+     * contarían como el mismo cliente y una le quitaría el lugar a la otra.
+     */
+    const claveDe = (c: { cliente_id: string | null; cliente_nombre: string; cliente_empresa: string }) =>
+      (c.cliente_id ??
+        nombreParaMostrar({ nombre: c.cliente_nombre, empresa: c.cliente_empresa })
+      ).toLowerCase();
 
     /** Ya le hablaste hace poco: no ocupa uno de los diez lugares. */
     const habloReciente = (clienteId: string | null) => {
@@ -225,7 +233,7 @@ function InicioPage() {
         cot,
         recordatorioId: r.id,
         clienteId: r.cliente_id,
-        nombre: cot.cliente_nombre,
+        nombre: nombreParaMostrar({ nombre: cot.cliente_nombre, empresa: cot.cliente_empresa }),
         empresa: cot.cliente_empresa,
         telefono: cot.cliente_telefono,
         monto: Number(cot.total),
@@ -253,7 +261,7 @@ function InicioPage() {
         cot: c,
         recordatorioId: null,
         clienteId: c.cliente_id,
-        nombre: c.cliente_nombre,
+        nombre: nombreParaMostrar({ nombre: c.cliente_nombre, empresa: c.cliente_empresa }),
         empresa: c.cliente_empresa,
         telefono: c.cliente_telefono,
         monto: Number(c.total),
@@ -277,7 +285,7 @@ function InicioPage() {
           cot: c,
           recordatorioId: null,
           clienteId: c.cliente_id,
-          nombre: c.cliente_nombre,
+          nombre: nombreParaMostrar({ nombre: c.cliente_nombre, empresa: c.cliente_empresa }),
           empresa: c.cliente_empresa,
           telefono: c.cliente_telefono,
           monto: Number(c.total),
@@ -317,7 +325,7 @@ function InicioPage() {
           cot: c,
           recordatorioId: null,
           clienteId: c.cliente_id,
-          nombre: c.cliente_nombre,
+          nombre: nombreParaMostrar({ nombre: c.cliente_nombre, empresa: c.cliente_empresa }),
           empresa: c.cliente_empresa,
           telefono: c.cliente_telefono,
           monto: Number(c.total),
@@ -339,17 +347,33 @@ function InicioPage() {
     return out;
   }, [cots, contactos, ultimoContacto]);
 
+  /**
+   * Mientras haya una tira abierta, la lista se congela.
+   *
+   * Sin esto, cambiar de pestaña en el navegador dispara el refetch por foco de
+   * react-query; el contacto recién registrado ya silencia esa fila, la fila
+   * desaparece y se lleva el comentario a medio escribir. Pasó en producción el
+   * primer día. La lista vuelve a moverse cuando se cierra la última tira.
+   */
+  const [congelada, setCongelada] = useState<Item[] | null>(null);
+  const filas = congelada ?? lista;
+
   const irACotizar = (c: Cot) =>
     navigate({ to: "/", search: { duplicate: c.id, clienteId: undefined } });
 
   const aplicarPerdida = (c: Cot) => setPerdidaRow(c);
 
+  const abrirSeguimiento = (key: string, contactoId: string) => {
+    setCongelada((c) => c ?? lista);
+    setRegistrados((r) => ({ ...r, [key]: contactoId }));
+  };
+
   /** El seguimiento ya quedó: se refresca y la fila cae sola. */
   const cerrarSeguimiento = (key: string) => {
-    setRegistrados((r) => {
-      const { [key]: _quitado, ...resto } = r;
-      return resto;
-    });
+    const resto = { ...registrados };
+    delete resto[key];
+    setRegistrados(resto);
+    if (Object.keys(resto).length === 0) setCongelada(null);
     void qc.invalidateQueries({ queryKey: ["contactos"] });
   };
 
@@ -423,13 +447,13 @@ function InicioPage() {
             </span>
           }
         >
-          {lista.length === 0 ? (
+          {filas.length === 0 ? (
             <p className="px-5 py-10 text-center font-mono text-[11px] uppercase tracking-[0.14em] text-[#767066]">
               Nada pendiente. Todo tiene movimiento reciente.
             </p>
           ) : (
             <div className="divide-y divide-[#EFEDE8]">
-              {lista.map((it) => {
+              {filas.map((it) => {
                 const wa = urlWhatsApp(it.telefono, it.mensajeWa);
                 const contactoId = registrados[it.key];
                 return (
@@ -476,9 +500,7 @@ function InicioPage() {
                             telefono={it.telefono}
                             cotizacionId={it.cot?.id ?? null}
                             recordatorioId={it.recordatorioId}
-                            onRegistrado={(id) =>
-                              setRegistrados((r) => ({ ...r, [it.key]: id }))
-                            }
+                            onRegistrado={(id) => abrirSeguimiento(it.key, id)}
                           />
                         )}
                         {it.cot && (
