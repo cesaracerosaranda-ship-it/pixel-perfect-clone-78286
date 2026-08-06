@@ -48,12 +48,12 @@ function RegistrarContactoModal({
     // recuerda. Se pide la fecha o se descarta la acción.
     if (accion.trim() && !fecha) { toast.error("Ponle fecha a la próxima acción"); return; }
     setSaving(true);
-    const err = await registrarContacto({
+    const { error } = await registrarContacto({
       cliente_id: clienteId, tipo, nota,
       proxima_accion: accion, proxima_fecha: fecha,
     });
     setSaving(false);
-    if (err) { toast.error(err); return; }
+    if (error) { toast.error(error); return; }
     toast.success(fecha ? "Contacto y recordatorio guardados" : "Contacto registrado");
     onOpenChange(false);
     onDone();

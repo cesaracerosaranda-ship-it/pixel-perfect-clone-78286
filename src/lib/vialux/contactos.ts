@@ -1,12 +1,12 @@
 import { supabase } from "@/integrations/supabase/client";
+import { upsertCliente } from "@/lib/vialux/clientes";
 
 /**
  * Bitácora de contacto.
  *
- * `contactos` no entra a types.ts hasta que Lovable aplique la migración
- * 20260804120000, así que se accede con un tipo mínimo propio. Igual que con
- * `pagos`: el build no depende de la regeneración de tipos y la UI degrada sin
- * romperse si la tabla aún no existe.
+ * Una tarea siempre nace de una conversación, por eso vive en una sola tabla:
+ * lo que se habló (`nota`) y lo que se prometió (`proxima_accion` +
+ * `proxima_fecha`) son el mismo registro.
  */
 
 export type TipoContacto = "whatsapp" | "llamada" | "correo" | "visita" | "nota";
@@ -31,43 +31,34 @@ export type Contacto = {
   cumplida: boolean;
 };
 
-type Res<T> = { data: T | null; error: { message: string } | null };
-type Filtro = { eq: (c: string, v: string) => PromiseLike<Res<Contacto[]>> } & PromiseLike<Res<Contacto[]>>;
-type Api = {
-  select: (cols: string) => {
-    order: (c: string, o: { ascending: boolean }) => { limit: (n: number) => PromiseLike<Res<Contacto[]>> };
-    eq: (c: string, v: string) => {
-      order: (c: string, o: { ascending: boolean }) => PromiseLike<Res<Contacto[]>>;
-    };
-  };
-  insert: (row: Record<string, unknown>) => PromiseLike<Res<null>>;
-  update: (row: Record<string, unknown>) => { eq: (c: string, v: string) => PromiseLike<Res<null>> };
-  delete: () => { eq: (c: string, v: string) => PromiseLike<Res<null>> };
-};
-
-export const tablaContactos = (): Api =>
-  (supabase as unknown as { from: (t: string) => Api }).from("contactos");
-
 /** Bitácora de un cliente, de lo más reciente a lo más viejo. */
 export async function contactosDe(clienteId: string): Promise<Contacto[]> {
-  const { data, error } = await tablaContactos()
+  const { data, error } = await supabase
+    .from("contactos")
     .select("*")
     .eq("cliente_id", clienteId)
     .order("fecha", { ascending: false });
   if (error) return [];
-  return data ?? [];
+  return (data ?? []) as Contacto[];
 }
 
-/** Todos los contactos recientes — alimenta las colas de Inicio. */
+/** Todos los contactos recientes — alimenta la lista de Inicio. */
 export async function contactosRecientes(limite = 3000): Promise<Contacto[]> {
-  const { data, error } = await tablaContactos()
+  const { data, error } = await supabase
+    .from("contactos")
     .select("*")
     .order("fecha", { ascending: false })
     .limit(limite);
   if (error) return [];
-  return data ?? [];
+  return (data ?? []) as Contacto[];
 }
 
+/**
+ * Inserta un contacto y devuelve su id.
+ *
+ * El id importa porque quien registra desde Inicio lo hace con un solo clic y
+ * la nota llega después: hay que saber a qué fila adjuntarla.
+ */
 export async function registrarContacto(c: {
   cliente_id: string;
   cotizacion_id?: string | null;
@@ -75,25 +66,87 @@ export async function registrarContacto(c: {
   nota: string;
   proxima_accion?: string | null;
   proxima_fecha?: string | null;
-}): Promise<string | null> {
-  const { error } = await tablaContactos().insert({
-    cliente_id: c.cliente_id,
-    cotizacion_id: c.cotizacion_id ?? null,
-    tipo: c.tipo,
-    nota: c.nota.trim(),
-    proxima_accion: c.proxima_accion?.trim() || null,
-    proxima_fecha: c.proxima_fecha || null,
+}): Promise<{ id: string | null; error: string | null }> {
+  const { data, error } = await supabase
+    .from("contactos")
+    .insert({
+      cliente_id: c.cliente_id,
+      cotizacion_id: c.cotizacion_id ?? null,
+      tipo: c.tipo,
+      nota: c.nota.trim(),
+      proxima_accion: c.proxima_accion?.trim() || null,
+      proxima_fecha: c.proxima_fecha || null,
+    })
+    .select("id")
+    .single();
+  return { id: data?.id ?? null, error: error ? error.message : null };
+}
+
+/**
+ * Registra un seguimiento desde Inicio, de un clic.
+ *
+ * Las filas de Inicio son cotizaciones y `cotizaciones.cliente_id` admite nulo,
+ * pero `contactos.cliente_id` es obligatorio y tiene llave foránea. En las
+ * cotizaciones viejas sin cliente ligado el insert fallaría, así que aquí se
+ * resuelve primero con `upsertCliente`: lo busca por nombre y si no existe lo
+ * crea. De paso el directorio se va completando solo.
+ */
+export async function registrarSeguimiento(args: {
+  clienteId: string | null;
+  nombre: string;
+  empresa?: string | null;
+  telefono?: string | null;
+  cotizacionId?: string | null;
+  tipo?: TipoContacto;
+}): Promise<{ id: string | null; error: string | null }> {
+  let clienteId = args.clienteId;
+
+  if (!clienteId) {
+    clienteId = await upsertCliente({
+      nombre: args.nombre,
+      empresa: args.empresa ?? undefined,
+      telefono: args.telefono ?? undefined,
+    });
+    if (!clienteId) {
+      return { id: null, error: "Falta ligar el cliente: la cotización no trae nombre utilizable" };
+    }
+  }
+
+  return registrarContacto({
+    cliente_id: clienteId,
+    cotizacion_id: args.cotizacionId ?? null,
+    tipo: args.tipo ?? "whatsapp",
+    nota: "",
   });
+}
+
+/**
+ * Completa un seguimiento ya registrado con la nota y/o el próximo paso.
+ *
+ * Va aparte del registro porque el clic tiene que ser uno solo: primero queda
+ * la constancia, y si César escribe algo se adjunta después.
+ */
+export async function completarSeguimiento(
+  id: string,
+  patch: { nota?: string; proxima_accion?: string | null; proxima_fecha?: string | null },
+): Promise<string | null> {
+  const fields: { nota?: string; proxima_accion?: string | null; proxima_fecha?: string | null } = {};
+  if (patch.nota !== undefined) fields.nota = patch.nota.trim();
+  if (patch.proxima_accion !== undefined) fields.proxima_accion = patch.proxima_accion?.trim() || null;
+  if (patch.proxima_fecha !== undefined) fields.proxima_fecha = patch.proxima_fecha || null;
+  if (!Object.keys(fields).length) return null;
+
+  const { error } = await supabase.from("contactos").update(fields).eq("id", id);
   return error ? error.message : null;
 }
 
 export async function marcarCumplida(id: string): Promise<string | null> {
-  const { error } = await tablaContactos().update({ cumplida: true }).eq("id", id);
+  const { error } = await supabase.from("contactos").update({ cumplida: true }).eq("id", id);
   return error ? error.message : null;
 }
 
 export async function borrarContacto(id: string): Promise<string | null> {
-  const { error } = await tablaContactos().delete().eq("id", id);
+  const { error } = await supabase.from("contactos").delete().eq("id", id);
   return error ? error.message : null;
 }
 
@@ -106,10 +159,8 @@ export function diasDesde(iso: string | null | undefined): number {
 /**
  * Último contacto registrado por cliente.
  *
- * Sirve para lo más importante del panel: si ya hablaste con alguien ayer, Inicio
- * NO debe seguir empujándote a perseguirlo. Sin esto, las colas son solo
- * inferencias de fechas y te mandan a molestar a gente con la que ya cerraste
- * el siguiente paso.
+ * Es lo que permite que la lista de Inicio no te empuje a perseguir a alguien
+ * con quien ya hablaste ayer. Sin esto la lista es pura inferencia de fechas.
  */
 export function ultimoContactoPorCliente(cs: Contacto[]): Map<string, Contacto> {
   const m = new Map<string, Contacto>();

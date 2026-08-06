@@ -1,41 +1,44 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { MessageCircle, Calculator, Clock, AlertTriangle, Bell, Check, XCircle } from "lucide-react";
+import { MessageCircle, Calculator, XCircle, NotebookPen } from "lucide-react";
+import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney } from "@/lib/vialux/constants";
 import { normalizarTelefono } from "@/lib/vialux/telefono";
 import {
   contactosRecientes, ultimoContactoPorCliente, recordatoriosVigentes,
-  marcarCumplida, diasDesde as diasDesdeISO, type Contacto,
+  diasDesde as diasDesdeISO, type Contacto,
 } from "@/lib/vialux/contactos";
 import type { Tables } from "@/integrations/supabase/types";
 import { RailSection, PageTitle } from "@/components/RailSection";
 import { TelefonoCliente } from "@/components/TelefonoCliente";
 import { MotivoPerdidaModal } from "@/components/MotivoPerdidaModal";
 import { BandaCargando, BandaError, textoError } from "@/components/EstadoConsulta";
+import { BotonSeguimiento, TiraSeguimiento } from "@/components/AccionSeguimiento";
+import { BitacoraCliente } from "@/components/BitacoraCliente";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
   component: InicioPage,
 });
 
 type Cot = Tables<"cotizaciones">;
-type Pago = { cotizacion_id: string; monto: number };
 
 /**
- * Umbrales de las colas de seguimiento. Se dejan explícitos y juntos porque son
- * decisiones de negocio, no constantes técnicas: si la operación cambia, se
- * ajustan aquí y todo el panel se recalcula.
+ * Umbrales de la lista del día. Explícitos y juntos porque son decisiones de
+ * negocio, no constantes técnicas: si la operación cambia, se ajustan aquí.
  */
-const DIAS_SIN_RESPUESTA = 2;   // cotizado/enviado sin movimiento = cabo suelto
-const DIAS_VIGENCIA = 7;        // la vigencia declarada en el PDF
-const DIAS_COBRO_VENCIDO = 30;  // saldo que ya pasó de "reciente" a "hay que perseguir"
-const DIAS_RECOMPRA = 60;       // cliente que compró y no ha vuelto
-// Si ya hablaste con alguien hace poco, no tiene caso que el panel te empuje a
-// perseguirlo otra vez: el contacto reciente silencia sus colas.
-const DIAS_SILENCIO = 2;
-// La cola de seguimiento se corta: una lista de treinta no se ataca, se ignora.
-const TOP_SEGUIMIENTO = 5;
+const DIAS_SIN_RESPUESTA = 2;  // cotización viva sin tocarse = cabo suelto
+const DIAS_VIGENCIA = 7;       // la vigencia declarada en el PDF
+const DIAS_EN_RIESGO = 3;      // vence dentro de esto = urge cerrarla
+const DIAS_RECOMPRA = 60;      // cliente que compró y no ha vuelto
+const DIAS_SILENCIO = 2;       // ya le hablaste: no ocupa lugar en la lista
+/**
+ * La lista se corta en 10. No es un límite técnico: es cuántos contactos reales
+ * caben en una mañana. Una lista de treinta no se ataca, se ignora.
+ */
+const TOP_HOY = 10;
 
 function dias(iso: string | null | undefined): number {
   if (!iso) return 0;
@@ -49,44 +52,26 @@ function urlWhatsApp(tel: string | null, texto: string): string | null {
   return `https://wa.me/52${n}?text=${encodeURIComponent(texto)}`;
 }
 
-// ─── Fila de acción ──────────────────────────────────────────────────────────
+type Razon = "compromiso" | "sin_respuesta" | "vencida" | "recompra";
 
-function FilaAccion({
-  titulo, subtitulo, telefono, monto, meta, urgente, acciones,
-}: {
-  titulo: string;
-  subtitulo?: string | null;
-  telefono?: string | null;
+type Item = {
+  key: string;
+  claveCliente: string;
+  razon: Razon;
+  etiqueta: string;
+  urgente: boolean;
+  cot: Cot | null;
+  recordatorioId: string | null;
+  clienteId: string | null;
+  nombre: string;
+  empresa: string | null;
+  telefono: string | null;
   monto: number;
-  meta: string;
-  urgente?: boolean;
-  acciones: React.ReactNode;
-}) {
-  return (
-    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3.5 transition-colors hover:bg-[#EDBA1A]/[0.04]">
-      <div className="min-w-[200px] flex-1">
-        <div className="text-[13px] font-bold uppercase">{titulo}</div>
-        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5">
-          {subtitulo && (
-            <span className="truncate text-[12px] text-muted-foreground">{subtitulo}</span>
-          )}
-          <TelefonoCliente tel={telefono} icono className="text-[11px] text-[#57524A]" />
-        </div>
-      </div>
-      <div className="w-28 text-right font-mono text-[13px] font-bold tabular-nums">
-        {formatMoney(monto)}
-      </div>
-      <div
-        className={`w-32 text-right font-mono text-[11px] tracking-[0.08em] ${
-          urgente ? "font-bold text-[#DC2626]" : "text-[#57524A]"
-        }`}
-      >
-        {meta}
-      </div>
-      <div className="flex shrink-0 gap-1">{acciones}</div>
-    </div>
-  );
-}
+  subtitulo: string | null;
+  mensajeWa: string;
+};
+
+// ─── Piezas de UI ────────────────────────────────────────────────────────────
 
 function BotonAccion({
   children, onClick, href, etiqueta,
@@ -112,37 +97,19 @@ function BotonAccion({
   );
 }
 
-function Cola({
-  num, label, titulo, descripcion, filas, vacio,
-}: {
-  num: string;
-  label: string;
-  titulo: string;
-  descripcion: string;
-  filas: React.ReactNode[];
-  vacio: string;
+function Kpi({ label, valor, pie, color }: {
+  label: string; valor: string; pie: string; color?: string;
 }) {
   return (
-    <RailSection
-      num={num}
-      label={label}
-      titulo={titulo}
-      descripcion={descripcion}
-      padded={false}
-      meta={
-        <span className="font-mono text-[11px] tracking-[0.08em] text-[#57524A]">
-          {filas.length} {filas.length === 1 ? "PENDIENTE" : "PENDIENTES"}
-        </span>
-      }
-    >
-      {filas.length === 0 ? (
-        <p className="px-5 py-8 text-center font-mono text-[11px] uppercase tracking-[0.14em] text-[#767066]">
-          {vacio}
-        </p>
-      ) : (
-        <div className="divide-y divide-[#EFEDE8]">{filas}</div>
-      )}
-    </RailSection>
+    <div className="bg-card p-4">
+      <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">
+        {label}
+      </div>
+      <div className={`font-mono text-[22px] font-extrabold leading-none tabular-nums ${color ?? ""}`}>
+        {valor}
+      </div>
+      <div className="mt-0.5 font-mono text-[10px] tracking-[0.08em] text-[#6B665C]">{pie}</div>
+    </div>
   );
 }
 
@@ -151,10 +118,10 @@ function Cola({
 function InicioPage() {
   const qc = useQueryClient();
   const navigate = useNavigate();
-  // Reforzar la venta o darla por perdida son las dos salidas de la misma
-  // decisión: tenerlas juntas evita que las cotizaciones muertas se queden
-  // eternamente en la cola inflando el "en proceso".
   const [perdidaRow, setPerdidaRow] = useState<Cot | null>(null);
+  const [bitacoraDe, setBitacoraDe] = useState<{ id: string; nombre: string } | null>(null);
+  /** Filas que acaban de registrar seguimiento: key de la fila → id del contacto. */
+  const [registrados, setRegistrados] = useState<Record<string, string>>({});
 
   const cotsQuery = useQuery({
     queryKey: ["cotizaciones"],
@@ -166,21 +133,6 @@ function InicioPage() {
         .limit(2000);
       if (error) throw error;
       return (data ?? []) as Cot[];
-    },
-  });
-
-  const pagosQuery = useQuery({
-    queryKey: ["pagos"],
-    queryFn: async () => {
-      const { data, error } = await (
-        supabase as unknown as {
-          from: (t: string) => {
-            select: (c: string) => { limit: (n: number) => PromiseLike<{ data: Pago[] | null; error: unknown }> };
-          };
-        }
-      ).from("pagos").select("cotizacion_id,monto").limit(5000);
-      if (error) return [] as Pago[];
-      return data ?? [];
     },
   });
 
@@ -198,70 +150,148 @@ function InicioPage() {
     return () => { void supabase.removeChannel(ch); };
   }, [qc]);
 
-  const cots = cotsQuery.data ?? [];
-
-  const pagadoPor = useMemo(() => {
-    const m = new Map<string, number>();
-    for (const p of pagosQuery.data ?? []) {
-      m.set(p.cotizacion_id, (m.get(p.cotizacion_id) ?? 0) + Number(p.monto));
-    }
-    return m;
-  }, [pagosQuery.data]);
-
-  const contactos = contactosQuery.data ?? [];
+  const cots = useMemo(() => cotsQuery.data ?? [], [cotsQuery.data]);
+  const contactos = useMemo<Contacto[]>(() => contactosQuery.data ?? [], [contactosQuery.data]);
   const ultimoContacto = useMemo(() => ultimoContactoPorCliente(contactos), [contactos]);
-  const recordatorios = useMemo(() => recordatoriosVigentes(contactos), [contactos]);
 
-  /** true si ya se habló con ese cliente hace menos de DIAS_SILENCIO. */
-  const habloReciente = (clienteId: string | null) => {
-    if (!clienteId) return false;
-    const c = ultimoContacto.get(clienteId);
-    return !!c && diasDesdeISO(c.fecha) < DIAS_SILENCIO;
-  };
+  // ─── Las tres cifras ──────────────────────────────────────────────────────
+  const kpis = useMemo(() => {
+    const vivas = cots.filter(
+      (c) => (c.estado === "cotizado" || c.estado === "enviado") && dias(c.fecha) <= DIAS_VIGENCIA,
+    );
+    const pipeline = vivas.reduce((s, c) => s + Number(c.total), 0);
+    // Vence dentro de DIAS_EN_RIESGO: la cifra que dice si hoy fue un buen día
+    // o solo un día ocupado.
+    const enRiesgo = vivas
+      .filter((c) => DIAS_VIGENCIA - dias(c.fecha) <= DIAS_EN_RIESGO)
+      .reduce((s, c) => s + Number(c.total), 0);
 
-  const colas = useMemo(() => {
+    const hoy = new Date();
+    const mes = hoy.getMonth();
+    const anio = hoy.getFullYear();
+    const cerradoMes = cots
+      .filter((c) => {
+        if (c.estado !== "cerrado") return false;
+        const f = new Date(c.fecha);
+        return f.getMonth() === mes && f.getFullYear() === anio;
+      })
+      .reduce((s, c) => s + Number(c.total), 0);
+
+    return { pipeline, enRiesgo, cerradoMes };
+  }, [cots]);
+
+  // ─── La lista del día ─────────────────────────────────────────────────────
+  const lista = useMemo(() => {
+    const claveDe = (c: { cliente_id: string | null; cliente_nombre: string }) =>
+      (c.cliente_id ?? c.cliente_nombre).toLowerCase();
+
+    /** Ya le hablaste hace poco: no ocupa uno de los diez lugares. */
+    const habloReciente = (clienteId: string | null) => {
+      if (!clienteId) return false;
+      const c = ultimoContacto.get(clienteId);
+      return !!c && diasDesdeISO(c.fecha) < DIAS_SILENCIO;
+    };
+
+    /**
+     * El último toque de una cotización es lo más reciente entre haberla movido
+     * y haber hablado con el cliente. Registrar un contacto reinicia el
+     * contador SIN escribir `updated_at`, que significa otra cosa.
+     */
+    const diasSinTocar = (c: Cot) => {
+      const porCotizacion = dias(c.updated_at);
+      const contacto = c.cliente_id ? ultimoContacto.get(c.cliente_id) : undefined;
+      if (!contacto) return porCotizacion;
+      return Math.min(porCotizacion, diasDesdeISO(contacto.fecha));
+    };
+
     const enProceso = cots.filter((c) => c.estado === "cotizado" || c.estado === "enviado");
+    const porId = new Map(cots.map((c) => [c.id, c]));
 
-    // 00 · Sin respuesta: las cinco que más conviene atacar HOY.
-    // Ordenar solo por monto mandaba a perseguir cotizaciones grandes pero casi
-    // vencidas antes que otras frescas y sanas. El puntaje pondera el monto por
-    // qué tan viva sigue: una recién enviada conserva todo su peso, una al
-    // borde de la vigencia conserva la mitad.
+    // ── Tramo 1 · Compromisos. Van primero SIEMPRE: no lo dedujo el sistema,
+    // se lo prometiste al cliente. No se silencian por contacto reciente.
+    const compromisos: Item[] = recordatoriosVigentes(contactos).flatMap((r) => {
+      const cot =
+        (r.cotizacion_id ? porId.get(r.cotizacion_id) : undefined) ??
+        cots.find((c) => c.cliente_id === r.cliente_id);
+      if (!cot) return [];
+      const atraso = Math.max(0, Math.floor(
+        (Date.now() - new Date(`${r.proxima_fecha}T12:00:00`).getTime()) / 86_400_000));
+      return [{
+        key: `compromiso-${r.id}`,
+        claveCliente: claveDe(cot),
+        razon: "compromiso" as Razon,
+        etiqueta: atraso === 0 ? "PROMETISTE HABLARLE HOY" : `PROMETIDO HACE ${atraso}D`,
+        urgente: atraso > 0,
+        cot,
+        recordatorioId: r.id,
+        clienteId: r.cliente_id,
+        nombre: cot.cliente_nombre,
+        empresa: cot.cliente_empresa,
+        telefono: cot.cliente_telefono,
+        monto: Number(cot.total),
+        subtitulo: r.proxima_accion ?? `${cot.folio} · ${cot.cantidad} PZS`,
+        mensajeWa: `Hola, le escribo de VIALUX para dar seguimiento a la cotización ${cot.folio}.`,
+      }];
+    });
+
+    // ── Tramo 2 · Sin respuesta. Lo más caliente: ya pidieron precio. Se
+    // ordenan por monto ponderado según qué tan viva sigue la cotización.
     const calor = (c: Cot) =>
       Number(c.total) * (1 - Math.min(dias(c.fecha) / DIAS_VIGENCIA, 1) * 0.5);
-    const sinRespuesta = enProceso
-      .filter(
-        (c) =>
-          dias(c.updated_at) >= DIAS_SIN_RESPUESTA &&
-          dias(c.fecha) <= DIAS_VIGENCIA &&
-          !habloReciente(c.cliente_id),
-      )
+    const sinRespuesta: Item[] = enProceso
+      .filter((c) =>
+        diasSinTocar(c) >= DIAS_SIN_RESPUESTA &&
+        dias(c.fecha) <= DIAS_VIGENCIA &&
+        !habloReciente(c.cliente_id))
       .sort((a, b) => calor(b) - calor(a))
-      .slice(0, TOP_SEGUIMIENTO);
+      .map((c) => ({
+        key: `sinresp-${c.id}`,
+        claveCliente: claveDe(c),
+        razon: "sin_respuesta" as Razon,
+        etiqueta: `NO CONTESTÓ · ${diasSinTocar(c)}D`,
+        urgente: diasSinTocar(c) >= 5,
+        cot: c,
+        recordatorioId: null,
+        clienteId: c.cliente_id,
+        nombre: c.cliente_nombre,
+        empresa: c.cliente_empresa,
+        telefono: c.cliente_telefono,
+        monto: Number(c.total),
+        subtitulo: `${c.folio} · ${c.cantidad} PZS`,
+        mensajeWa: `Hola, retomo la cotización ${c.folio} de VIALUX por ${c.cantidad} boyas. ¿Sigue en pie el requerimiento o le ayudo con algún ajuste?`,
+      }));
 
-    // 01 · Vigencia: pasada la vigencia, el precio ya no es válido. O se recotiza
-    // o se cierra como perdida — dejarlas abiertas ensucia el embudo.
-    // Recién vencidas primero: una cotización que caducó ayer sigue tibia y se
-    // recupera con una llamada; una de hace dos meses ya es arqueología. El
-    // orden inverso ponía lo irrecuperable al principio de la lista.
-    const vencidas = enProceso
-      .filter((c) => dias(c.fecha) > DIAS_VIGENCIA)
-      .sort((a, b) => dias(a.fecha) - dias(b.fecha));
+    // ── Tramo 3 · Vencidas. Recientes primero: la que caducó ayer sigue tibia
+    // y se recupera con una llamada; la de hace dos meses es arqueología.
+    const vencidas: Item[] = enProceso
+      .filter((c) => dias(c.fecha) > DIAS_VIGENCIA && !habloReciente(c.cliente_id))
+      .sort((a, b) => dias(a.fecha) - dias(b.fecha))
+      .map((c) => {
+        const v = dias(c.fecha) - DIAS_VIGENCIA;
+        return {
+          key: `vencida-${c.id}`,
+          claveCliente: claveDe(c),
+          razon: "vencida" as Razon,
+          etiqueta: v === 0 ? "VENCIÓ HOY · RECOTIZAR" : `VENCIÓ HACE ${v}D · RECOTIZAR`,
+          urgente: v <= 2,
+          cot: c,
+          recordatorioId: null,
+          clienteId: c.cliente_id,
+          nombre: c.cliente_nombre,
+          empresa: c.cliente_empresa,
+          telefono: c.cliente_telefono,
+          monto: Number(c.total),
+          subtitulo: `${c.folio} · ${c.cantidad} PZS`,
+          mensajeWa: `Hola, le escribo de VIALUX. La cotización ${c.folio} ya venció; con gusto le actualizo el precio. ¿Sigue en pie el proyecto?`,
+        };
+      });
 
-    // 02 · Por cobrar vencido
-    // Solo las marcadas a crédito: una venta cerrada ya está cobrada.
-    const porCobrar = cots
-      .filter((c) => c.estado === "cerrado" && c.cobro_pendiente)
-      .map((c) => ({ c, saldo: Number(c.total) - (pagadoPor.get(c.id) ?? 0), d: dias(c.fecha) }))
-      .filter((x) => x.saldo > 0.01 && x.d >= DIAS_COBRO_VENCIDO)
-      .sort((a, b) => b.d - a.d);
-
-    // 03 · Recompra: último cierre del cliente hace más de DIAS_RECOMPRA y sin
-    // ninguna cotización posterior. Es el cliente recurrente que "ya le toca".
+    // ── Tramo 4 · Recompra. La cartera es lo más barato de reactivar: ya te
+    // conocen y ya te compraron.
     const ultimoCierre = new Map<string, Cot>();
     const ultimoMovimiento = new Map<string, number>();
     for (const c of cots) {
-      const k = (c.cliente_id ?? c.cliente_nombre).toLowerCase();
+      const k = claveDe(c);
       const d = dias(c.fecha);
       if (!ultimoMovimiento.has(k) || d < ultimoMovimiento.get(k)!) ultimoMovimiento.set(k, d);
       if (c.estado === "cerrado") {
@@ -269,25 +299,67 @@ function InicioPage() {
         if (!prev || dias(prev.fecha) > d) ultimoCierre.set(k, c);
       }
     }
-    const recompra = [...ultimoCierre.entries()]
-      .filter(([k, c]) => dias(c.fecha) >= DIAS_RECOMPRA && (ultimoMovimiento.get(k) ?? 0) >= DIAS_RECOMPRA)
+    const recompra: Item[] = [...ultimoCierre.entries()]
+      .filter(([k, c]) =>
+        dias(c.fecha) >= DIAS_RECOMPRA &&
+        (ultimoMovimiento.get(k) ?? 0) >= DIAS_RECOMPRA &&
+        !habloReciente(c.cliente_id))
       .map(([, c]) => c)
       .sort((a, b) => Number(b.total) - Number(a.total))
-      .slice(0, 12);
+      .map((c) => {
+        const meses = Math.floor(dias(c.fecha) / 30);
+        return {
+          key: `recompra-${c.id}`,
+          claveCliente: claveDe(c),
+          razon: "recompra" as Razon,
+          etiqueta: `COMPRÓ HACE ${meses} ${meses === 1 ? "MES" : "MESES"}`,
+          urgente: false,
+          cot: c,
+          recordatorioId: null,
+          clienteId: c.cliente_id,
+          nombre: c.cliente_nombre,
+          empresa: c.cliente_empresa,
+          telefono: c.cliente_telefono,
+          monto: Number(c.total),
+          subtitulo: `ÚLTIMA COMPRA · ${c.cantidad} PZS`,
+          mensajeWa: `Hola, le escribo de VIALUX. ¿Cómo le funcionaron las boyas? Con gusto le preparo una nueva cotización cuando lo necesite.`,
+        };
+      });
 
-    return { sinRespuesta, vencidas, porCobrar, recompra };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cots, pagadoPor, ultimoContacto]);
-
-  const totalPendientes =
-    recordatorios.length + colas.sinRespuesta.length + colas.vencidas.length +
-    colas.porCobrar.length + colas.recompra.length;
-  const dineroEnJuego =
-    colas.sinRespuesta.reduce((s, c) => s + Number(c.total), 0) +
-    colas.vencidas.reduce((s, c) => s + Number(c.total), 0);
+    // El orden de los tramos ES la prioridad. Y se deduplica por cliente: en
+    // una lista de diez lugares, nadie aparece dos veces.
+    const vistos = new Set<string>();
+    const out: Item[] = [];
+    for (const it of [...compromisos, ...sinRespuesta, ...vencidas, ...recompra]) {
+      if (vistos.has(it.claveCliente)) continue;
+      vistos.add(it.claveCliente);
+      out.push(it);
+      if (out.length >= TOP_HOY) break;
+    }
+    return out;
+  }, [cots, contactos, ultimoContacto]);
 
   const irACotizar = (c: Cot) =>
     navigate({ to: "/", search: { duplicate: c.id, clienteId: undefined } });
+
+  const aplicarPerdida = (c: Cot) => setPerdidaRow(c);
+
+  /** El seguimiento ya quedó: se refresca y la fila cae sola. */
+  const cerrarSeguimiento = (key: string) => {
+    setRegistrados((r) => {
+      const { [key]: _quitado, ...resto } = r;
+      return resto;
+    });
+    void qc.invalidateQueries({ queryKey: ["contactos"] });
+  };
+
+  const ultimoToqueTexto = (clienteId: string | null): string => {
+    if (!clienteId) return "SIN CONTACTO";
+    const c = ultimoContacto.get(clienteId);
+    if (!c) return "SIN CONTACTO";
+    const d = diasDesdeISO(c.fecha);
+    return d === 0 ? "LE ESCRIBISTE HOY" : `ÚLTIMO TOQUE ${d}D`;
+  };
 
   return (
     <div className="mx-auto w-full max-w-6xl px-6 py-8">
@@ -297,20 +369,20 @@ function InicioPage() {
         right={
           <div className="text-right">
             <div className="font-mono text-[11px] uppercase tracking-[0.2em] text-[#57524A]">
-              Acciones pendientes
+              Para hoy
             </div>
             <div
               className={`font-mono text-xl font-extrabold tabular-nums ${
-                totalPendientes === 0 ? "text-[#12843C]" : "text-[#8A6508]"
+                lista.length === 0 ? "text-[#12843C]" : "text-[#8A6508]"
               }`}
             >
-              {totalPendientes}
+              {lista.length}
             </div>
           </div>
         }
       />
 
-      {cotsQuery.isLoading && <BandaCargando mensaje="Cargando tus pendientes…" />}
+      {cotsQuery.isLoading && <BandaCargando mensaje="Armando tu lista de hoy…" />}
       {cotsQuery.isError && (
         <BandaError
           mensaje={textoError(cotsQuery.error)}
@@ -318,249 +390,136 @@ function InicioPage() {
         />
       )}
 
-      {/* Resumen: el dinero que está esperando una acción tuya */}
-      <div className="mb-4 grid grid-cols-2 gap-px border border-border bg-border md:grid-cols-5">
-        {[
-          { l: "En juego", v: formatMoney(dineroEnJuego), s: "SIN RESPUESTA + VENCIDAS", c: "text-[#8A6508]" },
-          { l: "Recordatorios", v: String(recordatorios.length), s: "COMPROMISOS QUE TOCAN", c: recordatorios.length ? "text-[#8A6508]" : "" },
-          { l: "Sin respuesta", v: String(colas.sinRespuesta.length), s: `${DIAS_SIN_RESPUESTA}+ DÍAS QUIETAS`, c: "" },
-          { l: "Vigencia vencida", v: String(colas.vencidas.length), s: "PRECIO YA NO VÁLIDO", c: colas.vencidas.length ? "text-[#DC2626]" : "" },
-          { l: "Cobro vencido", v: String(colas.porCobrar.length), s: `${DIAS_COBRO_VENCIDO}+ DÍAS`, c: colas.porCobrar.length ? "text-[#DC2626]" : "" },
-        ].map((k) => (
-          <div key={k.l} className="bg-card p-4">
-            <div className="mb-1.5 font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">
-              {k.l}
-            </div>
-            <div className={`font-mono text-[22px] font-extrabold leading-none tabular-nums ${k.c}`}>
-              {k.v}
-            </div>
-            <div className="mt-0.5 font-mono text-[10px] tracking-[0.08em] text-[#6B665C]">{k.s}</div>
-          </div>
-        ))}
+      <div className="mb-4 grid grid-cols-1 gap-px border border-border bg-border sm:grid-cols-3">
+        <Kpi
+          label="Pipeline vivo"
+          valor={formatMoney(kpis.pipeline)}
+          pie="COTIZACIONES DENTRO DE VIGENCIA"
+        />
+        <Kpi
+          label="En riesgo esta semana"
+          valor={formatMoney(kpis.enRiesgo)}
+          pie={`VENCEN EN ${DIAS_EN_RIESGO} DÍAS O MENOS`}
+          color={kpis.enRiesgo > 0 ? "text-[#DC2626]" : undefined}
+        />
+        <Kpi
+          label="Cerrado este mes"
+          valor={formatMoney(kpis.cerradoMes)}
+          pie="VENTAS GANADAS"
+          color={kpis.cerradoMes > 0 ? "text-[#12843C]" : undefined}
+        />
       </div>
 
       <div className="border border-border bg-card">
-        <Cola
-          num="00"
-          label="COMPROMISOS"
-          titulo="Recordatorios"
-          descripcion="Lo que tú mismo te apuntaste al registrar un contacto. A diferencia del resto, esto no lo dedujo el sistema — lo prometiste."
-          vacio="Sin compromisos para hoy"
-          filas={recordatorios.map((r) => {
-            const cot = cots.find((c) => c.id === r.cotizacion_id) ?? null;
-            const cli = cots.find((c) => c.cliente_id === r.cliente_id);
-            const nombre = cli?.cliente_nombre ?? "Cliente";
-            const atraso = Math.max(0, Math.floor(
-              (Date.now() - new Date(`${r.proxima_fecha}T12:00:00`).getTime()) / 86_400_000));
-            const wa = urlWhatsApp(cli?.cliente_telefono ?? null, `Hola, le escribo de VIALUX para dar seguimiento.`);
-            return (
-              <FilaAccion
-                key={r.id}
-                titulo={nombre}
-                subtitulo={r.proxima_accion}
-                telefono={cli?.cliente_telefono}
-                monto={cot ? Number(cot.total) : 0}
-                meta={atraso === 0 ? "HOY" : `ATRASADO ${atraso}D`}
-                urgente={atraso > 0}
-                acciones={
-                  <>
-                    {wa && (
-                      <BotonAccion href={wa} etiqueta={`Escribir por WhatsApp a ${nombre}`}>
-                        <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" /> WhatsApp
-                      </BotonAccion>
-                    )}
-                    <BotonAccion
-                      etiqueta="Marcar el compromiso como cumplido"
-                      onClick={async () => {
-                        const e = await marcarCumplida(r.id);
-                        if (e) return;
-                        void qc.invalidateQueries({ queryKey: ["contactos"] });
-                      }}
-                    >
-                      <Check className="h-3.5 w-3.5" aria-hidden="true" /> Hecha
-                    </BotonAccion>
-                  </>
-                }
-              />
-            );
-          })}
-        />
-
-        <Cola
+        <RailSection
           num="01"
-          label="SEGUIMIENTO"
-          titulo="Sin respuesta"
-          descripcion={`Las ${TOP_SEGUIMIENTO} que más conviene atacar hoy: ${DIAS_SIN_RESPUESTA} días o más sin movimiento, aún dentro de vigencia, y ordenadas por monto ponderado según qué tan frescas sigan.`}
-          vacio="Nada pendiente de seguimiento"
-          filas={colas.sinRespuesta.map((c) => {
-            const d = dias(c.updated_at);
-            const wa = urlWhatsApp(
-              c.cliente_telefono,
-              `Hola, ${" "}retomo la cotización ${c.folio} de VIALUX por ${c.cantidad} boyas. ¿Sigue en pie el requerimiento o le ayudo con algún ajuste?`,
-            );
-            return (
-              <FilaAccion
-                key={c.id}
-                titulo={c.cliente_nombre}
-                subtitulo={`${c.folio} · ${c.cantidad} PZS${c.cliente_empresa && c.cliente_empresa !== "-" ? ` · ${c.cliente_empresa}` : ""}`}
-                telefono={c.cliente_telefono}
-                monto={Number(c.total)}
-                meta={`${d}D SIN MOVER`}
-                urgente={d >= 5}
-                acciones={
-                  <>
-                    {wa && (
-                      <BotonAccion href={wa} etiqueta={`Escribir por WhatsApp a ${c.cliente_nombre}`}>
-                        <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" /> WhatsApp
-                      </BotonAccion>
-                    )}
-                    <BotonAccion onClick={() => irACotizar(c)} etiqueta={`Recotizar ${c.folio}`}>
-                      <Calculator className="h-3.5 w-3.5" aria-hidden="true" /> Recotizar
-                    </BotonAccion>
-                    <BotonAccion
-                      onClick={() => setPerdidaRow(c)}
-                      etiqueta={`Marcar ${c.folio} como perdida`}
-                    >
-                      <XCircle className="h-3.5 w-3.5" aria-hidden="true" /> Perdida
-                    </BotonAccion>
-                  </>
-                }
-              />
-            );
-          })}
-        />
-
-        <Cola
-          num="02"
-          label="VIGENCIA"
-          titulo="Vigencia vencida"
-          descripcion={`Pasaron más de ${DIAS_VIGENCIA} días y el precio ya no es válido. De la más reciente a la más vieja: la que acaba de vencer todavía se recupera.`}
-          vacio="Ninguna cotización vencida"
-          filas={colas.vencidas.map((c) => {
-            const d = dias(c.fecha);
-            const wa = urlWhatsApp(
-              c.cliente_telefono,
-              `Hola, la cotización ${c.folio} de VIALUX ya venció. Si sigue interesado le preparo una actualizada con el precio vigente.`,
-            );
-            return (
-              <FilaAccion
-                key={c.id}
-                titulo={c.cliente_nombre}
-                subtitulo={`${c.folio} · ${c.cantidad} PZS`}
-                telefono={c.cliente_telefono}
-                monto={Number(c.total)}
-                meta={`VENCIDA HACE ${d - DIAS_VIGENCIA}D`}
-                urgente
-                acciones={
-                  <>
-                    {wa && (
-                      <BotonAccion href={wa} etiqueta={`Escribir por WhatsApp a ${c.cliente_nombre}`}>
-                        <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" /> WhatsApp
-                      </BotonAccion>
-                    )}
-                    <BotonAccion onClick={() => irACotizar(c)} etiqueta={`Recotizar ${c.folio}`}>
-                      <Calculator className="h-3.5 w-3.5" aria-hidden="true" /> Recotizar
-                    </BotonAccion>
-                    <BotonAccion
-                      onClick={() => setPerdidaRow(c)}
-                      etiqueta={`Marcar ${c.folio} como perdida`}
-                    >
-                      <XCircle className="h-3.5 w-3.5" aria-hidden="true" /> Perdida
-                    </BotonAccion>
-                  </>
-                }
-              />
-            );
-          })}
-        />
-
-        <Cola
-          num="03"
-          label="COBRANZA"
-          titulo="Cobro vencido"
-          descripcion={`Solo las ventas marcadas con cobro pendiente que ya llevan ${DIAS_COBRO_VENCIDO} días o más. Lo normal es que esté vacía: aquí se cobra antes de cerrar.`}
-          vacio="Sin saldos vencidos"
-          filas={colas.porCobrar.map(({ c, saldo, d }) => {
-            const wa = urlWhatsApp(
-              c.cliente_telefono,
-              `Hola, le escribo de VIALUX para dar seguimiento al saldo de la orden ${c.folio}. ¿Me confirma la fecha estimada de pago?`,
-            );
-            return (
-              <FilaAccion
-                key={c.id}
-                titulo={c.cliente_nombre}
-                subtitulo={`${c.folio} · SALDO DE ${formatMoney(Number(c.total))}`}
-                telefono={c.cliente_telefono}
-                monto={saldo}
-                meta={`${d}D DE ANTIGÜEDAD`}
-                urgente
-                acciones={
-                  <>
-                    {wa && (
-                      <BotonAccion href={wa} etiqueta={`Escribir por WhatsApp a ${c.cliente_nombre}`}>
-                        <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" /> WhatsApp
-                      </BotonAccion>
-                    )}
-                    <BotonAccion
-                      onClick={() => navigate({ to: "/cobranza" })}
-                      etiqueta="Ir a Cobranza"
-                    >
-                      Cobranza
-                    </BotonAccion>
-                  </>
-                }
-              />
-            );
-          })}
-        />
-
-        <Cola
-          num="04"
-          label="RECOMPRA"
-          titulo="Ya les toca"
-          descripcion={`Clientes que compraron hace ${DIAS_RECOMPRA} días o más y no han vuelto a pedir. Son los más baratos de reactivar: ya te conocen y ya te compraron.`}
-          vacio="Sin clientes por reactivar"
-          filas={colas.recompra.map((c) => {
-            const d = dias(c.fecha);
-            const wa = urlWhatsApp(
-              c.cliente_telefono,
-              `Hola, le saluda VIALUX. Vi que su último pedido de boyas fue hace un tiempo — ¿le preparo una cotización con precios actualizados?`,
-            );
-            return (
-              <FilaAccion
-                key={c.id}
-                titulo={c.cliente_nombre}
-                subtitulo={`ÚLTIMA COMPRA: ${c.folio} · ${c.cantidad} PZS`}
-                telefono={c.cliente_telefono}
-                monto={Number(c.total)}
-                meta={`HACE ${d}D`}
-                acciones={
-                  <>
-                    {wa && (
-                      <BotonAccion href={wa} etiqueta={`Escribir por WhatsApp a ${c.cliente_nombre}`}>
-                        <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" /> WhatsApp
-                      </BotonAccion>
-                    )}
-                    <BotonAccion onClick={() => irACotizar(c)} etiqueta={`Cotizar de nuevo a ${c.cliente_nombre}`}>
-                      <Calculator className="h-3.5 w-3.5" aria-hidden="true" /> Cotizar
-                    </BotonAccion>
-                  </>
-                }
-              />
-            );
-          })}
-        />
-
-        {/* Cierre: qué significa que no haya nada */}
-        {totalPendientes === 0 && !cotsQuery.isLoading && (
-          <div className="border-t border-border px-5 py-10 text-center">
-            <Clock className="mx-auto mb-2 h-6 w-6 text-[#948D80]" aria-hidden="true" />
-            <p className="text-[13px] font-semibold">Ningún cabo suelto</p>
-            <p className="mt-1 text-[12px] text-muted-foreground">
-              Todas las cotizaciones tienen movimiento reciente y no hay saldos vencidos.
+          label="HOY"
+          titulo="A quién le hablas hoy"
+          descripcion="En orden: primero lo que prometiste, luego lo más caliente, luego lo recuperable, y al final la cartera que ya te compró. Registrar un seguimiento reinicia el contador y libera el lugar."
+          padded={false}
+          meta={
+            <span className="font-mono text-[11px] tracking-[0.08em] text-[#57524A]">
+              {lista.length} DE {TOP_HOY}
+            </span>
+          }
+        >
+          {lista.length === 0 ? (
+            <p className="px-5 py-10 text-center font-mono text-[11px] uppercase tracking-[0.14em] text-[#767066]">
+              Nada pendiente. Todo tiene movimiento reciente.
             </p>
-          </div>
-        )}
+          ) : (
+            <div className="divide-y divide-[#EFEDE8]">
+              {lista.map((it) => {
+                const wa = urlWhatsApp(it.telefono, it.mensajeWa);
+                const contactoId = registrados[it.key];
+                return (
+                  <div key={it.key}>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 py-3.5 transition-colors hover:bg-[#EDBA1A]/[0.04]">
+                      <div className="min-w-[200px] flex-1">
+                        <div className="text-[13px] font-bold uppercase">{it.nombre}</div>
+                        <div className="flex flex-wrap items-center gap-x-2.5 gap-y-0.5">
+                          {it.subtitulo && (
+                            <span className="truncate text-[12px] text-muted-foreground">
+                              {it.subtitulo}
+                            </span>
+                          )}
+                          <TelefonoCliente tel={it.telefono} icono className="text-[11px] text-[#57524A]" />
+                          <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-[#767066]">
+                            {ultimoToqueTexto(it.clienteId)}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="w-28 text-right font-mono text-[13px] font-bold tabular-nums">
+                        {formatMoney(it.monto)}
+                      </div>
+
+                      <div
+                        className={`w-48 text-right font-mono text-[11px] tracking-[0.08em] ${
+                          it.urgente ? "font-bold text-[#DC2626]" : "text-[#57524A]"
+                        }`}
+                      >
+                        {it.etiqueta}
+                      </div>
+
+                      <div className="flex shrink-0 flex-wrap gap-1">
+                        {wa && (
+                          <BotonAccion href={wa} etiqueta={`Escribir por WhatsApp a ${it.nombre}`}>
+                            <MessageCircle className="h-3.5 w-3.5" aria-hidden="true" /> WhatsApp
+                          </BotonAccion>
+                        )}
+                        {!contactoId && (
+                          <BotonSeguimiento
+                            nombre={it.nombre}
+                            clienteId={it.clienteId}
+                            empresa={it.empresa}
+                            telefono={it.telefono}
+                            cotizacionId={it.cot?.id ?? null}
+                            recordatorioId={it.recordatorioId}
+                            onRegistrado={(id) =>
+                              setRegistrados((r) => ({ ...r, [it.key]: id }))
+                            }
+                          />
+                        )}
+                        {it.cot && (
+                          <BotonAccion
+                            onClick={() => irACotizar(it.cot!)}
+                            etiqueta={`Recotizar ${it.cot.folio}`}
+                          >
+                            <Calculator className="h-3.5 w-3.5" aria-hidden="true" /> Recotizar
+                          </BotonAccion>
+                        )}
+                        {it.clienteId && (
+                          <BotonAccion
+                            onClick={() => setBitacoraDe({ id: it.clienteId!, nombre: it.nombre })}
+                            etiqueta={`Ver bitácora de ${it.nombre}`}
+                          >
+                            <NotebookPen className="h-3.5 w-3.5" aria-hidden="true" /> Bitácora
+                          </BotonAccion>
+                        )}
+                        {it.cot && it.razon !== "recompra" && (
+                          <BotonAccion
+                            onClick={() => aplicarPerdida(it.cot!)}
+                            etiqueta={`Marcar ${it.cot.folio} como perdida`}
+                          >
+                            <XCircle className="h-3.5 w-3.5" aria-hidden="true" /> Perdida
+                          </BotonAccion>
+                        )}
+                      </div>
+                    </div>
+
+                    {contactoId && (
+                      <TiraSeguimiento
+                        contactoId={contactoId}
+                        onListo={() => cerrarSeguimiento(it.key)}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </RailSection>
       </div>
 
       <MotivoPerdidaModal
@@ -572,18 +531,22 @@ function InicioPage() {
             .from("cotizaciones")
             .update({ estado: "perdido", motivo_perdida: motivo })
             .eq("id", perdidaRow.id);
-          if (error) return;
+          if (error) { toast.error(error.message); return; }
           setPerdidaRow(null);
           void qc.invalidateQueries({ queryKey: ["cotizaciones"] });
         }}
       />
 
-      <p className="mt-3 flex items-start gap-2 font-mono text-[11px] uppercase leading-relaxed tracking-[0.1em] text-[#57524A]">
-        <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-        Registrar un contacto silencia a ese cliente por {DIAS_SILENCIO} días · Los días se
-        cuentan desde el último cambio de la cotización · Los mensajes de WhatsApp
-        se abren precargados pero NO se envían solos
-      </p>
+      <Dialog open={!!bitacoraDe} onOpenChange={(v) => { if (!v) setBitacoraDe(null); }}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="font-mono text-[13px] uppercase tracking-[0.14em]">
+              Bitácora · {bitacoraDe?.nombre}
+            </DialogTitle>
+          </DialogHeader>
+          {bitacoraDe && <BitacoraCliente clienteId={bitacoraDe.id} />}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

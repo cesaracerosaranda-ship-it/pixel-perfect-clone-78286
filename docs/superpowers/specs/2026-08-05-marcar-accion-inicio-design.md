@@ -1,246 +1,163 @@
-# Marcar acción tomada desde INICIO
+# INICIO — la lista de trabajo del día
 
-Fecha: **5/ago/2026** · Estado: aprobado, pendiente de plan de implementación
-
----
-
-## 1 · El problema
-
-César empezó a trabajar las colas de INICIO y no tiene cómo decirle al sistema
-que ya atendió a alguien. Pidió tres cosas: palomear tareas, dejar comentarios y
-que el contador de días se reinicie.
-
-Al revisar el código resultó que **la mitad ya está construida, pero en el lugar
-equivocado, y el contador mide otra cosa.**
-
-### Lo que ya existe
-
-La tabla `contactos` ya es una bitácora completa: `tipo`, `nota`,
-`proxima_accion`, `proxima_fecha`, `cumplida`. `registrarContacto()` inserta,
-`marcarCumplida()` palomea, y `ultimoContactoPorCliente()` alimenta el silencio
-de las colas.
-
-### Los tres huecos reales
-
-1. **No se alcanza desde INICIO.** `BitacoraCliente` solo se renderiza en la
-   pantalla de Clientes. Desde el panel hay que salirse, buscar al cliente y
-   registrar allá — cuatro clics para decir "ya le escribí".
-2. **El contador no mide el contacto.** La etiqueta `{d}D SIN MOVER` sale de
-   `dias(cotizacion.updated_at)`. Registrar un contacto no toca ese campo, así
-   que al vencer el silencio el cliente reaparece diciendo "9D SIN MOVER" aunque
-   se habló con él anteayer.
-3. **El silencio aplica a UNA sola cola.** `habloReciente()` se consulta
-   únicamente en `01 Sin respuesta`. Vigencia vencida, Cobro vencido y Recompra
-   no lo miran: registrar un contacto hoy no les hace nada. El ARRANQUE lo
-   describe como si aplicara a todo el panel; el código no lo hace.
+Fecha: **5/ago/2026** · Reemplaza la primera versión de este mismo día
 
 ---
 
-## 2 · Decisiones tomadas
+## Qué necesita César
 
-| Decisión | Elegido | Por qué |
-|---|---|---|
-| Fricción | Un clic, nota opcional | Con 307 leads fugados, lo que se usa a diario es lo que no estorba. La nota obligatoria se abandona en una semana. |
-| Registro automático al abrir WhatsApp | **Descartado** | Registraría la intención, no el envío: abrir el chat sin escribir marcaría al cliente como atendido y lo escondería 2 días. |
-| Alcance por cola | Depende de la cola | El contacto oculta la fila solo cuando hablar era la tarea completa. Un precio vencido sigue vencido aunque le escribas. |
-| Cómo reinicia el contador | Recalcular en INICIO | No inventa datos ni pide migración (ver §3). |
-| Agendar el siguiente toque | Sí, atajos opcionales | Sin esto el lead contactado vuelve a quedar en el aire: se silencia 2 días y reaparece sin que nadie decidiera nada. |
-| Elegir tipo de contacto desde INICIO | **Fuera de alcance** | Un selector más en una fila que ya tiene cuatro botones. Se corrige desde la bitácora del cliente si hace falta. |
+Abrir la app en la mañana y ver **a quién le habla hoy para cerrar más ventas**,
+en el orden correcto, sin tener que decidir por dónde empezar.
 
----
+La primera versión de este spec falló por diseñar encima de las cinco colas que
+ya existían. Cinco colas obligan a elegir cuál trabajar primero — eso es trabajo
+mental que la herramienta debe quitar, no repartir.
 
-## 3 · Modelo de datos
-
-**Sin migraciones.** `contactos` ya tiene los cinco campos necesarios. Todo el
-trabajo es de aplicación.
-
-### El último toque
-
-Se introduce un solo concepto: el *último toque* de una cotización es la fecha
-más reciente entre `cotizaciones.updated_at` y el último contacto registrado de
-ese cliente. INICIO cuenta desde ahí. La etiqueta pasa de `9D SIN MOVER` a
-`2D SIN TOCAR`, que es lo que realmente mide.
-
-### Por qué NO se escribe `updated_at`
-
-Tocar `updated_at` al registrar un contacto sería una línea de código y todas
-las vistas se enterarían solas. Se descartó: ese campo significa *"la cotización
-cambió"*, y escribirlo por un WhatsApp lo vuelve mentira. Historial y Cobranza
-también lo leen, y se perdería para siempre la respuesta a "¿cuándo se editó de
-verdad esta cotización?".
-
-Es la misma clase de error que ya costó el módulo de Cobranza: un campo que
-significaba una cosa, usado para significar otra.
-
-También se descartó una columna `ultimo_contacto_at` denormalizada: exige
-migración, duplica lo que `contactos` ya tiene y puede desincronizarse. Solo
-valdría si el cálculo resultara lento, y con ~60 ventas y 3000 contactos de tope
-no lo será.
-
-### Caso borde: cotizaciones sin cliente ligado
-
-`cotizaciones.cliente_id` admite nulo; `contactos.cliente_id` es obligatorio y
-tiene llave foránea. En cotizaciones viejas sin cliente el insert fallaría.
-
-Se resuelve con `upsertCliente()`, que ya existe: busca por nombre y si no está
-lo crea con teléfono y empresa. Efecto secundario deseable — cada seguimiento
-va completando el directorio.
+Prioridades del negocio que manda la pantalla: **vender más, recomprar la
+cartera, y tener trazabilidad de qué se hizo con cada lead.**
 
 ---
 
-## 4 · Comportamiento por cola
+## La pantalla
 
-| Cola | Al registrar seguimiento | Mecanismo | Qué la saca de verdad |
-|---|---|---|---|
-| `00` Recordatorios | *sin cambios* — ya tiene "Hecha" | — | Palomear el compromiso |
-| `01` Sin respuesta | Reinicia el contador, y con eso sale de la cola | Último toque | Que conteste, recotizar o marcar perdida |
-| `02` Vigencia vencida | Sella `YA LE ESCRIBISTE HACE 1D`, **no oculta** | Sello | Recotizar o marcar perdida |
-| `03` Cobro vencido | Sella, **no oculta** | Sello | Registrar el pago |
-| `04` Ya les toca | Oculta 2 días; el contador **no** se reinicia | Silencio | Que vuelva a pedir |
+### Tres cifras arriba
 
-La regla en una línea: **el contacto oculta la fila solo cuando hablar era la
-tarea completa.** Donde queda un hecho sin resolver — precio vencido, saldo
-vivo — la fila se queda y solo se marca: no le escribes dos veces, pero tampoco
-se te pierde.
+| Cifra | Qué suma |
+|---|---|
+| **Pipeline vivo** | Cotizaciones abiertas dentro de vigencia |
+| **En riesgo esta semana** | Las que vencen en ≤3 días |
+| **Cerrado este mes** | Ventas cerradas del mes en curso |
 
-### Dos mecanismos distintos, y no son intercambiables
+*En riesgo* es la que dice si hoy fue un buen día o solo un día ocupado.
 
-Es la ambigüedad que hay que tener clara al implementar, porque `01` y `04`
-parecen el mismo caso y no lo son:
+### Una lista: "Hoy" — máximo 10
 
-- **`01 Sin respuesta` cuenta días sin tocar.** Registrar el contacto reinicia
-  ese contador, y al reiniciarlo la fila deja de cumplir
-  `dias(últimoToque) >= DIAS_SIN_RESPUESTA` y sale sola. **No** hay que aplicarle
-  además `habloReciente()`: serían dos mecanismos haciendo el mismo trabajo, y
-  con ambos umbrales en 2 días la condición es idéntica. Se retira de esta cola.
-- **`04 Ya les toca` cuenta días desde la última compra.** Esa fecha es un hecho
-  histórico y **no** debe reiniciarse porque le hayas escrito: el cliente compró
-  cuando compró. Aquí el ocultamiento sí lo hace `habloReciente()`, que se
-  conserva y pasa a ser su único uso.
+Cada fila lleva una etiqueta que dice **por qué está ahí**:
 
-Consecuencia práctica: si más adelante se tunea `DIAS_SILENCIO`, solo cambia el
-comportamiento de Recompra. Si se tunea `DIAS_SIN_RESPUESTA`, solo cambia el de
-Seguimiento. Hoy ambos valen 2 y eso escondía que son perillas separadas.
+```
+Constructora Sur · 1,200 pzs · $63,600     [PROMETISTE HABLARLE HOY]
+Ferretería del Norte · 800 pzs · $42,400   [NO CONTESTÓ · 4D]
+Grupo Vial MTY · 2,000 pzs · $106,000      [VENCIÓ AYER · RECOTIZAR]
+Aceros del Golfo · 500 pzs · $26,500       [COMPRÓ HACE 3 MESES]
+```
 
-Los umbrales (`DIAS_SILENCIO` y compañía) se quedan como constantes juntas al
-principio de `inicio.tsx`, con su comentario de por qué. César va a calibrar en
-productivo, así que ajustar debe ser cambiar un número y pushear.
+**El orden no lo elige César.** Por prioridad de tramo, y dentro de cada tramo
+por monto:
 
----
+1. **Compromiso** — se lo prometió al cliente. Va primero siempre.
+2. **Sin respuesta** — cotización viva sin movimiento ≥2 días. Lo más caliente:
+   ya pidieron precio. Ponderada por monto y frescura.
+3. **Vencida** — pasó la vigencia de 7 días. Recientes primero: la que caducó
+   ayer se recupera, la de hace dos meses es arqueología.
+4. **Recompra** — cerró hace ≥60 días y no ha vuelto. La cartera es lo más
+   barato de reactivar y es prioridad declarada del negocio.
 
-## 5 · Interfaz y flujo
+**10 renglones** (confirmado con César). Una lista de treinta no se ataca, se
+ignora.
 
-**El clic registra de inmediato.** Botón `Ya le di seguimiento` junto a
-WhatsApp / Recotizar / Perdida. Al tocarlo se inserta el contacto: sin modal,
-sin confirmación. Tipo por omisión `whatsapp`, el canal real casi siempre.
+### Trazabilidad en la fila
 
-**La nota llega después, sin bloquear.** La fila no desaparece de golpe: queda
-marcada como recién atendida y despliega una tira delgada con un campo de nota y
-los atajos `Mañana · En 3 días · En 1 semana`. Si escribes o tocas un atajo, se
-actualiza ese mismo contacto. Si los ignoras, la tira se va sola en el siguiente
-refetch — y con ella la fila, en las colas que ocultan (`01`, `04`). En `02` y
-`03` la fila se queda con su sello, que es justo lo que se decidió en §4.
-
-Esto resuelve un conflicto de la cola `01`: si la fila se ocultara en el instante
-del clic, no quedaría dónde escribir la nota.
-
-### Piezas nuevas
-
-- `BotonSeguimiento` — el botón, con estado de guardando y de error.
-- `TiraSeguimiento` — nota + atajos de fecha. Única pieza con estado propio.
-- `registrarSeguimiento()` en `contactos.ts` — resuelve el `cliente_id` faltante
-  vía `upsertCliente()` y luego inserta.
-
-### Cambios en lo existente
-
-- `registrarContacto()` hoy devuelve solo el mensaje de error. Debe devolver
-  también el `id` del contacto creado: la tira lo necesita para adjuntar la nota.
-  Es ampliar el retorno, no romper la firma.
-- Quitar el tipo `Api` escrito a mano y el `supabase as unknown as` de
-  `contactos.ts`. La tabla ya está en `types.ts`, así que ese andamio caducó —
-  igual que los `as never` que se limpiaron el 5/ago en `cd5022b` y `cf2b663`.
+Cada renglón muestra el último toque —*"le escribiste hace 2d"*— y un clic abre
+la bitácora completa del cliente sin salir de la pantalla.
 
 ---
 
-## 6 · Manejo de errores
+## Cambios respecto a la primera versión
 
-### Dos fallas silenciosas preexistentes
+**Cobranza sale de INICIO.** Tiene su propio módulo, y como en VIALUX se cobra
+antes de cerrar, esa cola estaría vacía casi siempre. INICIO es para vender.
 
-Al buscar dónde enganchar los errores del botón nuevo aparecieron dos que ya
-están en INICIO, ambas con el patrón `if (error) return;` sin aviso:
+**Recompra sube** de quinto lugar a tramo propio.
 
-- El botón **"Hecha"** de Recordatorios (`marcarCumplida`): palomeas, falla, no
-  pasa nada, y el recordatorio sigue vivo sin explicación.
-- **Marcar una cotización como perdida** (`MotivoPerdidaModal`, `onConfirm`):
-  mismo patrón.
+**Se elimina la lógica de inventario.** César confirma que dan abasto; la app no
+debe frenarlo por eso.
 
-Entran en este trabajo: `toast.error(mensaje)`, que es lo que ya hacen Historial
-y Cobranza. Son de la misma familia que el botón nuevo y viven en el archivo que
-se va a tocar; dejarlas sería estrenar un botón que avisa sus errores al lado de
-dos que no.
+**El silencio pasa a ser uniforme: 2 días para todos los tramos.** En la primera
+versión se decidió que una vigencia vencida se quedara visible con sello de
+contactado. Eso tenía sentido cuando la pantalla era un tablero de estado; en una
+lista de **solo 10 lugares**, un lead contactado ayer le quita el lugar a uno que
+nadie ha tocado. Vuelve a aparecer solo si sigue sin resolverse.
 
-### Errores del flujo nuevo
+---
+
+## Registrar la acción
+
+**Un clic.** Botón `Ya le di seguimiento` en cada fila. Inserta el contacto en la
+bitácora al instante: sin modal, sin confirmación. Tipo `whatsapp` por omisión.
+
+**La nota es opcional y llega después.** Al registrar, la fila queda marcada y
+despliega una tira con campo de nota y atajos `Mañana · En 3 días · En 1 semana`.
+Si se ignoran, la fila cae en el siguiente refetch.
+
+**En una fila de compromiso, el mismo botón marca el recordatorio como cumplido.**
+Un solo concepto, no dos botones que hacen casi lo mismo.
+
+### El contador
+
+El *último toque* de una cotización es la fecha más reciente entre
+`cotizaciones.updated_at` y el último contacto del cliente. INICIO cuenta desde
+ahí.
+
+**No se escribe `updated_at`.** Ese campo significa "la cotización cambió", y
+usarlo para un WhatsApp lo vuelve mentira — es el mismo error que costó el
+módulo de Cobranza. Tampoco se agrega columna: `contactos` ya tiene el dato.
+
+**Sin migraciones.**
+
+---
+
+## Detalles de implementación
+
+**Caso borde:** `cotizaciones.cliente_id` admite nulo pero `contactos.cliente_id`
+es obligatorio con llave foránea. Se resuelve con `upsertCliente()`, que ya
+existe: busca por nombre y si no está lo crea. Efecto secundario bueno — cada
+seguimiento completa el directorio.
+
+**Piezas nuevas:** `BotonSeguimiento`, `TiraSeguimiento`, y
+`registrarSeguimiento()` en `contactos.ts`.
+
+**Cambios en lo existente:** `registrarContacto()` debe devolver también el `id`
+del contacto creado (la tira lo necesita para adjuntar la nota). Y se quita el
+tipo `Api` a mano de `contactos.ts`: la tabla ya está en `types.ts`, ese andamio
+caducó igual que los `as never` limpiados hoy.
+
+---
+
+## Errores
+
+**Dos fallas silenciosas preexistentes** en INICIO, ambas con el patrón
+`if (error) return;` sin avisar: el botón de marcar recordatorio cumplido y el
+de marcar cotización como perdida. Entran en este trabajo con `toast.error`,
+como ya hacen Historial y Cobranza.
+
+**Del flujo nuevo:**
 
 | Caso | Comportamiento |
 |---|---|
-| No se pudo guardar (red, RLS, FK) | La fila revierte su estado de "recién registrado" + toast. Nunca queda marcado como atendido algo que no se guardó. |
-| `upsertCliente()` devuelve null | Toast explicando que falta ligar el cliente. No se inserta nada a medias. |
-| Doble clic | Botón deshabilitado mientras guarda. Sin esto entran dos contactos y ensucian la bitácora. |
-| La nota falla pero el contacto ya se guardó | El seguimiento cuenta igual; se avisa que la nota no se adjuntó. Lo importante ya quedó. |
+| No se pudo guardar | La fila revierte su marca + toast. Nunca queda marcado lo que no se guardó. |
+| `upsertCliente()` devuelve null | Toast pidiendo ligar el cliente. No se inserta nada a medias. |
+| Doble clic | Botón deshabilitado mientras guarda. |
+| La nota falla, el contacto ya se guardó | El seguimiento cuenta; se avisa que la nota no se adjuntó. |
 
 ---
 
-## 7 · Reversibilidad
+## Reversibilidad y verificación
 
-El cambio no borra ni transforma nada: solo inserta filas en `contactos` y
-cambia cómo INICIO calcula. Revertir el commit devuelve el panel exacto a como
-está hoy, y los contactos registrados mientras tanto se quedan — siguen siendo
-bitácora válida y se ven en Clientes. No hay estado corrupto posible.
+Solo inserta filas en `contactos` y cambia cómo INICIO calcula. Revertir el
+commit devuelve la pantalla anterior, y los contactos registrados se quedan como
+bitácora válida en Clientes. No hay estado corrupto posible.
 
-Esto importa porque la calibración va a ser en productivo.
-
----
-
-## 8 · Verificación
-
-El repo **no tiene infraestructura de pruebas** — ni vitest, ni jest, ni un solo
-archivo `.test.*`. No se finge cobertura y no se propone montar un harness: sería
-otro proyecto.
-
-Automático antes de entregar: `npx tsc --noEmit`, `npm run build`, `npm run lint`.
-
-Manual en productivo, en este orden:
-
-1. En `01 Sin respuesta`, dar seguimiento a alguien → la fila se marca, aparece
-   la tira, y al refrescar **ya no está**. Al día siguiente tampoco. (Reaparece
-   a los 2 días si el cliente nunca contestó: es el comportamiento correcto, no
-   una falla.)
-2. El mismo cliente en `02 Vigencia vencida` → **sí** se queda, con el sello de
-   contactado.
-3. Tocar el atajo `En 3 días` → aparece en `00 Recordatorios` ese día.
-4. Abrir ese cliente en **Clientes** → el seguimiento está en su bitácora con la
-   nota.
-5. Con el celular en modo avión, dar seguimiento → **debe** salir toast de error,
-   no quedarse callado.
-
-El punto 5 es el que prueba que las fallas silenciosas de §6 quedaron cerradas.
+El repo **no tiene infraestructura de pruebas** y no se propone montarla.
+Verificación: `tsc --noEmit`, `npm run build`, `npm run lint`, y revisión en
+productivo — que es como César quiere calibrarlo.
 
 ---
 
-## 9 · Fuera de alcance
+## Fuera de alcance
 
-- Elegir tipo de contacto (llamada/visita) desde INICIO.
-- Notificaciones que alcancen a César fuera de la app. INICIO seguirá siendo
-  *pull*: funciona si la abres. Es un hueco real y merece su propio diseño.
-- Montar infraestructura de pruebas.
-- Quitar `clavosSupported` de Historial: es código muerto desde que se aplicó la
-  migración de clavos, pero ramifica UI en seis lugares y es cambio de
-  comportamiento, no limpieza de tipos.
-
----
-
-## Nota sobre referencias
-
-Este documento cita **símbolos y archivos, no números de línea**. Los números se
-pudren con el primer commit — igual que el hash fijo que traía el ARRANQUE en §H
-y que mandó a repetir una migración que ya estaba aplicada.
+- Elegir tipo de contacto (llamada/visita) desde INICIO. Se corrige en la
+  bitácora del cliente.
+- **Notificaciones que alcancen a César fuera de la app.** INICIO seguirá siendo
+  *pull*. Es el hueco más caro que queda y merece su propio diseño.
+- Traer al panel los 307 rezagados de WhatsApp: no están en la base. Requiere el
+  backfill del histórico, que es otro trabajo.
