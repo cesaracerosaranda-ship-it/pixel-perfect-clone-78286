@@ -43,7 +43,9 @@ no el nombre del archivo en `supabase/migrations/`.
 **Con fecha límite — antes del 15/ago (día de pago de S4)**
 - [x] **Campaña consolidada montada y publicada** el 5/ago 14:25. Ver §I.
 - [x] Apagadas las dos débiles (`IG 10.12.25` y `Nuevas img AI 20.03.26`).
-- [ ] **9-11/ago:** apagar `Ubis || 1.12.25` (cutover completo).
+- [ ] **LUNES 11/ago:** apagar `Ubis || 1.12.25` (cutover completo). Decidido
+      el 7/ago: se toma el extremo tardío de la ventana 9-11 — más días de
+      señal en paralelo, y el corte cae en día hábil junto con la lectura.
 - [ ] **11-13/ago:** leer resultados. Criterio: ≤$25/conv contra el baseline de
       **$20.35** de la ganadora.
 - [ ] **13-14/ago:** decisión S4 → avisar la salida.
