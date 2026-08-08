@@ -151,7 +151,10 @@ pago, factura, cotización de flete, PDF de cotización auto-archivado).
 Storage: bucket PRIVADO `documentos` (el workspace de Lovable bloquea buckets
 públicos) — los archivos se abren con createSignedUrls (1 h), NUNCA getPublicUrl.
 Rutas: `{cliente_id}/{ts}_{archivo}`.
-RLS: público (sin auth) — app interna.
+RLS: requiere sesión — el rol `anon` NO tiene SELECT sobre las tablas
+(verificado 7/ago: 42501 en `cotizaciones`). Todo acceso a datos, incluidos
+scripts e imports, debe correr dentro de la app autenticada; no hay llaves de
+servicio fuera de Supabase.
 Edge Functions: `enviar-cotizacion` (supabase/functions/) — envía la cotización
 por correo desde el Gmail de VIALUX (SMTP smtp.gmail.com:465 vía denomailer) con
 el PDF del expediente adjunto, plantilla comercial real de la empresa, y pasa el

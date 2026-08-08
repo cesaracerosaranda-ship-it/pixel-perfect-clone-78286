@@ -8,6 +8,16 @@ para continuar. Los detalles viven en `plan-marketing-inhouse.md`,
 
 ## 0 · LO PRIMERO al abrir la sesión
 
+**Siguiente tarea (8/ago): implementar el import de WhatsApp.** El diseño
+completo está en `docs/superpowers/specs/2026-08-07-import-whatsapp-design.md`
+— leerlo antes de tocar código; trae el porqué de cada decisión, el mapeo de
+campos y las 3 verificaciones previas. Los datos ya están listos:
+`/Users/cesararanda/vialux/data/chats.json` (1,067 conversaciones, año
+completo ago25→ago26, unificado y respaldado).
+
+Dos entregas: (1) pantalla de import en el módulo WhatsApp con dry-run,
+(2) tramo nuevo en INICIO "TE ESCRIBIÓ · SIN COTIZAR".
+
 **No hay paso bloqueante.** `cobro_pendiente` ya está en producción desde el
 5/ago (commit `fe1bb65`, del bot de Lovable). Cobranza e Inicio ya filtran bien.
 
