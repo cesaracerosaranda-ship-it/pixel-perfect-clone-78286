@@ -348,15 +348,32 @@ function CotizadorPage() {
         const { data, error } = await supabase.functions.invoke("enviar-cotizacion", {
           body: { cotizacion_id: cotizacionId },
         });
-        if (error) throw new Error(error.message);
+        if (error) {
+          // invoke() esconde el motivo: su .message genérico ("non-2xx status
+          // code") no sirve; el error real de la función viaja en el cuerpo de
+          // la respuesta, dentro de error.context.
+          let motivo = error.message;
+          const ctx = (error as { context?: Response }).context;
+          if (ctx && typeof ctx.json === "function") {
+            try {
+              const body = (await ctx.json()) as { error?: string };
+              if (body?.error) motivo = body.error;
+            } catch { /* cuerpo no-JSON: se queda el genérico */ }
+          }
+          throw new Error(motivo);
+        }
         if (data?.error) throw new Error(data.error);
         toast.success(`Cotización ${folio} enviada a ${data?.email ?? state.email} con el PDF adjunto`);
         return;
-      } catch {
-        // Fallback: la función no está desplegada/configurada aún —
-        // se abre el borrador tradicional con la liga de descarga
+      } catch (err) {
+        // Fallback: se abre el borrador tradicional con la liga de descarga.
+        // El motivo se muestra SIEMPRE — sin él, secretos faltantes, cliente
+        // sin correo y SMTP caído se ven idénticos y no hay cómo diagnosticar.
         window.location.href = buildMailto(state, folio, calc.total, pdfUrl);
-        toast.info("Envío automático no disponible — se abrió el borrador de correo");
+        const motivo = err instanceof Error && err.message ? `: ${err.message}` : "";
+        toast.info(`Envío automático no disponible${motivo} — se abrió el borrador de correo`, {
+          duration: 10000,
+        });
       }
     } catch (e) {
       toast.error((e as Error).message);
