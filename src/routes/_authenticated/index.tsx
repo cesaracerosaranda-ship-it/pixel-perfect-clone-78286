@@ -11,7 +11,9 @@ import {
 } from "@/components/ui/dialog";
 import { QuoteForm } from "@/components/cotizador/QuoteForm";
 import { PriceSummary } from "@/components/cotizador/PriceSummary";
-import { initialQuote, useQuoteState, type QuoteState } from "@/hooks/useQuoteState";
+import {
+  initialQuote, mismoFormulario, useQuoteState, type QuoteState,
+} from "@/hooks/useQuoteState";
 import { deliveryMessage, PRODUCTOS } from "@/lib/vialux/constants";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -40,6 +42,11 @@ function CotizadorPage() {
   const { state, setState, update, reset, calc } = useQuoteState();
   const [savedFolio, setSavedFolio] = useState<string | null>(null);
   const [savedId, setSavedId] = useState<string | null>(null);
+  /**
+   * Foto del formulario tal como quedó guardado. Sirve para detectar que el
+   * usuario ya está capturando OTRA cotización sobre la misma pantalla.
+   */
+  const [estadoGuardado, setEstadoGuardado] = useState<QuoteState | null>(null);
   const [saving, setSaving] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [waResumen, setWaResumen] = useState<string | null>(null);
@@ -143,6 +150,31 @@ function CotizadorPage() {
 
   const deliveryMsg = deliveryMessage(state.cp, state.cantidad);
 
+  /**
+   * Editar el formulario después de guardar = cotización nueva.
+   *
+   * El guardado es idempotente por sesión: mientras haya `savedId`, todas las
+   * acciones reutilizan ese folio y se saltan el insert. Eso es correcto
+   * mientras se trabaje el MISMO documento, pero al capturar otro cliente
+   * encima —sin pasar por "Nueva cotización"— producía dos daños silenciosos:
+   * el PDF salía con el folio del cliente anterior, y la cotización nueva no
+   * quedaba registrada en Ventas.
+   *
+   * Al detectar el cambio se suelta el candado, así que la siguiente acción
+   * genera folio propio e inserta. El efecto colateral —corregir un dato y
+   * volver a descargar crea un segundo registro— es visible y borrable desde
+   * Historial; el anterior no se notaba hasta que el cliente recibía un
+   * documento con folio de alguien más.
+   */
+  useEffect(() => {
+    if (!savedId || !estadoGuardado) return;
+    if (mismoFormulario(state, estadoGuardado)) return;
+    setSavedId(null);
+    setSavedFolio(null);
+    setEstadoGuardado(null);
+    toast.info("Datos modificados — se generará una cotización nueva con folio propio");
+  }, [state, savedId, estadoGuardado]);
+
   const ensureFolio = async (): Promise<string> => {
     if (savedFolio) return savedFolio;
     const folio = await generateFolio(state.revision, state.folioPadre);
@@ -211,6 +243,7 @@ function CotizadorPage() {
       if (error) throw error;
       cotizacionId = data.id;
       setSavedId(data.id);
+      setEstadoGuardado(state);
       if (!silent) toast.success(`Cotización ${folio} guardada`);
     }
 
@@ -386,6 +419,7 @@ function CotizadorPage() {
     reset();
     setSavedFolio(null);
     setSavedId(null);
+    setEstadoGuardado(null);
     setFormErrors({});
     toast.info("Formulario limpiado");
   };

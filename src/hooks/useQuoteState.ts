@@ -50,6 +50,17 @@ export const initialQuote: QuoteState = {
   fleteCosto: 0,
 };
 
+/**
+ * ¿Es el mismo documento comercial?
+ *
+ * Se compara campo por campo, incluidas las notas internas: si algo cambió, el
+ * PDF que se genere ya NO corresponde al registro guardado, y el cotizador
+ * tiene que soltar el folio para no emitir un documento con folio ajeno.
+ */
+export function mismoFormulario(a: QuoteState, b: QuoteState): boolean {
+  return (Object.keys(initialQuote) as (keyof QuoteState)[]).every((k) => a[k] === b[k]);
+}
+
 export function useQuoteState(initial: QuoteState = initialQuote) {
   const [state, setState] = useState<QuoteState>(initial);
 
