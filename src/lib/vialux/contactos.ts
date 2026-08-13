@@ -102,11 +102,17 @@ export async function registrarSeguimiento(args: {
   let clienteId = args.clienteId;
 
   if (!clienteId) {
-    clienteId = await upsertCliente({
-      nombre: args.nombre,
-      empresa: args.empresa ?? undefined,
-      telefono: args.telefono ?? undefined,
-    });
+    // upsertCliente lanza si la base rechaza la operación; aquí se convierte en
+    // mensaje porque el botón de Inicio no debe reventar la pantalla por esto.
+    try {
+      clienteId = await upsertCliente({
+        nombre: args.nombre,
+        empresa: args.empresa ?? undefined,
+        telefono: args.telefono ?? undefined,
+      });
+    } catch (e) {
+      return { id: null, error: (e as Error).message };
+    }
     if (!clienteId) {
       return { id: null, error: "Falta ligar el cliente: la cotización no trae nombre utilizable" };
     }

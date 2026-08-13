@@ -52,6 +52,19 @@ export function nombreParaMostrar(input: {
  *
  * Empareja por `identidadCliente`, no por el nombre crudo.
  */
+/**
+ * Lanza si la base rechaza la operación.
+ *
+ * Antes las tres consultas descartaban su error: el select, el update (cuyo
+ * resultado ni se guardaba) y el insert. Cuando algo fallaba —RLS, un nombre
+ * duplicado que hace fallar el `maybeSingle`, una restricción— la función
+ * devolvía null sin decir nada, la cotización se guardaba con `cliente_id`
+ * vacío, y el correo capturado en el formulario nunca llegaba a `clientes`.
+ *
+ * El síntoma aparecía mucho después y en otro lado: "El cliente no tiene correo
+ * registrado" al intentar enviar la cotización. Un fallo mudo aquí cuesta media
+ * hora de diagnóstico allá.
+ */
 export async function upsertCliente(input: {
   nombre: string;
   empresa?: string;
@@ -65,27 +78,40 @@ export async function upsertCliente(input: {
   const telefono = (input.telefono || "").trim();
   const email = (input.email || "").trim();
 
-  const { data: existing } = await supabase
+  // Se pide una lista en vez de `maybeSingle`: con nombres duplicados aquel
+  // devuelve error y el cliente existente se volvía invisible, provocando un
+  // insert que chocaba o duplicaba. Si hay varios se toma el más reciente.
+  const { data: encontrados, error: eBuscar } = await supabase
     .from("clientes")
-    .select("id, empresa, telefono, email")
+    .select("id, empresa, telefono, email, updated_at")
     .eq("nombre", nombre)
-    .maybeSingle();
+    .order("updated_at", { ascending: false })
+    .limit(1);
+  if (eBuscar) throw new Error(`No se pudo buscar al cliente: ${eBuscar.message}`);
 
+  const existing = encontrados?.[0];
   if (existing) {
     const patch: { telefono?: string; empresa?: string; email?: string } = {};
     if (telefono && telefono !== existing.telefono) patch.telefono = telefono;
     if (empresa && empresa !== existing.empresa) patch.empresa = empresa;
     if (email && email !== existing.email) patch.email = email;
     if (Object.keys(patch).length) {
-      await supabase.from("clientes").update(patch).eq("id", existing.id);
+      const { error: eActualizar } = await supabase
+        .from("clientes")
+        .update(patch)
+        .eq("id", existing.id);
+      if (eActualizar) {
+        throw new Error(`No se pudieron actualizar los datos del cliente: ${eActualizar.message}`);
+      }
     }
     return existing.id;
   }
 
-  const { data: created } = await supabase
+  const { data: created, error: eCrear } = await supabase
     .from("clientes")
     .insert({ nombre, empresa, telefono, email })
     .select("id")
     .single();
+  if (eCrear) throw new Error(`No se pudo crear el cliente: ${eCrear.message}`);
   return created?.id ?? null;
 }

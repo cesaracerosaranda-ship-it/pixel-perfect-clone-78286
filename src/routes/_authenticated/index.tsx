@@ -373,6 +373,14 @@ function CotizadorPage() {
     try {
       setSaving(true);
       const { folio, cotizacionId, clienteId } = await persistQuote(true);
+      // La función lee el correo de `clientes` vía cotizaciones.cliente_id, no
+      // del formulario. Sin cliente ligado el envío falla sí o sí, y conviene
+      // decirlo aquí y no dejar que se vea como un problema del correo.
+      if (!clienteId) {
+        toast.error(
+          "La cotización no quedó ligada a un cliente, así que no se puede enviar automáticamente. Revisa el nombre del cliente.",
+        );
+      }
       // Garantiza el PDF archivado (la función lo adjunta desde el expediente)
       const pdfUrl = await obtenerLigaPdf(folio, cotizacionId, clienteId);
 
