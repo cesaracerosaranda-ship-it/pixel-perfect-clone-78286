@@ -160,6 +160,27 @@ todo lo demás del panel.
   entregable.
 - Separar clientes ya fusionados por "A QUIEN CORRESPONDA" (pendiente aparte).
 
+## 6.5 · ADDENDUM 13/ago — el dato de abr-ago es de UN SOLO LADO
+
+Medido el 13/ago: después del 15/abr los datos traen **1,700 mensajes salientes
+y 1 entrante**. El dispositivo re-vinculado sincronizó lo enviado, no lo
+recibido. Consecuencias para la implementación:
+
+- **La ventana confiable para "te escribió" empieza el 7/ago** (día del
+  re-vinculado, cuando el dispositivo quedó recibiendo en vivo). Antes del
+  15/abr el histórico sí es de dos lados.
+- El tramo de INICIO debe alimentarse SOLO de conversaciones con mensajes
+  entrantes en ventana confiable; abr-ago es el registro de la ráfaga de
+  reactivación de César con las respuestas invisibles — presentarlo como
+  "conversaciones enfriadas" vendería humo.
+- La lista Excel del 13/ago ya usa estas cubetas (ver `lista_leads.py` en el
+  repo del Analyzer): VIVOS (entrante ≥7/ago) · QUEDARON SIN RESPUESTA
+  (último mensaje del cliente, pre-abril) · ENFRIADOS (dos lados, pre-abril) ·
+  YA LOS BUSCASTE (solo salientes abr-ago).
+- Esto invalida la conclusión del 13/ago en la mañana ("sí contestas, 0 sin
+  responder en 90 días"): no era que César contestara todo, es que las
+  respuestas de los clientes no están en los datos.
+
 ## 7 · Contexto operativo del Analyzer (para no re-aprenderlo)
 
 - La extracción vive en `/Users/cesararanda/vialux` (`main.py --extract`).
