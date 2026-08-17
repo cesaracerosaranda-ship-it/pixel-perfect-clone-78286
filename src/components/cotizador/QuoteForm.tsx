@@ -27,6 +27,7 @@ import {
 import { Minus, Plus, Search } from "lucide-react";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { ultimoCpDeCliente } from "@/lib/vialux/clientes";
 import { PRODUCTOS, formatMoney } from "@/lib/vialux/constants";
 import type { QuoteState } from "@/hooks/useQuoteState";
 import { useCpLookup } from "@/hooks/useCpLookup";
@@ -162,6 +163,13 @@ export function QuoteForm({ state, update, errors = {} }: Props) {
                 update("empresa", c.empresa);
                 update("telefono", c.telefono);
                 update("email", c.email || "");
+                // El directorio no guarda C.P.: se deriva de la ultima
+                // cotizacion del cliente. Tambien cuando no hay antecedente se
+                // escribe ("" limpia), para no heredar el C.P. de otro cliente
+                // que estuviera en el formulario.
+                void ultimoCpDeCliente({ clienteId: c.id, nombre: c.nombre }).then(
+                  (cp) => update("cp", cp),
+                );
               }}
             />
           </div>

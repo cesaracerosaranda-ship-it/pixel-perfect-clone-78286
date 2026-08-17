@@ -25,7 +25,7 @@ import {
 } from "@/lib/vialux/quote-actions";
 import { generateQuotePdf } from "@/lib/pdf/generateQuotePdf";
 import { generateFichaPdf } from "@/lib/pdf/generateFichaPdf";
-import { upsertCliente } from "@/lib/vialux/clientes";
+import { upsertCliente, ultimoCpDeCliente } from "@/lib/vialux/clientes";
 import { archivarCotizacionPdf, ligaPdfCotizacion } from "@/lib/vialux/documentos";
 
 export const Route = createFileRoute("/_authenticated/")({
@@ -134,12 +134,15 @@ function CotizadorPage() {
         );
         return;
       }
+      // El C.P. no vive en el directorio: se deriva de la ultima cotizacion.
+      const cp = await ultimoCpDeCliente({ clienteId, nombre: data.nombre });
       setState((s) => ({
         ...s,
         cliente: data.nombre,
         empresa: data.empresa ?? "",
         telefono: data.telefono ?? "",
         email: data.email ?? "",
+        cp,
       }));
       void navigate({ to: "/", search: {} as never, replace: true });
       setPrecarga("idle");

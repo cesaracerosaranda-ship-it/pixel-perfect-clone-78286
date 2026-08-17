@@ -53,6 +53,45 @@ export function nombreParaMostrar(input: {
  * Empareja por `identidadCliente`, no por el nombre crudo.
  */
 /**
+ * Último C.P. de destino conocido para un cliente.
+ *
+ * El directorio no guarda código postal — vive en cada cotización. Cuando un
+ * cliente existente se carga en el cotizador, su destino más probable es el de
+ * su cotización más reciente, así que se deriva de ahí. Se busca primero por
+ * cliente_id y, para cotizaciones viejas que se guardaron sin ligar, por
+ * nombre. Devuelve "" si no hay antecedente.
+ */
+export async function ultimoCpDeCliente(args: {
+  clienteId?: string | null;
+  nombre?: string | null;
+}): Promise<string> {
+  if (args.clienteId) {
+    const { data } = await supabase
+      .from("cotizaciones")
+      .select("cp_destino")
+      .eq("cliente_id", args.clienteId)
+      .not("cp_destino", "is", null)
+      .order("fecha", { ascending: false })
+      .limit(1);
+    const cp = (data?.[0]?.cp_destino ?? "").trim();
+    if (cp) return cp;
+  }
+  const nombre = (args.nombre ?? "").trim().toUpperCase();
+  if (nombre) {
+    const { data } = await supabase
+      .from("cotizaciones")
+      .select("cp_destino")
+      .eq("cliente_nombre", nombre)
+      .not("cp_destino", "is", null)
+      .order("fecha", { ascending: false })
+      .limit(1);
+    const cp = (data?.[0]?.cp_destino ?? "").trim();
+    if (cp) return cp;
+  }
+  return "";
+}
+
+/**
  * Lanza si la base rechaza la operación.
  *
  * Antes las tres consultas descartaban su error: el select, el update (cuyo
