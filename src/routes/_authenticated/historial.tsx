@@ -50,7 +50,9 @@ import { TelefonoCliente } from "@/components/TelefonoCliente";
 import { LayoutGrid, Rows3 } from "lucide-react";
 import { BandaCargando, BandaError, textoError } from "@/components/EstadoConsulta";
 import { upsertCliente } from "@/lib/vialux/clientes";
-import { whatsappDeFila, correoDeFila, idsSustituidas, folioSucesor } from "@/lib/vialux/reenviar";
+import {
+  resumenDeFila, descargarPdfDeFila, correoDeFila, emailDeFila, idsSustituidas, folioSucesor,
+} from "@/lib/vialux/reenviar";
 import {
   MotivoPerdidaModal,
   motivoPerdidaDe as motivoDe,
@@ -892,9 +894,23 @@ function HistorialPage() {
   const reenviarWhatsApp = async (r: CotizacionRow) => {
     setReenviando(r.id);
     try {
-      const { url, error } = await whatsappDeFila(r);
-      if (!url) { toast.error(error ?? "No se pudo armar el mensaje"); return; }
-      window.open(url, "_blank");
+      // El portapapeles va PRIMERO, en el instante del clic: tras los segundos
+      // que tarda el PDF, el navegador ya bloquea ventanas y portapapeles.
+      // Por eso aqui no se abre WhatsApp: PDF descargado + texto copiado, y
+      // Cesar adjunta el archivo real en el chat.
+      let copiado = false;
+      try {
+        await navigator.clipboard.writeText(resumenDeFila(r));
+        copiado = true;
+      } catch { /* sin permiso de portapapeles: igual se descarga el PDF */ }
+      toast.info(copiado
+        ? "Mensaje copiado — generando el PDF…"
+        : "Generando el PDF… (no se pudo copiar el mensaje)");
+      const { ok, error } = await descargarPdfDeFila(r);
+      if (!ok) { toast.error(error ?? "No se pudo generar el PDF"); return; }
+      toast.success(copiado
+        ? `PDF de ${r.folio} descargado y mensaje en el portapapeles — pégalo en WhatsApp y adjunta el PDF`
+        : `PDF de ${r.folio} descargado — adjúntalo en WhatsApp`);
     } finally {
       setReenviando(null);
     }
@@ -903,6 +919,13 @@ function HistorialPage() {
   const reenviarCorreo = async (r: CotizacionRow) => {
     setReenviando(r.id);
     try {
+      // Aviso claro ANTES de intentar nada: sin correo en el directorio no hay
+      // envio posible y el error de la funcion tardaria segundos en decirlo.
+      const email = await emailDeFila(r);
+      if (!email) {
+        toast.error(`${r.cliente_nombre} no tiene correo registrado — agrégalo en Clientes y reintenta`);
+        return;
+      }
       const res = await correoDeFila(r);
       if (res.via === "funcion") {
         toast.success(`${r.folio} reenviada a ${res.email} con el PDF adjunto`);
@@ -1274,8 +1297,8 @@ function HistorialPage() {
                               variant="ghost"
                               disabled={reenviando === r.id}
                               onClick={() => void reenviarWhatsApp(r)}
-                              aria-label="Reenviar por WhatsApp tal cual"
-                              title="Reenviar por WhatsApp (mismo folio, sin crear revisión)"
+                              aria-label="Descargar PDF y copiar mensaje para WhatsApp"
+                              title="PDF + mensaje al portapapeles para WhatsApp (mismo folio, sin crear revisión)"
                             >
                               <MessageCircle className="h-4 w-4 text-[#57524A]" />
                             </Button>

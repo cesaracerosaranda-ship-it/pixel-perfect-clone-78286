@@ -2,7 +2,9 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 import { calcular, type QuoteState, initialQuote } from "@/hooks/useQuoteState";
 import { deliveryMessage } from "@/lib/vialux/constants";
-import { buildWhatsAppUrl, buildMailto } from "@/lib/vialux/quote-actions";
+import {
+  buildMailto, buildWhatsAppResumen,
+} from "@/lib/vialux/quote-actions";
 import { generateQuotePdf } from "@/lib/pdf/generateQuotePdf";
 import { archivarCotizacionPdf, ligaPdfCotizacion } from "@/lib/vialux/documentos";
 
@@ -44,7 +46,7 @@ export function estadoDesdeFila(row: Cot, email = ""): QuoteState {
   };
 }
 
-async function emailDeFila(row: Cot): Promise<string> {
+export async function emailDeFila(row: Cot): Promise<string> {
   if (!row.cliente_id) return "";
   const { data } = await supabase
     .from("clientes")
@@ -99,15 +101,62 @@ export async function ligaPdfDeFila(
   }
 }
 
-/** wa.me con el resumen del documento y su liga. Null si no hay teléfono. */
-export async function whatsappDeFila(row: Cot): Promise<{ url: string | null; error: string | null }> {
-  if (!(row.cliente_telefono ?? "").trim()) {
-    return { url: null, error: "La fila no tiene teléfono" };
-  }
-  const { url: pdfUrl } = await ligaPdfDeFila(row);
+/**
+ * Resumen del documento para pegar en WhatsApp. Puro e instantáneo: se copia
+ * al portapapeles EN el clic, antes de cualquier trabajo pesado — después de
+ * unos segundos de async el navegador ya no deja ni abrir ventanas ni,
+ * en algunos casos, escribir al portapapeles.
+ */
+export function resumenDeFila(row: Cot): string {
   const state = estadoDesdeFila(row);
-  return { url: buildWhatsAppUrl(state, row.folio, Number(row.total), pdfUrl), error: null };
+  return buildWhatsAppResumen(
+    state,
+    row.folio,
+    { precioUnitario: Number(row.precio_unitario), total: Number(row.total) },
+    deliveryMessage(state.cp, state.cantidad),
+  );
 }
+
+/**
+ * Descarga el PDF de la fila (misma regla de fidelidad que la liga) y, si hay
+ * cliente ligado, lo deja archivado en el expediente de una vez.
+ */
+export async function descargarPdfDeFila(row: Cot): Promise<{ ok: boolean; error: string | null }> {
+  const state = estadoDesdeFila(row);
+  const calc = calcular(state);
+  if (Math.abs(calc.total - Number(row.total)) > 0.01) {
+    return {
+      ok: false,
+      error: `El recálculo (${calc.total.toFixed(2)}) no cuadra con el total guardado (${Number(row.total).toFixed(2)}); no se genera el PDF para no alterar el documento`,
+    };
+  }
+  try {
+    const { filename, blob } = await generateQuotePdf({
+      folio: row.folio,
+      state,
+      calc,
+      deliveryMsg: deliveryMessage(state.cp, state.cantidad),
+    });
+    if (row.cliente_id) {
+      const yaArchivado = await ligaPdfCotizacion(row.id);
+      if (!yaArchivado) {
+        try {
+          await archivarCotizacionPdf({
+            clienteId: row.cliente_id,
+            cotizacionId: row.id,
+            blob,
+            nombre: filename,
+          });
+        } catch { /* el PDF ya se descargó; el expediente es best-effort */ }
+      }
+    }
+    return { ok: true, error: null };
+  } catch (e) {
+    return { ok: false, error: (e as Error).message };
+  }
+}
+
+
 
 /**
  * Envío por correo con la misma jerarquía que el cotizador: primero la función
