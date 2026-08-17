@@ -37,7 +37,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Copy, Trash2, Search, Truck, History, Pencil, Minus, Plus } from "lucide-react";
+import { Copy, Trash2, Search, Truck, History, Pencil, Minus, Plus, MessageCircle, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney, IVA_RATE, PRODUCTOS } from "@/lib/vialux/constants";
@@ -50,6 +50,7 @@ import { TelefonoCliente } from "@/components/TelefonoCliente";
 import { LayoutGrid, Rows3 } from "lucide-react";
 import { BandaCargando, BandaError, textoError } from "@/components/EstadoConsulta";
 import { upsertCliente } from "@/lib/vialux/clientes";
+import { whatsappDeFila, correoDeFila, idsSustituidas, folioSucesor } from "@/lib/vialux/reenviar";
 import {
   MotivoPerdidaModal,
   motivoPerdidaDe as motivoDe,
@@ -765,11 +766,21 @@ function HistorialPage() {
     });
   }, [cotizacionesQuery.data, search, filter]);
 
+  // Filas abiertas que ya tienen una revisión más nueva. Se muestran (son
+  // historia) pero con sello, y salen de los conteos de "en proceso".
+  const sustituidas = useMemo(
+    () => idsSustituidas(cotizacionesQuery.data ?? []),
+    [cotizacionesQuery.data],
+  );
+
   const kpis = useMemo(() => {
     const all = cotizacionesQuery.data ?? [];
+    const reemplazadas = idsSustituidas(all);
     const cerradas = all.filter((r) => r.estado === "cerrado");
     const enProceso = all.filter(
-      (r) => r.estado === "cotizado" || r.estado === "enviado",
+      (r) =>
+        (r.estado === "cotizado" || r.estado === "enviado") &&
+        !reemplazadas.has(r.id),
     );
     const perdidas = all.filter((r) => r.estado === "perdido");
 
@@ -873,6 +884,36 @@ function HistorialPage() {
     const { error } = await supabase.from("cotizaciones").delete().eq("id", id);
     if (error) toast.error(error.message);
     else toast.success("Cotización eliminada");
+  };
+
+  /** Fila que está reenviando ahora — deshabilita sus botones mientras tanto. */
+  const [reenviando, setReenviando] = useState<string | null>(null);
+
+  const reenviarWhatsApp = async (r: CotizacionRow) => {
+    setReenviando(r.id);
+    try {
+      const { url, error } = await whatsappDeFila(r);
+      if (!url) { toast.error(error ?? "No se pudo armar el mensaje"); return; }
+      window.open(url, "_blank");
+    } finally {
+      setReenviando(null);
+    }
+  };
+
+  const reenviarCorreo = async (r: CotizacionRow) => {
+    setReenviando(r.id);
+    try {
+      const res = await correoDeFila(r);
+      if (res.via === "funcion") {
+        toast.success(`${r.folio} reenviada a ${res.email} con el PDF adjunto`);
+      } else {
+        toast.info(`Envío automático no disponible — se abrió el borrador a ${res.email}`);
+      }
+    } catch (e) {
+      toast.error((e as Error).message);
+    } finally {
+      setReenviando(null);
+    }
   };
 
   const duplicate = (id: string) => {
@@ -1140,6 +1181,14 @@ function HistorialPage() {
                                 HISTÓRICA
                               </span>
                             )}
+                            {sustituidas.has(r.id) && (
+                              <span
+                                className="bg-[#F1EFEA] px-1.5 py-0.5 font-mono text-[10px] font-bold uppercase tracking-wider text-[#57524A]"
+                                title="Existe una revisión más nueva de esta cotización; ya no cuenta en el pipeline"
+                              >
+                                SUSTITUIDA POR {folioSucesor(r, cotizacionesQuery.data ?? []) ?? "REVISIÓN"}
+                              </span>
+                            )}
                           </div>
                         </td>
                         <td className="px-4 py-3 font-mono text-xs text-muted-foreground">
@@ -1215,10 +1264,30 @@ function HistorialPage() {
                               size="icon"
                               variant="ghost"
                               onClick={() => duplicate(r.id)}
-                              aria-label="Duplicar en cotizador"
-                              title="Duplicar en cotizador"
+                              aria-label="Editar como revisión nueva"
+                              title="Editar (crea revisión R+1 en el cotizador)"
                             >
                               <Copy className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              disabled={reenviando === r.id}
+                              onClick={() => void reenviarWhatsApp(r)}
+                              aria-label="Reenviar por WhatsApp tal cual"
+                              title="Reenviar por WhatsApp (mismo folio, sin crear revisión)"
+                            >
+                              <MessageCircle className="h-4 w-4 text-[#57524A]" />
+                            </Button>
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              disabled={reenviando === r.id}
+                              onClick={() => void reenviarCorreo(r)}
+                              aria-label="Reenviar por correo tal cual"
+                              title="Reenviar por correo (mismo folio, sin crear revisión)"
+                            >
+                              <Mail className="h-4 w-4 text-[#57524A]" />
                             </Button>
                             <AlertDialog>
                               <AlertDialogTrigger asChild>

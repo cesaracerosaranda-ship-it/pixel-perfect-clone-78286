@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatMoney } from "@/lib/vialux/constants";
+import { idsSustituidas } from "@/lib/vialux/reenviar";
 import type { Tables } from "@/integrations/supabase/types";
 import { RailSection } from "@/components/RailSection";
 import { MotivoPerdidaModal } from "@/components/MotivoPerdidaModal";
@@ -100,7 +101,11 @@ export function TableroEmbudo() {
             (r.cliente_empresa ?? "").toLowerCase().includes(q),
         )
       : (cotsQuery.data ?? []);
+    // Una fila abierta con revisión más nueva no cuenta: su seguimiento vive
+    // en la R+1 y dejarla duplicaría el embudo.
+    const reemplazadas = idsSustituidas(fuente);
     for (const r of fuente) {
+      if (reemplazadas.has(r.id)) continue;
       const e = r.estado as Estado;
       if (base[e]) base[e].push(r);
     }

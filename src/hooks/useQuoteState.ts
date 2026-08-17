@@ -61,6 +61,40 @@ export function mismoFormulario(a: QuoteState, b: QuoteState): boolean {
   return (Object.keys(initialQuote) as (keyof QuoteState)[]).every((k) => a[k] === b[k]);
 }
 
+/**
+ * Cálculo puro de una cotización. Vive fuera del hook para poder reconstruir
+ * el cálculo de una fila YA GUARDADA (reenviar desde Historial) sin montar el
+ * cotizador.
+ */
+export function calcular(state: QuoteState) {
+  const producto = PRODUCTOS[state.producto];
+  const listPrice = state.requiereFactura ? producto.conFactura : producto.sinFactura;
+  const precioUnitario =
+    state.precioEspecialOn && state.precioEspecial > 0
+      ? state.precioEspecial
+      : listPrice;
+  const subtotalProducto = precioUnitario * (state.cantidad || 0);
+  const subtotalFlete = state.incluyeFlete ? state.fleteCosto || 0 : 0;
+  const subtotalGeneral = subtotalProducto + subtotalFlete;
+  const iva = state.requiereFactura ? subtotalGeneral * IVA_RATE : 0;
+  const total = subtotalGeneral + iva;
+  const margen =
+    precioUnitario > 0 ? ((precioUnitario - COSTO_BASE) / precioUnitario) * 100 : 0;
+  return {
+    producto,
+    listPrice,
+    precioUnitario,
+    subtotalProducto,
+    subtotalFlete,
+    subtotalGeneral,
+    iva,
+    total,
+    margen,
+  };
+}
+
+export type QuoteCalc = ReturnType<typeof calcular>;
+
 export function useQuoteState(initial: QuoteState = initialQuote) {
   const [state, setState] = useState<QuoteState>(initial);
 
@@ -69,32 +103,7 @@ export function useQuoteState(initial: QuoteState = initialQuote) {
 
   const reset = () => setState(initialQuote);
 
-  const calc = useMemo(() => {
-    const producto = PRODUCTOS[state.producto];
-    const listPrice = state.requiereFactura ? producto.conFactura : producto.sinFactura;
-    const precioUnitario =
-      state.precioEspecialOn && state.precioEspecial > 0
-        ? state.precioEspecial
-        : listPrice;
-    const subtotalProducto = precioUnitario * (state.cantidad || 0);
-    const subtotalFlete = state.incluyeFlete ? state.fleteCosto || 0 : 0;
-    const subtotalGeneral = subtotalProducto + subtotalFlete;
-    const iva = state.requiereFactura ? subtotalGeneral * IVA_RATE : 0;
-    const total = subtotalGeneral + iva;
-    const margen =
-      precioUnitario > 0 ? ((precioUnitario - COSTO_BASE) / precioUnitario) * 100 : 0;
-    return {
-      producto,
-      listPrice,
-      precioUnitario,
-      subtotalProducto,
-      subtotalFlete,
-      subtotalGeneral,
-      iva,
-      total,
-      margen,
-    };
-  }, [state]);
+  const calc = useMemo(() => calcular(state), [state]);
 
   return { state, setState, update, reset, calc };
 }

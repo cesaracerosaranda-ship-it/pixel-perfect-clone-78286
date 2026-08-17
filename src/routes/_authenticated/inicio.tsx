@@ -11,6 +11,7 @@ import {
   diasDesde as diasDesdeISO, type Contacto,
 } from "@/lib/vialux/contactos";
 import { nombreParaMostrar } from "@/lib/vialux/clientes";
+import { idsSustituidas } from "@/lib/vialux/reenviar";
 import type { Tables } from "@/integrations/supabase/types";
 import { RailSection, PageTitle } from "@/components/RailSection";
 import { TelefonoCliente } from "@/components/TelefonoCliente";
@@ -157,8 +158,12 @@ function InicioPage() {
 
   // ─── Las tres cifras ──────────────────────────────────────────────────────
   const kpis = useMemo(() => {
+    const reemplazadas = idsSustituidas(cots);
     const vivas = cots.filter(
-      (c) => (c.estado === "cotizado" || c.estado === "enviado") && dias(c.fecha) <= DIAS_VIGENCIA,
+      (c) =>
+        (c.estado === "cotizado" || c.estado === "enviado") &&
+        !reemplazadas.has(c.id) &&
+        dias(c.fecha) <= DIAS_VIGENCIA,
     );
     const pipeline = vivas.reduce((s, c) => s + Number(c.total), 0);
     // Vence dentro de DIAS_EN_RIESGO: la cifra que dice si hoy fue un buen día
@@ -212,7 +217,12 @@ function InicioPage() {
       return Math.min(porCotizacion, diasDesdeISO(contacto.fecha));
     };
 
-    const enProceso = cots.filter((c) => c.estado === "cotizado" || c.estado === "enviado");
+    // Una cotización con revisión más nueva ya no es un pendiente: el
+    // seguimiento vive en la R+1. Sin este filtro, ambas pedirían acción.
+    const reemplazadas = idsSustituidas(cots);
+    const enProceso = cots.filter(
+      (c) => (c.estado === "cotizado" || c.estado === "enviado") && !reemplazadas.has(c.id),
+    );
     const porId = new Map(cots.map((c) => [c.id, c]));
 
     // ── Tramo 1 · Compromisos. Van primero SIEMPRE: no lo dedujo el sistema,
