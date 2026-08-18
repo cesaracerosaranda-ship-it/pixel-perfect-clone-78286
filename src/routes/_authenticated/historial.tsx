@@ -37,10 +37,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Copy, Trash2, Search, Truck, History, Pencil, Minus, Plus, MessageCircle, Mail } from "lucide-react";
+import { Copy, Trash2, Search, Truck, History, Pencil, Minus, Plus, MessageCircle, Mail, Eye, Loader2, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { formatMoney, IVA_RATE, PRODUCTOS } from "@/lib/vialux/constants";
+import { formatMoney, IVA_RATE, PRODUCTOS, VIGENCIA_DIAS } from "@/lib/vialux/constants";
 import type { ProductoKey } from "@/lib/vialux/constants";
 import { generateFolio } from "@/lib/vialux/quote-actions";
 import type { Tables } from "@/integrations/supabase/types";
@@ -51,7 +51,8 @@ import { LayoutGrid, Rows3 } from "lucide-react";
 import { BandaCargando, BandaError, textoError } from "@/components/EstadoConsulta";
 import { upsertCliente } from "@/lib/vialux/clientes";
 import {
-  resumenDeFila, descargarPdfDeFila, correoDeFila, emailDeFila, idsSustituidas, folioSucesor,
+  resumenDeFila, descargarPdfDeFila, correoDeFila, emailDeFila, idsSustituidas,
+  folioSucesor, ligaPdfDeFila,
 } from "@/lib/vialux/reenviar";
 import {
   MotivoPerdidaModal,
@@ -77,6 +78,127 @@ const ESTADO_CLASS: Record<Estado, string> = {
   enviado: "bg-[#E5E2DC] text-[#1B1A17]",
   perdido: "bg-[#DC2626] text-white",
 };
+
+
+// ─── Ver cotización (preview + PDF enviado) ──────────────────────────────────
+
+/**
+ * El caso real: el cliente llama preguntando si su tarifa sigue vigente y hay
+ * que poder contestarle viendo EL DOCUMENTO, no recordándolo. Las ligas que se
+ * mandaron caducan (son firmadas), así que aquí se muestra el detalle guardado
+ * al instante y se firma una liga FRESCA al PDF archivado — regenerándolo si
+ * la fila es de antes del archivado automático.
+ */
+function VerCotizacionModal({
+  row, open, onOpenChange,
+}: {
+  row: CotizacionRow;
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+}) {
+  const [pdf, setPdf] = useState<{ estado: "cargando" | "listo" | "error"; url?: string; error?: string }>({ estado: "cargando" });
+
+  useEffect(() => {
+    if (!open) return;
+    setPdf({ estado: "cargando" });
+    void ligaPdfDeFila(row).then(({ url, error }) => {
+      if (url) setPdf({ estado: "listo", url });
+      else setPdf({ estado: "error", error: error ?? "No se pudo obtener el PDF" });
+    });
+  }, [open, row]);
+
+  const dias = Math.max(0, Math.floor((Date.now() - new Date(row.fecha).getTime()) / 86_400_000));
+  const vigente = dias <= VIGENCIA_DIAS;
+
+  const L = ({ children }: { children: React.ReactNode }) => (
+    <div className="font-mono text-[10px] uppercase tracking-[0.2em] text-[#8A6508]">{children}</div>
+  );
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-lg">
+        <DialogHeader>
+          <DialogTitle className="flex flex-wrap items-center gap-2 uppercase tracking-wider">
+            {row.folio}
+            <span className={`px-2 py-0.5 font-mono text-[10px] font-bold tracking-wider ${vigente ? "bg-[#EDBA1A] text-[#1B1A17]" : "bg-[#DC2626] text-white"}`}>
+              {vigente
+                ? `VIGENTE · QUEDAN ${VIGENCIA_DIAS - dias} DÍAS`
+                : `VENCIÓ HACE ${dias - VIGENCIA_DIAS} DÍAS`}
+            </span>
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-3 py-1 text-[13px]">
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <L>Cliente</L>
+              <div className="font-bold uppercase">{row.cliente_nombre}</div>
+              {row.cliente_empresa && row.cliente_empresa !== "-" && (
+                <div className="text-[12px] text-muted-foreground">{row.cliente_empresa}</div>
+              )}
+            </div>
+            <div>
+              <L>Fecha</L>
+              <div className="font-mono">{new Date(row.fecha).toLocaleDateString("es-MX")}</div>
+            </div>
+          </div>
+
+          <div>
+            <L>Producto</L>
+            <div className="text-[12px] leading-snug">{row.descripcion_producto}</div>
+          </div>
+
+          <div className="border border-border">
+            {[
+              ["CANTIDAD", `${row.cantidad.toLocaleString("es-MX")} PZS`],
+              ["PRECIO / PZA", formatMoney(Number(row.precio_unitario))],
+              ["SUBTOTAL PRODUCTO", formatMoney(Number(row.subtotal_producto))],
+              ...(row.incluye_flete
+                ? [[`FLETE · ${row.flete_paqueteria || "PAQUETERÍA"}`, formatMoney(Number(row.flete_costo ?? 0))]]
+                : []),
+              [row.requiere_factura ? "IVA 16%" : "SIN FACTURA", formatMoney(Number(row.iva ?? 0))],
+            ].map(([l, v]) => (
+              <div key={l as string} className="flex justify-between border-b border-[#EFEDE8] px-3 py-1.5 last:border-0">
+                <span className="font-mono text-[11px] tracking-[0.08em] text-[#57524A]">{l}</span>
+                <span className="font-mono font-bold tabular-nums">{v}</span>
+              </div>
+            ))}
+            <div className="flex justify-between bg-[#1B1A17] px-3 py-2">
+              <span className="font-mono text-[11px] tracking-[0.14em] text-[#A8A29A]">TOTAL</span>
+              <span className="font-mono text-[15px] font-extrabold tabular-nums text-[#EDBA1A]">
+                {formatMoney(Number(row.total))}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between gap-3 border border-border bg-[#F1EFEA] px-3 py-2.5">
+            <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-[#57524A]">
+              El documento tal como se envió
+            </span>
+            {pdf.estado === "cargando" && (
+              <span className="flex items-center gap-2 font-mono text-[11px] text-[#57524A]">
+                <Loader2 className="h-3.5 w-3.5 animate-spin" /> Preparando PDF…
+              </span>
+            )}
+            {pdf.estado === "listo" && (
+              <a
+                href={pdf.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 border border-[#8A6508] bg-[#EDBA1A] px-2.5 py-1.5 font-mono text-[11px] font-bold uppercase tracking-[0.1em] text-[#1B1A17] hover:opacity-90"
+              >
+                <ExternalLink className="h-3.5 w-3.5" /> Abrir PDF
+              </a>
+            )}
+            {pdf.estado === "error" && (
+              <span className="text-[11px] text-[#DC2626]">{pdf.error}</span>
+            )}
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
 
 // ─── Agregar Flete Modal (Escenario C) ───────────────────────────────────────
 
@@ -890,6 +1012,8 @@ function HistorialPage() {
 
   /** Fila que está reenviando ahora — deshabilita sus botones mientras tanto. */
   const [reenviando, setReenviando] = useState<string | null>(null);
+  /** Fila abierta en el visor de cotización (detalle + PDF enviado). */
+  const [verRow, setVerRow] = useState<CotizacionRow | null>(null);
 
   const reenviarWhatsApp = async (r: CotizacionRow) => {
     setReenviando(r.id);
@@ -1272,6 +1396,15 @@ function HistorialPage() {
                         </td>
                         <td className="px-4 py-3 text-right">
                           <div className="flex justify-end gap-1">
+                            <Button
+                              size="icon"
+                              variant="ghost"
+                              onClick={() => setVerRow(r)}
+                              aria-label="Ver la cotización y su PDF"
+                              title="Ver cotización (detalle + PDF enviado)"
+                            >
+                              <Eye className="h-4 w-4 text-[#57524A]" />
+                            </Button>
                             {canAddFlete && (
                               <Button
                                 size="icon"
@@ -1361,6 +1494,14 @@ function HistorialPage() {
           open={!!fleteRow}
           onOpenChange={(v) => { if (!v) setFleteRow(null); }}
           onDone={invalidate}
+        />
+      )}
+
+      {verRow && (
+        <VerCotizacionModal
+          row={verRow}
+          open={!!verRow}
+          onOpenChange={(v) => { if (!v) setVerRow(null); }}
         />
       )}
 
