@@ -1405,7 +1405,7 @@ function HistorialPage() {
                             >
                               <Eye className="h-4 w-4 text-[#57524A]" />
                             </Button>
-                            {canAddFlete && (
+                            {canAddFlete ? (
                               <Button
                                 size="icon"
                                 variant="ghost"
@@ -1415,6 +1415,11 @@ function HistorialPage() {
                               >
                                 <Truck className="h-4 w-4 text-[#57524A]" />
                               </Button>
+                            ) : (
+                              /* Hueco del mismo ancho que el botón (h-11 w-11):
+                                 sin él, las filas sin camión recorren todos los
+                                 iconos y las columnas dejan de alinearse. */
+                              <span aria-hidden="true" className="h-11 w-11 shrink-0" />
                             )}
                             <Button
                               size="icon"
