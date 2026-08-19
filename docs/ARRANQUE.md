@@ -148,9 +148,22 @@ transferencias, cotizaciones enviadas y aprobadas, guías". Las guías ya viven 
    volumen actual: con ~5 ventas/semana la muestra no dice nada y quema contacto.
    Un mensaje a los pocos días de entregado sí.
 3. **WhatsApp fase pesada** — coexistencia del número real + captura de
-   `referral`/`ctwa_clid` + backfill del historial. **Después del 15/ago**, en
-   sesión dedicada, con `whatsapp-runbook.md` a la mano. El token de prueba caduca
-   cada 24 h: dar por hecho que hay que renovarlo antes de probar nada.
+   `referral`/`ctwa_clid` + backfill del historial. En sesión dedicada, con
+   `whatsapp-runbook.md` a la mano.
+
+   **Estado verificado el 19/ago — subió de prioridad:**
+   - **No hay WABA.** `META_WABA_ID` y `META_PHONE_NUMBER_ID` siguen en
+     placeholder, y el `META_ACCESS_TOKEN` del `.env` del Analyzer **expiró el
+     13/abr/2026**. El WhatsApp de VIALUX es la app del teléfono, no Cloud API.
+   - **Green API lleva sin sincronizar desde el 7/ago** (dice `authorized` y no
+     recibe nada — su cuarto fallo mudo). O sea que **no hay NINGUNA captura
+     activa**: los leads que genera la campaña existen solo en el teléfono de
+     César. Es fuga activa, no deuda futura.
+   - Un formulario de tercero (HeyClicky/Composio, 19/ago) pidió el WABA ID.
+     **Se parkeó**: no aporta —César contesta desde WhatsApp Web y Cloud API no
+     da historial— y registrar el número de negocio desde un onboarding ajeno
+     arriesga el único canal de ventas. Si se prueba un tercero, con número de
+     prueba de Meta, nunca con la línea real.
 4. **Migrar los ~431 hex hardcodeados a variables CSS** — deuda técnica, no urge.
 
 ---
