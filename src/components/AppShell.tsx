@@ -6,10 +6,19 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import { LogOut } from "lucide-react";
 
+/**
+ * Pestañas visibles.
+ *
+ * Cobranza queda fuera del menú, no borrada: VIALUX no vende a crédito, así que
+ * el módulo no está sin uso — está sin CASO. Una sección permanentemente vacía
+ * enseña a ignorarla, y el día que sí haya crédito ya nadie la voltea a ver.
+ * La ruta /cobranza sigue viva y funcional para quien la escriba a mano;
+ * devolverla al menú es descomentar una línea.
+ */
 const tabs = [
   { to: "/inicio", label: "Inicio" },
   { to: "/", label: "Cotizador" },
-  { to: "/cobranza", label: "Cobranza" },
+  // { to: "/cobranza", label: "Cobranza" },  ← revivir cuando se venda a crédito
   { to: "/historial", label: "Ventas" },
   { to: "/clientes", label: "Clientes" },
   { to: "/whatsapp", label: "WhatsApp" },
