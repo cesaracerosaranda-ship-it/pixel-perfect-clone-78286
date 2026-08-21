@@ -385,6 +385,50 @@ export type Database = {
         }
         Relationships: []
       }
+      movimientos_inventario: {
+        Row: {
+          boyas_despues: number
+          clavos_despues: number
+          cotizacion_id: string | null
+          created_at: string
+          delta_boyas: number
+          delta_clavos: number
+          fecha: string
+          id: string
+          origen: string
+        }
+        Insert: {
+          boyas_despues: number
+          clavos_despues: number
+          cotizacion_id?: string | null
+          created_at?: string
+          delta_boyas?: number
+          delta_clavos?: number
+          fecha?: string
+          id?: string
+          origen: string
+        }
+        Update: {
+          boyas_despues?: number
+          clavos_despues?: number
+          cotizacion_id?: string | null
+          created_at?: string
+          delta_boyas?: number
+          delta_clavos?: number
+          fecha?: string
+          id?: string
+          origen?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "movimientos_inventario_cotizacion_id_fkey"
+            columns: ["cotizacion_id"]
+            isOneToOne: false
+            referencedRelation: "cotizaciones"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pagos: {
         Row: {
           cotizacion_id: string
