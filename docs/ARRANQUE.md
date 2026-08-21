@@ -175,22 +175,32 @@ transferencias, cotizaciones enviadas y aprobadas, guías". Las guías ya viven 
 - Estructura de portafolios: renombrar "Celosias" a la razón social de la CSF,
   sacar Lattice Works a su propio portafolio, despublicar CRG Safety. Requisito
   previo a la Business Verification.
-- **Conector MCP de Meta Ads — VERIFICADO que existe** (21/ago). Ya no es
-  hipótesis: `https://mcp.facebook.com/ads` responde 401 con cabecera
-  `www-authenticate: Bearer resource_metadata=…`, y
-  `/.well-known/oauth-protected-resource/ads` devuelve el metadata OAuth. Es un
-  servidor MCP real de Meta. Falta lo único que no se puede probar desde fuera:
-  si la cuenta de César tiene el permiso `ads_mcp_management`.
+- ✅ **Conector MCP de Meta Ads — CONECTADO** (21/ago). `mcp.facebook.com/ads`
+  es un servidor MCP real de Meta con OAuth. Registrado a **alcance de usuario**
+  (`claude mcp add --scope user --transport http meta-ads …`), disponible desde
+  cualquier carpeta.
 
-  **Scopes que pide:** `ads_management`, `ads_read`, `catalog_management`,
-  `business_management`, `pages_show_list`, `instagram_basic`,
-  `ads_mcp_management`.
+  **Trampa que ya costó un intento:** agregarlo sin `--scope user` lo deja atado
+  a la carpeta donde se corrió el comando (sale `[project: /Users/cesararanda]`
+  en la salida). Desde `~/vialux-control` no aparecería y parecería que el
+  conector no sirve. Y `/mcp` es un comando DENTRO de Claude, no de la terminal.
+
+  **Permisos otorgados, a propósito mínimos:** Página `Vialux Monterrey`
+  únicamente (fuera CRG Safety, Lattice Works MX, Timeless) y portafolio
+  `Celosias` únicamente (fuera Aceros Aranda y Cesar Robles). Se eligió
+  "current only" y no "all current and future": la opción por defecto concede
+  acceso a activos que todavía no existen.
 
   ⚠️ **`ads_management` es ESCRITURA**: con ese token se pueden editar campañas,
-  cambiar presupuestos y pausar anuncios, no solo leer métricas. Conectarlo está
-  bien, pero ninguna acción que toque una campaña o el gasto se ejecuta sin que
-  César lo apruebe explícitamente en el momento.
+  mover presupuestos y pausar anuncios. Ninguna acción que toque una campaña o
+  el gasto se ejecuta sin aprobación explícita de César en el momento.
 
+  ⚠️ **Sube de prioridad la limpieza de portafolios** (renombrar Celosias a la
+  razón social, sacar Lattice Works, despublicar CRG Safety): mientras Celosias
+  sea un cajón mixto, `business_management` sobre él arrastra lo demás.
+
+  **Las herramientas solo cargan al arrancar la sesión.** Si no aparecen, es que
+  la sesión es anterior a la conexión — reiniciar Claude.
 ---
 
 ## G · Números de referencia (baseline real, 4/ago)
