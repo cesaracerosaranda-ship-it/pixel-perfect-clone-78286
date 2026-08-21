@@ -45,6 +45,7 @@ import type { ProductoKey } from "@/lib/vialux/constants";
 import { generateFolio } from "@/lib/vialux/quote-actions";
 import type { Tables } from "@/integrations/supabase/types";
 import { RailSection, PageTitle } from "@/components/RailSection";
+import { CorteInventario } from "@/components/CorteInventario";
 import { TableroEmbudo } from "@/components/TableroEmbudo";
 import { TelefonoCliente } from "@/components/TelefonoCliente";
 import { LayoutGrid, Rows3 } from "lucide-react";
@@ -867,7 +868,10 @@ function HistorialPage() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "inventario" },
-        () => qc.invalidateQueries({ queryKey: ["inventario"] }),
+        () => {
+          qc.invalidateQueries({ queryKey: ["inventario"] });
+          qc.invalidateQueries({ queryKey: ["movimientos-inventario"] });
+        },
       )
       .subscribe();
     return () => {
@@ -1493,6 +1497,21 @@ function HistorialPage() {
           </div>
         </RailSection>
         )}
+
+        {/* 02 CORTE — la comprobación contra la bodega, no el dato del día */}
+        <RailSection
+          num="02"
+          label="CORTE"
+          titulo="Corte de inventario"
+          descripcion="Qué salió y qué se corrigió desde el último conteo físico. Sirve para revisar cuando el contador y la bodega no coinciden."
+          padded={false}
+          last
+        >
+          <CorteInventario
+            boyasHoy={inventarioQuery.data?.boyas_disponibles ?? 0}
+            clavosHoy={clavosDisponibles}
+          />
+        </RailSection>
       </div>
 
       {vista === "tablero" && (
@@ -1540,7 +1559,10 @@ function HistorialPage() {
         boyasActual={inventarioQuery.data?.boyas_disponibles ?? 0}
         clavosActual={clavosDisponibles}
         clavosSupported={clavosSupported}
-        onDone={() => qc.invalidateQueries({ queryKey: ["inventario"] })}
+        onDone={() => {
+          qc.invalidateQueries({ queryKey: ["inventario"] });
+          qc.invalidateQueries({ queryKey: ["movimientos-inventario"] });
+        }}
       />
     </div>
   );
