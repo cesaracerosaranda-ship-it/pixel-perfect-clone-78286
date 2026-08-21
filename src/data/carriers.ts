@@ -42,7 +42,7 @@ export const CARRIERS: Carrier[] = [
   {
     name: "JR Paquetería",
     states: ["SON", "SIN", "CHIH", "BCS", "BCN"],
-    webUrl: "https://www.jrpaqueteria.com/",
+    webUrl: "https://cotizador.jrpaqueteria.mx/cotizador/",
     nota: "Noroeste",
   },
   {
@@ -58,7 +58,10 @@ export const CARRIERS: Carrier[] = [
   {
     name: "Flecha Amarilla",
     states: ["CDMX", "MEX", "GTO", "QRO", "SLP", "MICH", "JAL", "AGS", "HGO"],
-    webUrl: "https://www.flechaamarilla.com.mx/",
+    // Dominio distinto a propósito: flechaamarilla.com.mx es la línea de
+    // autobuses. La paquetería es otro negocio y vive aquí; el cotizador está
+    // en la misma página de inicio, el menú "Cotización" solo hace scroll.
+    webUrl: "https://www.paqueteria-flechaamarilla.com.mx/#/inicio",
     nota: "Poco confiable",
   },
   {
