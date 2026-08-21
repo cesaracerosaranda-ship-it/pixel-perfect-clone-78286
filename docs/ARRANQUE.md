@@ -201,6 +201,22 @@ transferencias, cotizaciones enviadas y aprobadas, guías". Las guías ya viven 
 
   **Las herramientas solo cargan al arrancar la sesión.** Si no aparecen, es que
   la sesión es anterior a la conexión — reiniciar Claude.
+
+  📅 **El token vence el 20/oct/2026 y NO trae refresh token**: no se renueva
+  solo. Ese día las herramientas dejan de responder y hay que repetir `/mcp`
+  desde una sesión interactiva.
+
+  **Cómo saber si de verdad quedó autenticado**, porque la pantalla de Meta
+  miente: la primera vez dijo "Claude has been connected to ads MCP server" y el
+  `accessToken` estaba VACÍO — se registró el cliente pero nunca se canjeó el
+  código. El callback llega a un puerto local que solo vive mientras la sesión de
+  `claude` que lanzó `/mcp` sigue abierta; si se cierra antes, el flujo muere en
+  silencio. La prueba real:
+
+  ```bash
+  security find-generic-password -s "Claude Code-credentials" -w \
+    | python3 -c "import sys,json;d=json.load(sys.stdin);print([ (v.get('serverName'), bool(v.get('accessToken'))) for v in (d.get('mcpOAuth') or {}).values() ])"
+  ```
 ---
 
 ## G · Números de referencia (baseline real, 4/ago)
