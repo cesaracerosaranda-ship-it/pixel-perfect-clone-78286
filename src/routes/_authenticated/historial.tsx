@@ -774,7 +774,7 @@ function ActualizarInventarioModal({
             />
             {clavosSupported && (
               <StepperInput
-                label="Clavos disponibles"
+                label="Clavos disponibles (piezas)"
                 value={clavos}
                 onChange={(v) => { setTocado(true); setClavos(v); }}
                 paso={200}
@@ -782,9 +782,10 @@ function ActualizarInventarioModal({
             )}
           </div>
           <p className="font-mono text-[12px] leading-relaxed text-[#6B665C]">
-            AL CERRAR UNA VENTA SE DESCUENTAN LAS BOYAS Y, SI LA CONFIGURACIÓN
-            LLEVA CLAVOS, UN JUEGO DE CLAVOS POR BOYA. LOS CLAVOS PUEDEN QUEDAR
-            EN NEGATIVO (JUEGOS COMPROMETIDOS POR LLEGAR). USA ESTO PARA
+            LOS CLAVOS SE CUENTAN POR PIEZA SUELTA, NO POR JUEGO: CADA BOYA CON
+            CLAVOS DESCUENTA 4. AL CERRAR UNA VENTA SE DESCUENTAN LAS BOYAS Y, SI
+            LA CONFIGURACIÓN LLEVA CLAVOS, 4 PIEZAS POR BOYA. LOS CLAVOS PUEDEN
+            QUEDAR EN NEGATIVO (PIEZAS COMPROMETIDAS POR LLEGAR). USA ESTO PARA
             REABASTECIMIENTOS O CORRECCIONES DE CONTEO.
           </p>
         </div>
@@ -1150,7 +1151,14 @@ function HistorialPage() {
                   <div className="font-mono text-[22px] font-extrabold leading-none text-[#8A6508] tabular-nums">
                     {clavosSupported ? clavosDisponibles.toLocaleString("es-MX") : "—"}
                   </div>
-                  <div className="mt-0.5 font-mono text-[10px] tracking-[0.08em] text-[#6B665C]">CLAVOS</div>
+                  <div className="mt-0.5 font-mono text-[10px] tracking-[0.08em] text-[#6B665C]">
+                    CLAVOS{" "}
+                    {clavosSupported && clavosDisponibles > 0 && (
+                      <span className="text-[#8A6508]">
+                        · {Math.floor(clavosDisponibles / 4).toLocaleString("es-MX")} BOYAS
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

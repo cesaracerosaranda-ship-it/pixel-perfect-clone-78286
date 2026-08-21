@@ -46,7 +46,7 @@ export function InventarioBadge() {
 
   return (
     <div
-      title={`Inventario: ${fmt(boyas)} boyas · ${fmt(clavos)} clavos`}
+      title={`Inventario: ${fmt(boyas)} boyas · ${fmt(clavos)} clavos (piezas, 4 por boya)`}
       className={`flex items-center gap-2.5 border px-3 py-1.5 ${
         isLow ? "border-red-500/40 bg-red-500/10" : "border-[#EDBA1A]/25 bg-[#EDBA1A]/10"
       }`}
