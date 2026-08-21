@@ -175,9 +175,21 @@ transferencias, cotizaciones enviadas y aprobadas, guías". Las guías ya viven 
 - Estructura de portafolios: renombrar "Celosias" a la razón social de la CSF,
   sacar Lattice Works a su propio portafolio, despublicar CRG Safety. Requisito
   previo a la Business Verification.
-- **Conector MCP de Meta Ads** (`mcp.facebook.com/ads`) — **sin verificar**, ~40%
-  de las cuentas no tienen el permiso. Si existe, sustituye los exports manuales.
-  Es mejora de flujo, no requisito.
+- **Conector MCP de Meta Ads — VERIFICADO que existe** (21/ago). Ya no es
+  hipótesis: `https://mcp.facebook.com/ads` responde 401 con cabecera
+  `www-authenticate: Bearer resource_metadata=…`, y
+  `/.well-known/oauth-protected-resource/ads` devuelve el metadata OAuth. Es un
+  servidor MCP real de Meta. Falta lo único que no se puede probar desde fuera:
+  si la cuenta de César tiene el permiso `ads_mcp_management`.
+
+  **Scopes que pide:** `ads_management`, `ads_read`, `catalog_management`,
+  `business_management`, `pages_show_list`, `instagram_basic`,
+  `ads_mcp_management`.
+
+  ⚠️ **`ads_management` es ESCRITURA**: con ese token se pueden editar campañas,
+  cambiar presupuestos y pausar anuncios, no solo leer métricas. Conectarlo está
+  bien, pero ninguna acción que toque una campaña o el gasto se ejecuta sin que
+  César lo apruebe explícitamente en el momento.
 
 ---
 
