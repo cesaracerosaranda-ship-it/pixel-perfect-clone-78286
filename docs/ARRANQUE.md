@@ -1,6 +1,6 @@
 # ARRANQUE — Punto exacto para retomar
 
-Última actualización: **5/ago/2026**. Este documento es el único que hay que leer
+Última actualización: **21/ago/2026**. Este documento es el único que hay que leer
 para continuar. Los detalles viven en `plan-marketing-inhouse.md`,
 `adopcion-corteclaro.md` y `whatsapp-runbook.md`.
 
@@ -201,6 +201,14 @@ transferencias, cotizaciones enviadas y aprobadas, guías". Las guías ya viven 
 
   **Las herramientas solo cargan al arrancar la sesión.** Si no aparecen, es que
   la sesión es anterior a la conexión — reiniciar Claude.
+
+  ✅ **Verificado el 21/ago: el servidor entrega 98 herramientas** con este token
+  (`ads_get_ad_entities`, `ads_insights_performance_trend`, `ads_library_search`,
+  `ads_insights_industry_benchmark`…). Si una sesión muestra `✓ Connected` con
+  CERO herramientas, el problema NO es Meta ni el permiso: es que la sesión
+  arrancó antes de que existiera el token y el catálogo MCP se pide una sola vez
+  al inicio. `Connected` es solo el health check. No se arregla mandando otro
+  mensaje — hay que abrir una sesión nueva.
 
   📅 **El token vence el 20/oct/2026 y NO trae refresh token**: no se renueva
   solo. Ese día las herramientas dejan de responder y hay que repetir `/mcp`
