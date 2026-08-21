@@ -1,7 +1,13 @@
 import { ExternalLink, Loader2, Truck } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { carriersForCp, cpToEstado, STATE_COORDS, STATE_NAMES } from "@/data/carriers";
+import {
+  carriersForCp,
+  cpToEstado,
+  STATE_COORDS,
+  STATE_NAMES,
+  webUrlForCarrier,
+} from "@/data/carriers";
 import type { Tables } from "@/integrations/supabase/types";
 
 type CoverageRow = Tables<"carrier_coverage">;
@@ -27,19 +33,6 @@ function resolveClientCoords(
 ): [number, number] {
   if (clientLat != null && clientLng != null) return [clientLat, clientLng];
   return STATE_COORDS[estado] ?? [23.6345, -102.5528];
-}
-
-function webUrlForCarrier(name: string): string | null {
-  const n = name.toLowerCase();
-  if (n.includes("julian") || n.includes("obregon") || n.includes("obregón")) {
-    return "https://www.juliandeobregon.com.mx/";
-  }
-  if (n.includes("tres guerras")) return "https://www.tresguerras.com.mx/";
-  if (n.startsWith("jr ") || n === "jr paquetería" || n === "jr paqueteria") {
-    return "https://www.jrpaqueteria.com/";
-  }
-  if (n.includes("flecha amarilla")) return "https://www.flechaamarilla.com.mx/";
-  return null;
 }
 
 type CarrierEntry = {

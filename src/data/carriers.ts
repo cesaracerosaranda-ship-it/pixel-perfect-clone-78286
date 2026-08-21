@@ -1,6 +1,13 @@
 export type Carrier = {
   name: string;
   states: string[] | "NACIONAL";
+  /**
+   * Liga directa al COTIZADOR de la paquetería, no a su portada.
+   *
+   * El botón se usa en un solo momento —hay un CP en pantalla y hace falta el
+   * costo del flete ya— así que mandar a la home obligaba a buscar el cotizador
+   * dentro del sitio de cada quien, que es distinto en las tres.
+   */
   webUrl?: string;
   nota?: string;
 };
@@ -23,13 +30,13 @@ export const CARRIERS: Carrier[] = [
   {
     name: "Julián Obregón",
     states: "NACIONAL",
-    webUrl: "https://www.juliandeobregon.com.mx/",
+    webUrl: "https://www.juliandeobregon.com.mx/cotizador",
     nota: "Nacional",
   },
   {
     name: "Tres Guerras",
     states: "NACIONAL",
-    webUrl: "https://www.tresguerras.com.mx/",
+    webUrl: "https://www.tresguerras.com.mx/3G/cotizadorcp.php",
     nota: "Tarifa más alta",
   },
   {
@@ -41,6 +48,7 @@ export const CARRIERS: Carrier[] = [
   {
     name: "Castores",
     states: "NACIONAL",
+    webUrl: "https://www.castores.com.mx/cotizar-envio.html",
   },
   {
     name: "Central de Fletes",
@@ -188,6 +196,30 @@ export const STATE_COORDS: Record<string, [number, number]> = {
   YUC: [20.9674, -89.5926],
   ZAC: [22.7709, -102.5832],
 };
+
+/**
+ * Liga al cotizador de una paquetería a partir de su nombre.
+ *
+ * Se busca por nombre y no por id porque las filas de `carrier_coverage` traen
+ * el nombre escrito a mano y no siempre coincide letra por letra con CARRIERS
+ * ("JR Paquetería" / "JR PAQUETERIA", "Julián Obregón" sin acento).
+ */
+const plano = (t: string) =>
+  (t ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").trim();
+
+export function webUrlForCarrier(name: string): string | null {
+  const n = plano(name);
+  if (!n) return null;
+  // Exacto primero. La contención solo con nombres largos: uno genérico como
+  // "Transportes" calzaría con la primera transportista de la lista y mandaría
+  // al cotizador equivocado, que es peor que no mostrar botón.
+  const exacto = CARRIERS.find((c) => plano(c.name) === n);
+  const parcial = CARRIERS.find((c) => {
+    const cn = plano(c.name);
+    return cn.length >= 6 && (n.includes(cn) || cn.includes(n));
+  });
+  return (exacto ?? parcial)?.webUrl ?? null;
+}
 
 export function carriersForCp(cp: string): Carrier[] {
   const estado = cpToEstado(cp);
